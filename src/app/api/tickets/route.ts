@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { title, description, type, priority, department } = await request.json();
+  const { title, description, type, priority, department, target_repo } = await request.json();
 
   if (!title) {
     return NextResponse.json({ error: "Title required" }, { status: 400 });
@@ -48,6 +48,7 @@ export async function POST(request: NextRequest) {
       type: type || "bug",
       priority: priority || "medium",
       department: department || null,
+      target_repo: target_repo || null,
       created_by: user.id,
     })
     .select()

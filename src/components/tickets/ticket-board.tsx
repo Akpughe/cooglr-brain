@@ -62,6 +62,8 @@ export function TicketBoard() {
   const [type, setType] = useState("bug");
   const [priority, setPriority] = useState("medium");
   const [creating, setCreating] = useState(false);
+  const [repos, setRepos] = useState<{full_name: string; owner: {login: string}; name: string}[]>([]);
+  const [targetRepo, setTargetRepo] = useState("");
 
   const loadTickets = useCallback(async () => {
     const url = filter === "all" ? "/api/tickets" : `/api/tickets?status=${encodeURIComponent(filter)}`;
@@ -70,7 +72,10 @@ export function TicketBoard() {
     setLoading(false);
   }, [filter]);
 
-  useEffect(() => { loadTickets(); }, [loadTickets]);
+  useEffect(() => {
+    loadTickets();
+    fetch("/api/github/repos").then(r => r.ok ? r.json() : []).then(setRepos).catch(() => {});
+  }, [loadTickets]);
 
   async function createTicket(e: React.FormEvent) {
     e.preventDefault();
@@ -79,7 +84,7 @@ export function TicketBoard() {
     const res = await fetch("/api/tickets", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, description, type, priority }),
+      body: JSON.stringify({ title, description, type, priority, target_repo: targetRepo && targetRepo !== "none" ? targetRepo : null }),
     });
 
     if (res.ok) {
@@ -165,6 +170,17 @@ export function TicketBoard() {
                     </SelectContent>
                   </Select>
                 </div>
+                <Select value={targetRepo} onValueChange={(v) => v && setTargetRepo(v)}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Target Repository (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No specific repo</SelectItem>
+                    {repos.map((r) => (
+                      <SelectItem key={r.full_name} value={r.full_name}>{r.full_name}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Button type="submit" className="w-full" disabled={creating}>
                   {creating ? "Creating..." : "Create Ticket"}
                 </Button>
