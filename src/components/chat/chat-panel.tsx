@@ -24,7 +24,7 @@ export function ChatPanel() {
           {connected ? "Connected" : "Disconnected"}
         </Badge>
       </div>
-      <MessageList messages={messages} historyLoaded={historyLoaded} />
+      <MessageList messages={messages} historyLoaded={historyLoaded} streaming={streaming} />
       <MessageInput onSend={sendMessage} disabled={streaming} />
     </div>
   );

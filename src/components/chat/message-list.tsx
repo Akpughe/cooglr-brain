@@ -5,7 +5,15 @@ import type { ChatMessage } from "@/types/gateway";
 import { MessageBubble } from "./message-bubble";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-export function MessageList({ messages, historyLoaded }: { messages: ChatMessage[]; historyLoaded: boolean }) {
+export function MessageList({
+  messages,
+  historyLoaded,
+  streaming,
+}: {
+  messages: ChatMessage[];
+  historyLoaded: boolean;
+  streaming?: boolean;
+}) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -14,7 +22,7 @@ export function MessageList({ messages, historyLoaded }: { messages: ChatMessage
 
   return (
     <ScrollArea className="flex-1 p-4">
-      <div className="space-y-4">
+      <div className="space-y-4 max-w-4xl mx-auto">
         {!historyLoaded && (
           <div className="text-center text-muted-foreground mt-20">
             <p className="text-sm">Loading chat history...</p>
@@ -27,7 +35,11 @@ export function MessageList({ messages, historyLoaded }: { messages: ChatMessage
           </div>
         )}
         {messages.map((msg, i) => (
-          <MessageBubble key={i} message={msg} />
+          <MessageBubble
+            key={i}
+            message={msg}
+            isStreaming={streaming && i === messages.length - 1 && msg.role === "assistant"}
+          />
         ))}
         <div ref={bottomRef} />
       </div>
