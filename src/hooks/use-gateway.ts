@@ -22,10 +22,11 @@ export function useGateway() {
         const event = JSON.parse(e.data);
 
         if (event.event === "agent") {
-          const { kind, delta, status } = event.payload || {};
+          const { stream, data } = event.payload || {};
 
-          if (kind === "text-delta" && delta) {
-            currentAssistantRef.current += delta;
+          // Assistant text stream — data.text contains full text so far
+          if (stream === "assistant" && data?.text) {
+            currentAssistantRef.current = data.text as string;
             setMessages((prev) => {
               const last = prev[prev.length - 1];
               if (last?.role === "assistant") {
@@ -41,7 +42,8 @@ export function useGateway() {
             });
           }
 
-          if (status === "ok" || status === "error") {
+          // Lifecycle events — end means the run is complete
+          if (stream === "lifecycle" && data?.phase === "end") {
             setStreaming(false);
             currentAssistantRef.current = "";
           }

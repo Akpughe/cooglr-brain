@@ -120,12 +120,20 @@ export class GatewayConnection {
     return () => this.eventHandlers.delete(handler);
   }
 
+  get sessionKey(): string {
+    return this.helloPayload?.snapshot?.sessionDefaults?.mainSessionKey || "agent:main:main";
+  }
+
   async sendChat(message: string): Promise<GatewayResponse> {
-    return this.sendRequest("chat.send", { text: message });
+    return this.sendRequest("chat.send", {
+      sessionKey: this.sessionKey,
+      message,
+      idempotencyKey: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    });
   }
 
   async getChatHistory(): Promise<GatewayResponse> {
-    return this.sendRequest("chat.history", {});
+    return this.sendRequest("chat.history", { sessionKey: this.sessionKey });
   }
 
   disconnect() {
