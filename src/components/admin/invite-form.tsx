@@ -58,7 +58,7 @@ export function InviteForm({ onInvited }: Props) {
           required
         />
       </div>
-      <Select value={role} onValueChange={setRole}>
+      <Select value={role} onValueChange={(v) => v && setRole(v)}>
         <SelectTrigger className="w-[120px]">
           <SelectValue />
         </SelectTrigger>
@@ -67,7 +67,7 @@ export function InviteForm({ onInvited }: Props) {
           <SelectItem value={ROLES.ADMIN}>Admin</SelectItem>
         </SelectContent>
       </Select>
-      <Select value={department} onValueChange={setDepartment}>
+      <Select value={department} onValueChange={(v) => v && setDepartment(v)}>
         <SelectTrigger className="w-[150px]">
           <SelectValue placeholder="Department" />
         </SelectTrigger>

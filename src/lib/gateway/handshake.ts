@@ -21,5 +21,5 @@ export function buildConnectRequest(token: string, challenge: ConnectChallenge) 
     userAgent: "500claw-platform/1.0.0",
   };
 
-  return createRequest("connect", params);
+  return createRequest("connect", params as unknown as Record<string, unknown>);
 }
