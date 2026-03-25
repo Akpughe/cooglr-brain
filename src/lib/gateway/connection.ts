@@ -13,17 +13,43 @@ export class GatewayConnection {
   private pendingRequests = new Map<string, ResponseHandler>();
   private eventHandlers = new Set<MessageHandler>();
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private reconnectAttempts = 0;
   private helloPayload: HelloOk | null = null;
 
   async connect(): Promise<HelloOk> {
     return new Promise((resolve, reject) => {
-      const ws = new WebSocket(GATEWAY.wsUrl);
+      console.log("[gateway] connecting to", GATEWAY.wsUrl);
+      let ws: WebSocket;
+      try {
+        ws = new WebSocket(GATEWAY.wsUrl);
+      } catch (err) {
+        console.error("[gateway] WebSocket constructor failed:", err);
+        reject(err);
+        return;
+      }
       this.ws = ws;
 
       const timeout = setTimeout(() => {
+        console.error("[gateway] connection timed out after 10s");
         ws.close();
         reject(new Error("Gateway connection timeout"));
       }, 10000);
+
+      ws.on("open", () => {
+        console.log("[gateway] WebSocket open, waiting for challenge...");
+      });
+
+      ws.on("error", (err) => {
+        console.error("[gateway] WebSocket error:", err);
+        clearTimeout(timeout);
+        reject(err);
+      });
+
+      ws.on("close", (code, reason) => {
+        console.log("[gateway] WebSocket closed:", code, reason?.toString());
+        this.connected = false;
+        this.scheduleReconnect();
+      });
 
       ws.on("message", (raw) => {
         const frame = parseFrame(raw.toString());
@@ -62,16 +88,6 @@ export class GatewayConnection {
             handler(frame as GatewayEvent);
           }
         }
-      });
-
-      ws.on("error", (err) => {
-        clearTimeout(timeout);
-        reject(err);
-      });
-
-      ws.on("close", () => {
-        this.connected = false;
-        this.scheduleReconnect();
       });
     });
   }
@@ -125,10 +141,15 @@ export class GatewayConnection {
 
   private scheduleReconnect() {
     if (this.reconnectTimer) return;
+    const delay = Math.min(3000 * Math.pow(2, this.reconnectAttempts), 30000);
+    this.reconnectAttempts++;
+    console.log(`[gateway] reconnecting in ${delay / 1000}s (attempt ${this.reconnectAttempts})`);
     this.reconnectTimer = setTimeout(() => {
       this.reconnectTimer = null;
-      this.connect().catch(() => this.scheduleReconnect());
-    }, 3000);
+      this.connect()
+        .then(() => { this.reconnectAttempts = 0; })
+        .catch(() => this.scheduleReconnect());
+    }, delay);
   }
 }
 
