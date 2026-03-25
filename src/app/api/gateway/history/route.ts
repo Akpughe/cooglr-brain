@@ -28,18 +28,36 @@ export async function GET() {
     }> };
 
     // Convert OpenClaw history format to our ChatMessage format
+    // Only show user messages and the final assistant text (strip tool noise)
     const messages = (payload.messages || []).map((msg) => {
       const textParts = (msg.content || [])
         .filter((c) => c.type === "text" && c.text)
-        .map((c) => c.text)
+        .map((c) => {
+          let text = c.text || "";
+          // Extract <final> content if present
+          const finalMatch = text.match(/<final>([\s\S]*?)<\/final>/);
+          if (finalMatch) return finalMatch[1].trim();
+          return text.replace(/<\/?final>/g, "").trim();
+        })
+        .filter((t) => {
+          // Filter out tool noise
+          if (!t) return false;
+          if (t.startsWith("message_id") || t.startsWith("thread_id")) return false;
+          if (t.startsWith("Usage:  gh")) return false;
+          if (t.startsWith("unknown flag")) return false;
+          if (t.match(/^\(Command exited/)) return false;
+          if (t.match(/^Flags:\n/)) return false;
+          if (t.match(/^\d+$/) && t.length < 5) return false;
+          return true;
+        })
         .join("\n");
 
       return {
         role: msg.role as "user" | "assistant",
-        content: textParts || "(no content)",
+        content: textParts,
         timestamp: new Date(msg.timestamp).toISOString(),
       };
-    }).filter((m) => m.content && m.content !== "(no content)");
+    }).filter((m) => m.content.trim().length > 0);
 
     return NextResponse.json(messages);
   } catch {

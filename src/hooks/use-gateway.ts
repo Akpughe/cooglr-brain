@@ -9,7 +9,7 @@ export function useGateway() {
   const [connected, setConnected] = useState(false);
   const [statusText, setStatusText] = useState<string | null>(null);
   const [historyLoaded, setHistoryLoaded] = useState(false);
-  const currentAssistantRef = useRef("");
+  const currentTextRef = useRef("");
   const isStreamingRef = useRef(false);
 
   // Load chat history on mount
@@ -18,7 +18,14 @@ export function useGateway() {
       .then((r) => r.json())
       .then((history: ChatMessage[]) => {
         if (Array.isArray(history) && history.length > 0) {
-          setMessages(history);
+          // Clean up history — strip <final> tags, filter tool noise
+          const cleaned = history
+            .map((m) => ({
+              ...m,
+              content: cleanContent(m.content),
+            }))
+            .filter((m) => m.content.trim().length > 0);
+          setMessages(cleaned);
         }
         setHistoryLoaded(true);
       })
@@ -49,45 +56,61 @@ export function useGateway() {
           setStatusText("Thinking...");
         }
 
-        // Assistant text — stream it into the chat
-        if (stream === "assistant" && data?.text) {
-          const text = data.text as string;
-          currentAssistantRef.current = text;
-          setStatusText(null);
+        // Assistant text stream
+        if (stream === "assistant") {
+          const rawText = (data?.text || "") as string;
+          const delta = (data?.delta || "") as string;
 
-          setMessages((prev) => {
-            // Find if we're already streaming (last message is our streaming bubble)
-            if (isStreamingRef.current && prev.length > 0) {
-              const last = prev[prev.length - 1];
-              if (last.role === "assistant" && !last.timestamp) {
-                return [...prev.slice(0, -1), { role: "assistant" as const, content: text }];
+          // Skip tool output noise — these are internal
+          if (isToolNoise(rawText)) {
+            // Show a status hint about what's happening
+            const hint = extractToolHint(rawText);
+            if (hint) setStatusText(hint);
+            return;
+          }
+
+          // Extract and clean the displayable text
+          const displayText = cleanContent(rawText);
+
+          if (displayText.trim()) {
+            setStatusText(null);
+            currentTextRef.current = displayText;
+
+            setMessages((prev) => {
+              if (isStreamingRef.current && prev.length > 0) {
+                const last = prev[prev.length - 1];
+                if (last.role === "assistant" && !last.timestamp) {
+                  return [...prev.slice(0, -1), { role: "assistant" as const, content: displayText }];
+                }
               }
-            }
-            isStreamingRef.current = true;
-            return [...prev, { role: "assistant" as const, content: text }];
-          });
+              isStreamingRef.current = true;
+              return [...prev, { role: "assistant" as const, content: displayText }];
+            });
+          } else if (delta.trim() && !isToolNoise(delta)) {
+            // Delta without displayable full text yet — show as status
+            const hint = extractToolHint(delta);
+            if (hint) setStatusText(hint);
+          }
         }
 
-        // Tool call events
+        // Tool events
         if (stream === "tool-call" || stream === "tool_use") {
           const toolName = (data?.name || data?.toolName || "processing") as string;
           setStatusText(formatToolName(toolName));
         }
 
-        // Tool result — back to thinking
         if (stream === "tool-result" || stream === "tool_result") {
-          setStatusText("Processing...");
+          setStatusText("Processing results...");
         }
 
-        // Lifecycle end or error
+        // Lifecycle end/error
         if (stream === "lifecycle" && (data?.phase === "end" || data?.phase === "error")) {
           if (data?.phase === "error" && data?.error) {
-            const errorMsg = data.error as string;
-            setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${errorMsg}` }]);
+            setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${data.error}` }]);
           }
           setStreaming(false);
           setStatusText(null);
-          currentAssistantRef.current = "";
+          currentTextRef.current = "";
           isStreamingRef.current = false;
         }
       } catch {
@@ -102,7 +125,7 @@ export function useGateway() {
     setMessages((prev) => [...prev, { role: "user", content: text }]);
     setStreaming(true);
     setStatusText("Thinking...");
-    currentAssistantRef.current = "";
+    currentTextRef.current = "";
     isStreamingRef.current = false;
 
     try {
@@ -126,6 +149,42 @@ export function useGateway() {
   }, []);
 
   return { messages, sendMessage, streaming, connected, statusText, historyLoaded };
+}
+
+/** Strip <final> tags and clean up display text */
+function cleanContent(text: string): string {
+  // Extract content from <final> tags if present
+  const finalMatch = text.match(/<final>([\s\S]*?)<\/final>/);
+  if (finalMatch) return finalMatch[1].trim();
+
+  // Strip any remaining XML-like tags
+  return text.replace(/<\/?final>/g, "").trim();
+}
+
+/** Check if text is internal tool output noise */
+function isToolNoise(text: string): boolean {
+  const noise = [
+    /^(message_id|thread_id|Command exited|unknown flag)/i,
+    /^Usage:\s+gh\s/,
+    /^Flags:/,
+    /^\s*--\w+/,
+    /^\s*-\w,\s+--/,
+    /^\d+$/,  // bare numbers (exit codes)
+    /^\(Command exited/,
+  ];
+  const lines = text.trim().split("\n");
+  // If most lines match noise patterns, it's tool output
+  const noiseLines = lines.filter((line) => noise.some((p) => p.test(line.trim())));
+  return noiseLines.length > lines.length * 0.5 && lines.length > 1;
+}
+
+/** Extract a human-readable hint from tool output */
+function extractToolHint(text: string): string | null {
+  if (text.includes("message_id")) return "Sending email...";
+  if (text.includes("gh api")) return "Checking GitHub...";
+  if (text.includes("calendar")) return "Checking calendar...";
+  if (text.includes("commit")) return "Checking commits...";
+  return null;
 }
 
 function formatToolName(name: string): string {
