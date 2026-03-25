@@ -33,7 +33,7 @@ interface Ticket {
   ai_triage: Record<string, unknown> | null;
   pr_url: string | null;
   created_at: string;
-  created_by_profile: { email: string; full_name: string } | null;
+  created_by: string;
 }
 
 const STATUS_COLORS: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
@@ -205,7 +205,6 @@ export function TicketBoard() {
                     </p>
                   )}
                   <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground">
-                    <span>{ticket.created_by_profile?.full_name || ticket.created_by_profile?.email || "Unknown"}</span>
                     <span>{new Date(ticket.created_at).toLocaleDateString()}</span>
                     {ticket.ai_triage && <Badge variant="outline" className="text-[10px]">AI Triaged</Badge>}
                     {ticket.pr_url && <a href={ticket.pr_url} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline" onClick={(e) => e.stopPropagation()}>PR</a>}

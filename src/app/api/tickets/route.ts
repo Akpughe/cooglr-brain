@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
 
   let query = supabase
     .from("tickets")
-    .select("*, created_by_profile:profiles!tickets_created_by_fkey(email, full_name)")
+    .select("*")
     .order("created_at", { ascending: false });
 
   if (status) {
