@@ -9,10 +9,37 @@ export interface ProcessStep {
   timestamp: number;
 }
 
+/**
+ * Single SSE connection shared across sessions.
+ * Managed outside the hook to persist across session switches.
+ */
+let globalES: EventSource | null = null;
+let globalESListeners = new Set<(event: MessageEvent) => void>();
+let globalConnected = false;
+
+function ensureSSE(onConnect: () => void, onDisconnect: () => void) {
+  if (globalES && globalES.readyState !== EventSource.CLOSED) return;
+
+  globalES = new EventSource("/api/gateway");
+  globalES.onopen = () => {
+    globalConnected = true;
+    onConnect();
+  };
+  globalES.onerror = () => {
+    globalConnected = false;
+    onDisconnect();
+  };
+  globalES.onmessage = (e) => {
+    for (const listener of globalESListeners) {
+      listener(e);
+    }
+  };
+}
+
 export function useGateway(sessionId: string | null) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [streaming, setStreaming] = useState(false);
-  const [connected, setConnected] = useState(false);
+  const [connected, setConnected] = useState(globalConnected);
   const [statusText, setStatusText] = useState<string | null>(null);
   const [processSteps, setProcessSteps] = useState<ProcessStep[]>([]);
   const [historyLoaded, setHistoryLoaded] = useState(false);
@@ -21,7 +48,10 @@ export function useGateway(sessionId: string | null) {
   const isStreamingRef = useRef(false);
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-  const esRef = useRef<EventSource | null>(null);
+  const sessionIdRef = useRef(sessionId);
+
+  // Keep ref in sync
+  sessionIdRef.current = sessionId;
 
   function startTimer() {
     startTimeRef.current = Date.now();
@@ -46,6 +76,7 @@ export function useGateway(sessionId: string | null) {
     setStatusText(null);
     setProcessSteps([]);
     isStreamingRef.current = false;
+    stopTimer();
 
     if (!sessionId) {
       setHistoryLoaded(true);
@@ -66,29 +97,30 @@ export function useGateway(sessionId: string | null) {
       .catch(() => setHistoryLoaded(true));
   }, [sessionId]);
 
-  // SSE connection — reconnects when session changes
+  // Single SSE connection — persists across session switches
   useEffect(() => {
-    if (!sessionId) return;
+    ensureSSE(
+      () => setConnected(true),
+      () => {
+        setConnected(false);
+        setStreaming(false);
+        setStatusText(null);
+        setProcessSteps([]);
+        isStreamingRef.current = false;
+        stopTimer();
+      }
+    );
 
-    const url = `/api/gateway?sessionId=${sessionId}`;
-    const es = new EventSource(url);
-    esRef.current = es;
-
-    es.onopen = () => setConnected(true);
-    es.onerror = () => {
-      setConnected(false);
-      setStreaming(false);
-      setStatusText(null);
-      setProcessSteps([]);
-      isStreamingRef.current = false;
-      stopTimer();
-    };
-
-    es.onmessage = (e) => {
+    const listener = (e: MessageEvent) => {
       try {
         const event = JSON.parse(e.data);
         if (event.event !== "agent") return;
-        const { stream, data } = event.payload || {};
+
+        const { stream, data, sessionKey } = event.payload || {};
+
+        // Only process events for the ACTIVE session
+        const activeId = sessionIdRef.current;
+        if (!activeId || !sessionKey || !sessionKey.endsWith(activeId)) return;
 
         if (stream === "lifecycle" && data?.phase === "start") {
           setStatusText("Thinking...");
@@ -143,11 +175,14 @@ export function useGateway(sessionId: string | null) {
       } catch { /* ignore */ }
     };
 
+    globalESListeners.add(listener);
+
     return () => {
-      es.close();
+      globalESListeners.delete(listener);
       stopTimer();
+      // Don't close the SSE — it persists!
     };
-  }, [sessionId]);
+  }, []); // Empty deps — connects once
 
   const sendMessage = useCallback(async (text: string) => {
     if (!sessionId) return;

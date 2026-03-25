@@ -18,7 +18,6 @@ export async function POST(request: NextRequest) {
   try {
     if (!gateway.isConnected) await gateway.connect();
 
-    // Save the user message to Supabase
     if (sessionId) {
       await supabase.from("chat_messages").insert({
         session_id: sessionId,
@@ -41,14 +40,13 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET /api/gateway — SSE stream filtered to the user's session
-// Also saves assistant responses to Supabase when complete
+// GET /api/gateway — single persistent SSE stream for ALL user sessions
+// Events include sessionKey so the client can filter by active session
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const sessionId = request.nextUrl.searchParams.get("sessionId") || undefined;
   const gateway = getGateway();
 
   if (!gateway.isConnected) {
@@ -60,45 +58,58 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const sessionKey = gateway.userSessionKey(user.id, sessionId);
+  const userPrefix = `agent:main:user-${user.id}`;
   const encoder = new TextEncoder();
 
-  // Track the current assistant response for saving
-  let currentAssistantText = "";
+  // Track assistant text per session key for saving
+  const sessionTexts = new Map<string, string>();
 
   const stream = new ReadableStream({
     start(controller) {
       let closed = false;
 
-      const unsubscribe = gateway.onSessionEvent(sessionKey, (event) => {
+      // Subscribe to ALL gateway events and filter by user prefix
+      const unsubscribe = gateway.onEvent((event) => {
         if (closed) return;
 
         const payload = event.payload as Record<string, unknown>;
+        const sessionKey = payload.sessionKey as string | undefined;
+
+        // Only forward events for this user's sessions
+        if (!sessionKey || !sessionKey.startsWith(userPrefix)) return;
+
         const data = payload.data as Record<string, unknown> | undefined;
 
-        // Track assistant text for saving
+        // Track assistant text per session
         if (payload.stream === "assistant" && data?.text) {
-          currentAssistantText = data.text as string;
+          sessionTexts.set(sessionKey, data.text as string);
         }
 
-        // On lifecycle end, save the assistant response to Supabase
-        if (payload.stream === "lifecycle" && data?.phase === "end" && sessionId && currentAssistantText) {
-          // Clean the content before saving
-          let cleanText = currentAssistantText;
-          const finalMatch = cleanText.match(/<final>([\s\S]*?)<\/final>/);
-          if (finalMatch) cleanText = finalMatch[1].trim();
-          else cleanText = cleanText.replace(/<\/?final>/g, "").trim();
+        // On lifecycle end, save assistant response to Supabase
+        if (payload.stream === "lifecycle" && data?.phase === "end") {
+          const text = sessionTexts.get(sessionKey);
+          if (text) {
+            // Extract chat session ID from the key: agent:main:user-<userId>-<sessionId>
+            const parts = sessionKey.replace(userPrefix + "-", "");
+            const chatSessionId = parts !== sessionKey ? parts : null;
 
-          if (cleanText) {
-            // Fire and forget — don't block the stream
-            supabase.from("chat_messages").insert({
-              session_id: sessionId,
-              user_id: user.id,
-              role: "assistant",
-              content: cleanText,
-            }).then(() => {});
+            if (chatSessionId) {
+              let cleanText = text;
+              const finalMatch = cleanText.match(/<final>([\s\S]*?)<\/final>/);
+              if (finalMatch) cleanText = finalMatch[1].trim();
+              else cleanText = cleanText.replace(/<\/?final>/g, "").trim();
+
+              if (cleanText) {
+                supabase.from("chat_messages").insert({
+                  session_id: chatSessionId,
+                  user_id: user.id,
+                  role: "assistant",
+                  content: cleanText,
+                }).then(() => {});
+              }
+            }
+            sessionTexts.delete(sessionKey);
           }
-          currentAssistantText = "";
         }
 
         controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
