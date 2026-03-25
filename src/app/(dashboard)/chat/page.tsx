@@ -75,9 +75,9 @@ export default function ChatPage() {
   }
 
   return (
-    <div className="flex h-full">
-      {/* Session sidebar */}
-      <div className="w-56 border-r bg-muted/20 flex flex-col">
+    <div className="flex h-full overflow-hidden">
+      {/* Session sidebar — fixed, doesn't scroll with chat */}
+      <div className="w-56 border-r bg-muted/20 flex flex-col shrink-0 h-full">
         <div className="p-3 border-b">
           <Button onClick={createSession} className="w-full" size="sm">
             + New Chat
