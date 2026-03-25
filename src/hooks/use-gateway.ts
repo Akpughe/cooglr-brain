@@ -20,16 +20,20 @@ let globalConnected = false;
 function ensureSSE(onConnect: () => void, onDisconnect: () => void) {
   if (globalES && globalES.readyState !== EventSource.CLOSED) return;
 
+  console.log("[sse-client] creating EventSource");
   globalES = new EventSource("/api/gateway");
   globalES.onopen = () => {
+    console.log("[sse-client] connected, listeners:", globalESListeners.size);
     globalConnected = true;
     onConnect();
   };
-  globalES.onerror = () => {
+  globalES.onerror = (e) => {
+    console.log("[sse-client] error, readyState:", globalES?.readyState);
     globalConnected = false;
     onDisconnect();
   };
   globalES.onmessage = (e) => {
+    console.log("[sse-client] message received, listeners:", globalESListeners.size);
     for (const listener of globalESListeners) {
       listener(e);
     }

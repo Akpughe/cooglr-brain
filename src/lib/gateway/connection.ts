@@ -143,6 +143,10 @@ export class GatewayConnection {
     return () => this.eventHandlers.delete(handler);
   }
 
+  get eventHandlerCount() {
+    return this.eventHandlers.size;
+  }
+
   /** Subscribe to events for a specific session only */
   onSessionEvent(sessionKey: string, handler: MessageHandler) {
     if (!this.sessionHandlers.has(sessionKey)) {
