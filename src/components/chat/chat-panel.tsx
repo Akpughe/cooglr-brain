@@ -6,7 +6,7 @@ import { MessageInput } from "./message-input";
 import { Badge } from "@/components/ui/badge";
 
 export function ChatPanel() {
-  const { messages, sendMessage, streaming, connected } = useGateway();
+  const { messages, sendMessage, streaming, connected, thinking, toolActivity, historyLoaded } = useGateway();
 
   return (
     <div className="flex flex-col h-full">
@@ -16,7 +16,22 @@ export function ChatPanel() {
           {connected ? "Connected" : "Disconnected"}
         </Badge>
       </div>
-      <MessageList messages={messages} />
+      <MessageList messages={messages} historyLoaded={historyLoaded} />
+
+      {/* Thinking / Tool activity indicator */}
+      {(thinking || toolActivity) && (
+        <div className="px-4 py-2 border-t bg-muted/30">
+          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <span className="inline-flex gap-1">
+              <span className="animate-bounce" style={{ animationDelay: "0ms" }}>.</span>
+              <span className="animate-bounce" style={{ animationDelay: "150ms" }}>.</span>
+              <span className="animate-bounce" style={{ animationDelay: "300ms" }}>.</span>
+            </span>
+            <span>{toolActivity || "Thinking..."}</span>
+          </div>
+        </div>
+      )}
+
       <MessageInput onSend={sendMessage} disabled={streaming} />
     </div>
   );

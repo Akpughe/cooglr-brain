@@ -5,7 +5,7 @@ import type { ChatMessage } from "@/types/gateway";
 import { MessageBubble } from "./message-bubble";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-export function MessageList({ messages }: { messages: ChatMessage[] }) {
+export function MessageList({ messages, historyLoaded }: { messages: ChatMessage[]; historyLoaded: boolean }) {
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -15,7 +15,12 @@ export function MessageList({ messages }: { messages: ChatMessage[] }) {
   return (
     <ScrollArea className="flex-1 p-4">
       <div className="space-y-4">
-        {messages.length === 0 && (
+        {!historyLoaded && (
+          <div className="text-center text-muted-foreground mt-20">
+            <p className="text-sm">Loading chat history...</p>
+          </div>
+        )}
+        {historyLoaded && messages.length === 0 && (
           <div className="text-center text-muted-foreground mt-20">
             <p className="text-lg font-medium">500Claw Platform</p>
             <p className="text-sm mt-1">Send a message to get started.</p>

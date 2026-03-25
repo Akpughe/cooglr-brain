@@ -72,9 +72,10 @@ export interface HelloOk {
 }
 
 export interface ChatMessage {
-  role: "user" | "assistant" | "system";
+  role: "user" | "assistant" | "system" | "status";
   content: string;
   timestamp?: string;
+  toolName?: string;
 }
 
 export interface AgentEvent {

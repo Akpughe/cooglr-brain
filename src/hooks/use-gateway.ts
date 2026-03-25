@@ -7,9 +7,26 @@ export function useGateway() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [connected, setConnected] = useState(false);
+  const [thinking, setThinking] = useState(false);
+  const [toolActivity, setToolActivity] = useState<string | null>(null);
+  const [historyLoaded, setHistoryLoaded] = useState(false);
   const eventSourceRef = useRef<EventSource | null>(null);
   const currentAssistantRef = useRef("");
 
+  // Load chat history on mount
+  useEffect(() => {
+    fetch("/api/gateway/history")
+      .then((r) => r.json())
+      .then((history: ChatMessage[]) => {
+        if (Array.isArray(history) && history.length > 0) {
+          setMessages(history);
+        }
+        setHistoryLoaded(true);
+      })
+      .catch(() => setHistoryLoaded(true));
+  }, []);
+
+  // SSE connection for real-time events
   useEffect(() => {
     const es = new EventSource("/api/gateway");
     eventSourceRef.current = es;
@@ -18,6 +35,8 @@ export function useGateway() {
     es.onerror = () => {
       setConnected(false);
       setStreaming(false);
+      setThinking(false);
+      setToolActivity(null);
     };
 
     es.onmessage = (e) => {
@@ -27,36 +46,59 @@ export function useGateway() {
         if (event.event === "agent") {
           const { stream, data } = event.payload || {};
 
-          // Assistant text stream — data.text contains full text so far
+          // Lifecycle start — show thinking
+          if (stream === "lifecycle" && data?.phase === "start") {
+            setThinking(true);
+            setToolActivity(null);
+          }
+
+          // Assistant text stream
           if (stream === "assistant" && data?.text) {
+            setThinking(false);
+            setToolActivity(null);
             currentAssistantRef.current = data.text as string;
             setMessages((prev) => {
               const last = prev[prev.length - 1];
-              if (last?.role === "assistant") {
+              if (last?.role === "assistant" && !last.timestamp) {
+                // Update the current streaming message (no timestamp = still streaming)
                 return [
                   ...prev.slice(0, -1),
-                  { ...last, content: currentAssistantRef.current },
+                  { role: "assistant" as const, content: currentAssistantRef.current },
                 ];
               }
               return [
                 ...prev,
-                { role: "assistant", content: currentAssistantRef.current },
+                { role: "assistant" as const, content: currentAssistantRef.current },
               ];
             });
           }
 
-          // Lifecycle events — end or error means the run is complete
+          // Tool use events — show what the AI is doing
+          if (stream === "tool-call" || stream === "tool_use") {
+            const toolName = data?.name || data?.toolName || "working";
+            setThinking(false);
+            setToolActivity(formatToolName(toolName as string));
+          }
+
+          // Tool result — clear tool activity
+          if (stream === "tool-result" || stream === "tool_result") {
+            setToolActivity(null);
+            setThinking(true); // Back to thinking after tool result
+          }
+
+          // Lifecycle end/error — run complete
           if (stream === "lifecycle" && (data?.phase === "end" || data?.phase === "error")) {
             if (data?.phase === "error" && data?.error) {
-              // Show the error message to the user
               const errorMsg = data.error as string;
               setMessages((prev) => {
                 const last = prev[prev.length - 1];
-                if (last?.role === "assistant") return prev;
+                if (last?.role === "assistant" && !last.timestamp) return prev;
                 return [...prev, { role: "assistant", content: `Error: ${errorMsg}` }];
               });
             }
             setStreaming(false);
+            setThinking(false);
+            setToolActivity(null);
             currentAssistantRef.current = "";
           }
         }
@@ -73,6 +115,7 @@ export function useGateway() {
   const sendMessage = useCallback(async (text: string) => {
     setMessages((prev) => [...prev, { role: "user", content: text }]);
     setStreaming(true);
+    setThinking(true);
     currentAssistantRef.current = "";
 
     try {
@@ -89,6 +132,7 @@ export function useGateway() {
           { role: "assistant", content: `Error: ${err.error}` },
         ]);
         setStreaming(false);
+        setThinking(false);
       }
     } catch {
       setMessages((prev) => [
@@ -96,8 +140,33 @@ export function useGateway() {
         { role: "assistant", content: "Failed to reach the server." },
       ]);
       setStreaming(false);
+      setThinking(false);
     }
   }, []);
 
-  return { messages, sendMessage, streaming, connected };
+  return { messages, sendMessage, streaming, connected, thinking, toolActivity, historyLoaded };
+}
+
+function formatToolName(name: string): string {
+  // Make tool names human-friendly
+  const map: Record<string, string> = {
+    "google-calendar-create": "Creating calendar event...",
+    "google-calendar-list": "Checking calendar...",
+    "gmail-send": "Sending email...",
+    "gmail-read": "Reading emails...",
+    "github-create-issue": "Creating GitHub issue...",
+    "github-create-pr": "Creating pull request...",
+    "web-search": "Searching the web...",
+    "web-browse": "Browsing a page...",
+    "bash": "Running a command...",
+    "file-read": "Reading a file...",
+    "file-write": "Writing a file...",
+  };
+
+  if (map[name]) return map[name];
+
+  // Generic formatting: snake_case/kebab-case → sentence
+  return name
+    .replace(/[-_]/g, " ")
+    .replace(/\b\w/g, (c) => c.toUpperCase()) + "...";
 }
