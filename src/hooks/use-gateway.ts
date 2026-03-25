@@ -15,7 +15,10 @@ export function useGateway() {
     eventSourceRef.current = es;
 
     es.onopen = () => setConnected(true);
-    es.onerror = () => setConnected(false);
+    es.onerror = () => {
+      setConnected(false);
+      setStreaming(false);
+    };
 
     es.onmessage = (e) => {
       try {

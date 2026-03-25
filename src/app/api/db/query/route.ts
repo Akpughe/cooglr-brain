@@ -13,15 +13,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Connection ID and query required" }, { status: 400 });
   }
 
-  // Block destructive queries
-  const normalized = query.trim().toUpperCase();
-  const forbidden = ["INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "TRUNCATE", "CREATE", "GRANT", "REVOKE"];
-  for (const keyword of forbidden) {
-    if (normalized.startsWith(keyword)) {
-      return NextResponse.json({ error: "Only SELECT queries are allowed" }, { status: 403 });
-    }
-  }
-
   // Fetch the connection
   const { data: connection } = await supabase
     .from("database_connections")
@@ -34,22 +25,29 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Connection not found" }, { status: 404 });
   }
 
-  const connectionString = decrypt(connection.encrypted_connection_string);
+  let connectionString: string;
+  try {
+    connectionString = decrypt(connection.encrypted_connection_string);
+  } catch {
+    return NextResponse.json({ error: "Failed to decrypt connection. Key may have been rotated." }, { status: 500 });
+  }
+
+  const { Client } = await import("pg");
+  const client = new Client({
+    connectionString,
+    ssl: { rejectUnauthorized: false },
+    statement_timeout: 30000,
+  });
 
   try {
-    const { Client } = await import("pg");
-    const client = new Client({
-      connectionString,
-      ssl: { rejectUnauthorized: false },
-      statement_timeout: 30000,
-    });
     await client.connect();
 
-    // Wrap in read-only transaction for safety
+    // Read-only transaction + wrap user query with LIMIT for safety
     await client.query("BEGIN READ ONLY");
-    const result = await client.query(query);
+    const result = await client.query(
+      `SELECT * FROM (${query}) AS _user_query LIMIT 1000`
+    );
     await client.query("COMMIT");
-    await client.end();
 
     return NextResponse.json({
       columns: result.fields.map((f: { name: string }) => f.name),
@@ -59,5 +57,7 @@ export async function POST(request: NextRequest) {
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Query failed";
     return NextResponse.json({ error: msg }, { status: 500 });
+  } finally {
+    await client.end().catch(() => {});
   }
 }

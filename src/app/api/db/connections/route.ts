@@ -30,15 +30,16 @@ export async function POST(request: NextRequest) {
   }
 
   // Test the connection before saving
+  const { Client } = await import("pg");
+  const testClient = new Client({ connectionString, ssl: { rejectUnauthorized: false } });
   try {
-    const { Client } = await import("pg");
-    const client = new Client({ connectionString, ssl: { rejectUnauthorized: false } });
-    await client.connect();
-    await client.query("SELECT 1");
-    await client.end();
+    await testClient.connect();
+    await testClient.query("SELECT 1");
   } catch (err) {
     const msg = err instanceof Error ? err.message : "Connection failed";
     return NextResponse.json({ error: `Connection test failed: ${msg}` }, { status: 400 });
+  } finally {
+    await testClient.end().catch(() => {});
   }
 
   const serviceClient = await createServiceClient();

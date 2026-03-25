@@ -18,8 +18,17 @@ export class GatewayConnection {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private reconnectAttempts = 0;
   private helloPayload: HelloOk | null = null;
+  private connectingPromise: Promise<HelloOk> | null = null;
 
   async connect(): Promise<HelloOk> {
+    if (this.connectingPromise) return this.connectingPromise;
+    this.connectingPromise = this._doConnect().finally(() => {
+      this.connectingPromise = null;
+    });
+    return this.connectingPromise;
+  }
+
+  private _doConnect(): Promise<HelloOk> {
     return new Promise((resolve, reject) => {
       console.log("[gateway] connecting to", GATEWAY.wsUrl);
       let ws: WebSocket;

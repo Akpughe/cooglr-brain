@@ -64,7 +64,7 @@ export function TicketBoard() {
   const [creating, setCreating] = useState(false);
 
   const loadTickets = useCallback(async () => {
-    const url = filter === "all" ? "/api/tickets" : `/api/tickets?status=${filter}`;
+    const url = filter === "all" ? "/api/tickets" : `/api/tickets?status=${encodeURIComponent(filter)}`;
     const res = await fetch(url);
     if (res.ok) setTickets(await res.json());
     setLoading(false);
@@ -121,7 +121,7 @@ export function TicketBoard() {
           </Select>
 
           <Dialog open={showCreate} onOpenChange={setShowCreate}>
-            <DialogTrigger asChild>
+            <DialogTrigger>
               <Button>Create Ticket</Button>
             </DialogTrigger>
             <DialogContent>

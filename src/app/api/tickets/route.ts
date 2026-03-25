@@ -122,69 +122,57 @@ Respond with ONLY a JSON object (no markdown, no code fences) containing:
 }`;
 
   const sessionKey = `agent:main:triage-${ticketId}`;
-
-  // Collect the AI response
   let fullResponse = "";
 
-  const unsubscribe = gateway.onSessionEvent(sessionKey, (event) => {
-    const payload = event.payload as Record<string, unknown>;
-    if (payload.stream === "assistant") {
-      const data = payload.data as Record<string, unknown>;
-      if (data?.text) fullResponse = data.text as string;
-    }
-  });
-
-  await gateway.sendRequest("chat.send", {
-    sessionKey,
-    message: triagePrompt,
-    idempotencyKey: `triage-${ticketId}-${Date.now()}`,
-  });
-
-  // Wait for the response to complete (poll for lifecycle end)
+  // Single event handler for both streaming text and lifecycle end
   await new Promise<void>((resolve) => {
-    const checkInterval = setInterval(() => {
-      // Give it up to 30 seconds
-    }, 500);
+    const timeout = setTimeout(() => {
+      unsubscribe();
+      resolve();
+    }, 30000);
 
-    const done = gateway.onSessionEvent(sessionKey, (event) => {
+    const unsubscribe = gateway.onSessionEvent(sessionKey, (event) => {
       const payload = event.payload as Record<string, unknown>;
       const data = payload.data as Record<string, unknown> | undefined;
+
+      if (payload.stream === "assistant" && data?.text) {
+        fullResponse = data.text as string;
+      }
+
       if (payload.stream === "lifecycle" && data?.phase === "end") {
-        clearInterval(checkInterval);
-        done();
+        clearTimeout(timeout);
+        unsubscribe();
         resolve();
       }
     });
 
-    setTimeout(() => {
-      clearInterval(checkInterval);
-      done();
+    // Send the message AFTER subscribing to avoid missing events
+    gateway.sendRequest("chat.send", {
+      sessionKey,
+      message: triagePrompt,
+      idempotencyKey: `triage-${ticketId}-${Date.now()}`,
+    }).catch(() => {
+      clearTimeout(timeout);
+      unsubscribe();
       resolve();
-    }, 30000);
+    });
   });
-
-  unsubscribe();
 
   // Parse and save triage result
   if (fullResponse) {
     try {
-      // Try to extract JSON from the response
       const jsonMatch = fullResponse.match(/\{[\s\S]*\}/);
       const triage = jsonMatch ? JSON.parse(jsonMatch[0]) : null;
 
       if (triage) {
-        const { createClient: createSC } = await import("@supabase/supabase-js");
-        const adminClient = createSC(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
+        const { createServiceClient } = await import("@/lib/supabase/server");
+        const adminClient = await createServiceClient();
 
         await adminClient
           .from("tickets")
           .update({ ai_triage: triage })
           .eq("id", ticketId);
 
-        // Add AI comment with the triage
         await adminClient
           .from("ticket_comments")
           .insert({
