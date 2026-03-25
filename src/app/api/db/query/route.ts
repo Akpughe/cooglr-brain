@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
     await client.end();
 
     return NextResponse.json({
-      columns: result.fields.map((f) => f.name),
+      columns: result.fields.map((f: { name: string }) => f.name),
       rows: result.rows,
       rowCount: result.rowCount,
     });
