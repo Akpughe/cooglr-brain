@@ -11,7 +11,10 @@ export class GatewayConnection {
   private ws: WebSocket | null = null;
   private connected = false;
   private pendingRequests = new Map<string, ResponseHandler>();
+  // Global event handlers (receive ALL events)
   private eventHandlers = new Set<MessageHandler>();
+  // Per-session event handlers (only receive events for that sessionKey)
+  private sessionHandlers = new Map<string, Set<MessageHandler>>();
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private reconnectAttempts = 0;
   private helloPayload: HelloOk | null = null;
@@ -64,6 +67,7 @@ export class GatewayConnection {
             if (res.ok) {
               this.connected = true;
               this.helloPayload = res.payload as unknown as HelloOk;
+              console.log("[gateway] connected successfully");
               resolve(this.helloPayload);
             } else {
               reject(new Error(res.error?.message || "Connect rejected"));
@@ -84,8 +88,17 @@ export class GatewayConnection {
         }
 
         if (isEvent(frame)) {
+          const evt = frame as GatewayEvent;
+          // Route to global handlers
           for (const handler of this.eventHandlers) {
-            handler(frame as GatewayEvent);
+            handler(evt);
+          }
+          // Route to session-specific handlers
+          const sessionKey = (evt.payload?.sessionKey as string) || "";
+          if (sessionKey && this.sessionHandlers.has(sessionKey)) {
+            for (const handler of this.sessionHandlers.get(sessionKey)!) {
+              handler(evt);
+            }
           }
         }
       });
@@ -115,25 +128,46 @@ export class GatewayConnection {
     });
   }
 
+  /** Subscribe to ALL gateway events */
   onEvent(handler: MessageHandler) {
     this.eventHandlers.add(handler);
     return () => this.eventHandlers.delete(handler);
   }
 
-  get sessionKey(): string {
-    return this.helloPayload?.snapshot?.sessionDefaults?.mainSessionKey || "agent:main:main";
+  /** Subscribe to events for a specific session only */
+  onSessionEvent(sessionKey: string, handler: MessageHandler) {
+    if (!this.sessionHandlers.has(sessionKey)) {
+      this.sessionHandlers.set(sessionKey, new Set());
+    }
+    this.sessionHandlers.get(sessionKey)!.add(handler);
+    return () => {
+      const handlers = this.sessionHandlers.get(sessionKey);
+      if (handlers) {
+        handlers.delete(handler);
+        if (handlers.size === 0) this.sessionHandlers.delete(sessionKey);
+      }
+    };
   }
 
-  async sendChat(message: string): Promise<GatewayResponse> {
+  /** Build a per-user session key */
+  userSessionKey(userId: string): string {
+    return `agent:main:user-${userId}`;
+  }
+
+  /** Send a chat message scoped to a user's session */
+  async sendChat(message: string, userId: string): Promise<GatewayResponse> {
     return this.sendRequest("chat.send", {
-      sessionKey: this.sessionKey,
+      sessionKey: this.userSessionKey(userId),
       message,
       idempotencyKey: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     });
   }
 
-  async getChatHistory(): Promise<GatewayResponse> {
-    return this.sendRequest("chat.history", { sessionKey: this.sessionKey });
+  /** Get chat history for a user's session */
+  async getChatHistory(userId: string): Promise<GatewayResponse> {
+    return this.sendRequest("chat.history", {
+      sessionKey: this.userSessionKey(userId),
+    });
   }
 
   disconnect() {
@@ -161,10 +195,7 @@ export class GatewayConnection {
   }
 }
 
-// Singleton for the server-side connection, attached to globalThis
-// to survive Next.js hot module reloading in dev mode.
-// NOTE: Phase 1 uses a single shared connection. All users share the same
-// OpenClaw agent session. Phase 2 will add per-user session multiplexing.
+// Singleton attached to globalThis to survive Next.js HMR
 const globalForGateway = globalThis as unknown as {
   __gatewayInstance?: GatewayConnection;
 };

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getGateway } from "@/lib/gateway/connection";
 
-// POST /api/gateway — send a chat message
+// POST /api/gateway — send a chat message (scoped to user session)
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
     if (!gateway.isConnected) {
       await gateway.connect();
     }
-    const response = await gateway.sendChat(message);
+    const response = await gateway.sendChat(message, user.id);
     return NextResponse.json(response);
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Gateway error";
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
   }
 }
 
-// GET /api/gateway — SSE stream for agent events
+// GET /api/gateway — SSE stream filtered to the user's session
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -50,10 +50,13 @@ export async function GET(request: NextRequest) {
     }
   }
 
+  const sessionKey = gateway.userSessionKey(user.id);
   const encoder = new TextEncoder();
+
   const stream = new ReadableStream({
     start(controller) {
-      const unsubscribe = gateway.onEvent((event) => {
+      // Only subscribe to events for THIS user's session
+      const unsubscribe = gateway.onSessionEvent(sessionKey, (event) => {
         const data = JSON.stringify(event);
         controller.enqueue(encoder.encode(`data: ${data}\n\n`));
       });
