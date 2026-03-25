@@ -1,17 +1,33 @@
 "use client";
 
+import { useRef } from "react";
 import { useGateway } from "@/hooks/use-gateway";
 import { MessageList } from "./message-list";
 import { MessageInput } from "./message-input";
 import { Badge } from "@/components/ui/badge";
 
-export function ChatPanel({ sessionId }: { sessionId: string }) {
+interface Props {
+  sessionId: string;
+  onFirstMessage?: (message: string) => void;
+}
+
+export function ChatPanel({ sessionId, onFirstMessage }: Props) {
   const { messages, sendMessage, streaming, connected, statusText, processSteps, historyLoaded, elapsedMs } = useGateway(sessionId);
+  const firstMessageSentRef = useRef(false);
 
   const formatElapsed = (ms: number) => {
     const seconds = Math.floor(ms / 1000);
     return seconds > 0 ? `${seconds}s` : "";
   };
+
+  function handleSend(text: string) {
+    // Auto-name on first message in a new session
+    if (!firstMessageSentRef.current && onFirstMessage) {
+      firstMessageSentRef.current = true;
+      onFirstMessage(text);
+    }
+    sendMessage(text);
+  }
 
   return (
     <div className="flex flex-col h-full">
@@ -47,7 +63,7 @@ export function ChatPanel({ sessionId }: { sessionId: string }) {
         </div>
       )}
 
-      <MessageInput onSend={sendMessage} disabled={streaming} />
+      <MessageInput onSend={handleSend} disabled={streaming} />
     </div>
   );
 }

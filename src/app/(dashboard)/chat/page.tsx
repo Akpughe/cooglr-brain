@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ChatPanel } from "@/components/chat/chat-panel";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 
 interface ChatSession {
@@ -16,31 +17,38 @@ export default function ChatPage() {
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState("");
+  const editRef = useRef<HTMLInputElement>(null);
+  const initializedRef = useRef(false);
 
-  const loadSessions = useCallback(async () => {
-    const res = await fetch("/api/chat/sessions");
-    if (res.ok) {
-      const data = await res.json();
-      setSessions(data);
-      if (data.length > 0 && !activeSessionId) {
-        setActiveSessionId(data[0].id);
-      } else if (data.length === 0) {
-        const newRes = await fetch("/api/chat/sessions", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name: "New Chat" }),
-        });
-        if (newRes.ok) {
-          const session = await newRes.json();
-          setSessions([session]);
-          setActiveSessionId(session.id);
+  // Load sessions once on mount
+  useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
+    fetch("/api/chat/sessions")
+      .then((r) => r.json())
+      .then(async (data: ChatSession[]) => {
+        if (data.length > 0) {
+          setSessions(data);
+          setActiveSessionId(data[0].id);
+        } else {
+          // Create first session
+          const res = await fetch("/api/chat/sessions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name: "New Chat" }),
+          });
+          if (res.ok) {
+            const session = await res.json();
+            setSessions([session]);
+            setActiveSessionId(session.id);
+          }
         }
-      }
-    }
-    setLoading(false);
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  useEffect(() => { loadSessions(); }, [loadSessions]);
+        setLoading(false);
+      });
+  }, []);
 
   async function createSession() {
     const res = await fetch("/api/chat/sessions", {
@@ -70,13 +78,40 @@ export default function ChatPage() {
     });
   }
 
+  async function renameSession(id: string, name: string) {
+    if (!name.trim()) return;
+    await fetch("/api/chat/sessions", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, name: name.trim() }),
+    });
+    setSessions((prev) => prev.map((s) => (s.id === id ? { ...s, name: name.trim() } : s)));
+    setEditingId(null);
+  }
+
+  function startEditing(id: string, currentName: string) {
+    setEditingId(id);
+    setEditName(currentName);
+    setTimeout(() => editRef.current?.focus(), 50);
+  }
+
+  // Called by ChatPanel after first AI response to auto-name the session
+  function handleAutoName(sessionId: string, firstMessage: string) {
+    const session = sessions.find((s) => s.id === sessionId);
+    if (!session || session.name !== "New Chat") return;
+
+    // Use first 40 chars of the user's first message as the name
+    const autoName = firstMessage.length > 40 ? firstMessage.substring(0, 40) + "..." : firstMessage;
+    renameSession(sessionId, autoName);
+  }
+
   if (loading) {
     return <div className="flex items-center justify-center h-full text-muted-foreground">Loading...</div>;
   }
 
   return (
     <div className="flex h-full overflow-hidden">
-      {/* Session sidebar — fixed, doesn't scroll with chat */}
+      {/* Session sidebar */}
       <div className="w-56 border-r bg-muted/20 flex flex-col shrink-0 h-full">
         <div className="p-3 border-b">
           <Button onClick={createSession} className="w-full" size="sm">
@@ -88,22 +123,60 @@ export default function ChatPage() {
             <div
               key={session.id}
               className={cn(
-                "group flex items-center justify-between px-3 py-2 cursor-pointer hover:bg-accent text-sm border-b border-transparent",
+                "group flex items-center gap-1 px-3 py-2 cursor-pointer hover:bg-accent text-sm",
                 activeSessionId === session.id && "bg-accent"
               )}
               onClick={() => setActiveSessionId(session.id)}
             >
-              <span className="truncate flex-1">{session.name}</span>
-              {sessions.length > 1 && (
-                <button
-                  className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-destructive text-xs ml-2"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    deleteSession(session.id);
+              {editingId === session.id ? (
+                <Input
+                  ref={editRef}
+                  value={editName}
+                  onChange={(e) => setEditName(e.target.value)}
+                  onBlur={() => renameSession(session.id, editName)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") renameSession(session.id, editName);
+                    if (e.key === "Escape") setEditingId(null);
                   }}
-                >
-                  &times;
-                </button>
+                  className="h-6 text-xs px-1"
+                  onClick={(e) => e.stopPropagation()}
+                />
+              ) : (
+                <>
+                  <span
+                    className="truncate flex-1"
+                    onDoubleClick={(e) => {
+                      e.stopPropagation();
+                      startEditing(session.id, session.name);
+                    }}
+                  >
+                    {session.name}
+                  </span>
+                  <div className="opacity-0 group-hover:opacity-100 flex items-center gap-0.5">
+                    <button
+                      className="text-muted-foreground hover:text-foreground text-[10px] px-1"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        startEditing(session.id, session.name);
+                      }}
+                      title="Rename"
+                    >
+                      &#9998;
+                    </button>
+                    {sessions.length > 1 && (
+                      <button
+                        className="text-muted-foreground hover:text-destructive text-xs px-1"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          deleteSession(session.id);
+                        }}
+                        title="Delete"
+                      >
+                        &times;
+                      </button>
+                    )}
+                  </div>
+                </>
               )}
             </div>
           ))}
@@ -111,9 +184,13 @@ export default function ChatPage() {
       </div>
 
       {/* Chat panel */}
-      <div className="flex-1">
+      <div className="flex-1 min-w-0">
         {activeSessionId ? (
-          <ChatPanel key={activeSessionId} sessionId={activeSessionId} />
+          <ChatPanel
+            key={activeSessionId}
+            sessionId={activeSessionId}
+            onFirstMessage={(msg) => handleAutoName(activeSessionId, msg)}
+          />
         ) : (
           <div className="flex items-center justify-center h-full text-muted-foreground">
             Create a new chat to get started.
