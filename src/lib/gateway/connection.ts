@@ -132,16 +132,17 @@ export class GatewayConnection {
   }
 }
 
-// Singleton for the server-side connection.
+// Singleton for the server-side connection, attached to globalThis
+// to survive Next.js hot module reloading in dev mode.
 // NOTE: Phase 1 uses a single shared connection. All users share the same
-// OpenClaw agent session. Phase 2 will add per-user session multiplexing
-// so each user gets isolated conversations. For now, this is a known
-// limitation — treat it as a shared team chat with the AI.
-let gatewayInstance: GatewayConnection | null = null;
+// OpenClaw agent session. Phase 2 will add per-user session multiplexing.
+const globalForGateway = globalThis as unknown as {
+  __gatewayInstance?: GatewayConnection;
+};
 
 export function getGateway(): GatewayConnection {
-  if (!gatewayInstance) {
-    gatewayInstance = new GatewayConnection();
+  if (!globalForGateway.__gatewayInstance) {
+    globalForGateway.__gatewayInstance = new GatewayConnection();
   }
-  return gatewayInstance;
+  return globalForGateway.__gatewayInstance;
 }
