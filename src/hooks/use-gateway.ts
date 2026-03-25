@@ -3,14 +3,24 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import type { ChatMessage } from "@/types/gateway";
 
+export interface ProcessStep {
+  label: string;
+  status: "running" | "done";
+  timestamp: number;
+}
+
 export function useGateway() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [connected, setConnected] = useState(false);
   const [statusText, setStatusText] = useState<string | null>(null);
+  const [processSteps, setProcessSteps] = useState<ProcessStep[]>([]);
   const [historyLoaded, setHistoryLoaded] = useState(false);
+  const [elapsedMs, setElapsedMs] = useState(0);
   const currentTextRef = useRef("");
   const isStreamingRef = useRef(false);
+  const startTimeRef = useRef<number | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Load chat history on mount
   useEffect(() => {
@@ -18,12 +28,8 @@ export function useGateway() {
       .then((r) => r.json())
       .then((history: ChatMessage[]) => {
         if (Array.isArray(history) && history.length > 0) {
-          // Clean up history — strip <final> tags, filter tool noise
           const cleaned = history
-            .map((m) => ({
-              ...m,
-              content: cleanContent(m.content),
-            }))
+            .map((m) => ({ ...m, content: cleanContent(m.content) }))
             .filter((m) => m.content.trim().length > 0);
           setMessages(cleaned);
         }
@@ -31,6 +37,24 @@ export function useGateway() {
       })
       .catch(() => setHistoryLoaded(true));
   }, []);
+
+  // Elapsed time ticker
+  function startTimer() {
+    startTimeRef.current = Date.now();
+    setElapsedMs(0);
+    timerRef.current = setInterval(() => {
+      if (startTimeRef.current) {
+        setElapsedMs(Date.now() - startTimeRef.current);
+      }
+    }, 100);
+  }
+
+  function stopTimer() {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = null;
+    startTimeRef.current = null;
+    setElapsedMs(0);
+  }
 
   // SSE connection
   useEffect(() => {
@@ -41,7 +65,9 @@ export function useGateway() {
       setConnected(false);
       setStreaming(false);
       setStatusText(null);
+      setProcessSteps([]);
       isStreamingRef.current = false;
+      stopTimer();
     };
 
     es.onmessage = (e) => {
@@ -51,29 +77,41 @@ export function useGateway() {
 
         const { stream, data } = event.payload || {};
 
-        // Lifecycle start
+        // Lifecycle start — begin thinking
         if (stream === "lifecycle" && data?.phase === "start") {
           setStatusText("Thinking...");
+          setProcessSteps([{ label: "Processing your request", status: "running", timestamp: Date.now() }]);
+          startTimer();
         }
 
         // Assistant text stream
-        if (stream === "assistant") {
-          const rawText = (data?.text || "") as string;
-          const delta = (data?.delta || "") as string;
+        if (stream === "assistant" && data?.text) {
+          const rawText = data.text as string;
 
-          // Skip tool output noise — these are internal
           if (isToolNoise(rawText)) {
-            // Show a status hint about what's happening
+            // Tool output — add as a process step
             const hint = extractToolHint(rawText);
-            if (hint) setStatusText(hint);
+            if (hint) {
+              setStatusText(hint);
+              setProcessSteps((prev) => {
+                const updated = prev.map((s) =>
+                  s.status === "running" ? { ...s, status: "done" as const } : s
+                );
+                return [...updated, { label: hint, status: "running" as const, timestamp: Date.now() }];
+              });
+            }
             return;
           }
 
-          // Extract and clean the displayable text
           const displayText = cleanContent(rawText);
 
           if (displayText.trim()) {
+            // Mark all steps as done, add "Composing response"
+            setProcessSteps((prev) =>
+              prev.map((s) => (s.status === "running" ? { ...s, status: "done" as const } : s))
+            );
             setStatusText(null);
+            stopTimer();
             currentTextRef.current = displayText;
 
             setMessages((prev) => {
@@ -86,21 +124,7 @@ export function useGateway() {
               isStreamingRef.current = true;
               return [...prev, { role: "assistant" as const, content: displayText }];
             });
-          } else if (delta.trim() && !isToolNoise(delta)) {
-            // Delta without displayable full text yet — show as status
-            const hint = extractToolHint(delta);
-            if (hint) setStatusText(hint);
           }
-        }
-
-        // Tool events
-        if (stream === "tool-call" || stream === "tool_use") {
-          const toolName = (data?.name || data?.toolName || "processing") as string;
-          setStatusText(formatToolName(toolName));
-        }
-
-        if (stream === "tool-result" || stream === "tool_result") {
-          setStatusText("Processing results...");
         }
 
         // Lifecycle end/error
@@ -110,6 +134,10 @@ export function useGateway() {
           }
           setStreaming(false);
           setStatusText(null);
+          setProcessSteps((prev) =>
+            prev.map((s) => (s.status === "running" ? { ...s, status: "done" as const } : s))
+          );
+          stopTimer();
           currentTextRef.current = "";
           isStreamingRef.current = false;
         }
@@ -118,21 +146,26 @@ export function useGateway() {
       }
     };
 
-    return () => es.close();
+    return () => {
+      es.close();
+      stopTimer();
+    };
   }, []);
 
   const sendMessage = useCallback(async (text: string) => {
     setMessages((prev) => [...prev, { role: "user", content: text }]);
     setStreaming(true);
     setStatusText("Thinking...");
+    setProcessSteps([]);
     currentTextRef.current = "";
     isStreamingRef.current = false;
 
-    // Safety timeout — if no lifecycle end arrives in 60s, unlock the UI
     const safetyTimeout = setTimeout(() => {
       setStreaming(false);
       setStatusText(null);
+      setProcessSteps([]);
       isStreamingRef.current = false;
+      stopTimer();
     }, 60000);
 
     try {
@@ -148,31 +181,30 @@ export function useGateway() {
         setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${err.error}` }]);
         setStreaming(false);
         setStatusText(null);
+        setProcessSteps([]);
         isStreamingRef.current = false;
+        stopTimer();
       }
     } catch {
       clearTimeout(safetyTimeout);
       setMessages((prev) => [...prev, { role: "assistant", content: "Failed to reach the server." }]);
       setStreaming(false);
       setStatusText(null);
+      setProcessSteps([]);
       isStreamingRef.current = false;
+      stopTimer();
     }
   }, []);
 
-  return { messages, sendMessage, streaming, connected, statusText, historyLoaded };
+  return { messages, sendMessage, streaming, connected, statusText, processSteps, historyLoaded, elapsedMs };
 }
 
-/** Strip <final> tags and clean up display text */
 function cleanContent(text: string): string {
-  // Extract content from <final> tags if present
   const finalMatch = text.match(/<final>([\s\S]*?)<\/final>/);
   if (finalMatch) return finalMatch[1].trim();
-
-  // Strip any remaining XML-like tags
   return text.replace(/<\/?final>/g, "").trim();
 }
 
-/** Check if text is internal tool output noise */
 function isToolNoise(text: string): boolean {
   const noise = [
     /^(message_id|thread_id|Command exited|unknown flag)/i,
@@ -180,35 +212,20 @@ function isToolNoise(text: string): boolean {
     /^Flags:/,
     /^\s*--\w+/,
     /^\s*-\w,\s+--/,
-    /^\d+$/,  // bare numbers (exit codes)
+    /^\d+$/,
     /^\(Command exited/,
   ];
   const lines = text.trim().split("\n");
-  // If most lines match noise patterns, it's tool output
   const noiseLines = lines.filter((line) => noise.some((p) => p.test(line.trim())));
   return noiseLines.length > lines.length * 0.5 && lines.length > 1;
 }
 
-/** Extract a human-readable hint from tool output */
 function extractToolHint(text: string): string | null {
-  if (text.includes("message_id")) return "Sending email...";
-  if (text.includes("gh api")) return "Checking GitHub...";
+  if (text.includes("message_id")) return "Email sent successfully";
+  if (text.includes("gh api") || text.includes("github.com")) return "Querying GitHub...";
   if (text.includes("calendar")) return "Checking calendar...";
   if (text.includes("commit")) return "Checking commits...";
+  if (text.includes("Command exited with code 0")) return "Command completed";
+  if (text.includes("Command exited with code")) return "Command finished with error";
   return null;
-}
-
-function formatToolName(name: string): string {
-  const map: Record<string, string> = {
-    "google-calendar-create": "Creating calendar event...",
-    "google-calendar-list": "Checking calendar...",
-    "gmail-send": "Sending email...",
-    "gmail-read": "Reading emails...",
-    "github-create-issue": "Creating GitHub issue...",
-    "github-create-pr": "Creating pull request...",
-    "web-search": "Searching the web...",
-    "bash": "Running a command...",
-  };
-  if (map[name]) return map[name];
-  return name.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) + "...";
 }
