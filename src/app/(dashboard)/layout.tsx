@@ -29,6 +29,9 @@ export default async function DashboardLayout({
           <a href="/" className="block px-3 py-2 rounded-md bg-accent text-sm font-medium">
             Chat
           </a>
+          <a href="/tickets" className="block px-3 py-2 rounded-md hover:bg-accent text-sm">
+            Tickets
+          </a>
           <a href="/settings" className="block px-3 py-2 rounded-md hover:bg-accent text-sm">
             Settings
           </a>
