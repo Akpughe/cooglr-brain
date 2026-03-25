@@ -7,11 +7,10 @@ export function useGateway() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [connected, setConnected] = useState(false);
-  const [thinking, setThinking] = useState(false);
-  const [toolActivity, setToolActivity] = useState<string | null>(null);
+  const [statusText, setStatusText] = useState<string | null>(null);
   const [historyLoaded, setHistoryLoaded] = useState(false);
-  const eventSourceRef = useRef<EventSource | null>(null);
   const currentAssistantRef = useRef("");
+  const isStreamingRef = useRef(false);
 
   // Load chat history on mount
   useEffect(() => {
@@ -26,103 +25,85 @@ export function useGateway() {
       .catch(() => setHistoryLoaded(true));
   }, []);
 
-  // SSE connection for real-time events
+  // SSE connection
   useEffect(() => {
     const es = new EventSource("/api/gateway");
-    eventSourceRef.current = es;
 
     es.onopen = () => setConnected(true);
     es.onerror = () => {
       setConnected(false);
       setStreaming(false);
-      setThinking(false);
-      setToolActivity(null);
+      setStatusText(null);
+      isStreamingRef.current = false;
     };
 
     es.onmessage = (e) => {
       try {
         const event = JSON.parse(e.data);
+        if (event.event !== "agent") return;
 
-        if (event.event === "agent") {
-          const { stream, data } = event.payload || {};
+        const { stream, data } = event.payload || {};
 
-          // Lifecycle start — show thinking
-          if (stream === "lifecycle" && data?.phase === "start") {
-            setThinking(true);
-            setToolActivity(null);
-          }
+        // Lifecycle start
+        if (stream === "lifecycle" && data?.phase === "start") {
+          setStatusText("Thinking...");
+        }
 
-          // Assistant text stream — shows response appearing word by word
-          if (stream === "assistant" && data?.text) {
-            setThinking(false);
-            // Extract first sentence as activity hint if still early in response
-            const text = data.text as string;
-            if (text.length < 80 && !text.includes("\n")) {
-              setToolActivity(text);
-            } else {
-              setToolActivity(null);
-            }
-            currentAssistantRef.current = data.text as string;
-            setMessages((prev) => {
+        // Assistant text — stream it into the chat
+        if (stream === "assistant" && data?.text) {
+          const text = data.text as string;
+          currentAssistantRef.current = text;
+          setStatusText(null);
+
+          setMessages((prev) => {
+            // Find if we're already streaming (last message is our streaming bubble)
+            if (isStreamingRef.current && prev.length > 0) {
               const last = prev[prev.length - 1];
-              if (last?.role === "assistant" && !last.timestamp) {
-                // Update the current streaming message (no timestamp = still streaming)
-                return [
-                  ...prev.slice(0, -1),
-                  { role: "assistant" as const, content: currentAssistantRef.current },
-                ];
+              if (last.role === "assistant" && !last.timestamp) {
+                return [...prev.slice(0, -1), { role: "assistant" as const, content: text }];
               }
-              return [
-                ...prev,
-                { role: "assistant" as const, content: currentAssistantRef.current },
-              ];
-            });
-          }
-
-          // Tool use events — show what the AI is doing
-          if (stream === "tool-call" || stream === "tool_use") {
-            const toolName = data?.name || data?.toolName || "working";
-            setThinking(false);
-            setToolActivity(formatToolName(toolName as string));
-          }
-
-          // Tool result — clear tool activity
-          if (stream === "tool-result" || stream === "tool_result") {
-            setToolActivity(null);
-            setThinking(true); // Back to thinking after tool result
-          }
-
-          // Lifecycle end/error — run complete
-          if (stream === "lifecycle" && (data?.phase === "end" || data?.phase === "error")) {
-            if (data?.phase === "error" && data?.error) {
-              const errorMsg = data.error as string;
-              setMessages((prev) => {
-                const last = prev[prev.length - 1];
-                if (last?.role === "assistant" && !last.timestamp) return prev;
-                return [...prev, { role: "assistant", content: `Error: ${errorMsg}` }];
-              });
             }
-            setStreaming(false);
-            setThinking(false);
-            setToolActivity(null);
-            currentAssistantRef.current = "";
+            isStreamingRef.current = true;
+            return [...prev, { role: "assistant" as const, content: text }];
+          });
+        }
+
+        // Tool call events
+        if (stream === "tool-call" || stream === "tool_use") {
+          const toolName = (data?.name || data?.toolName || "processing") as string;
+          setStatusText(formatToolName(toolName));
+        }
+
+        // Tool result — back to thinking
+        if (stream === "tool-result" || stream === "tool_result") {
+          setStatusText("Processing...");
+        }
+
+        // Lifecycle end or error
+        if (stream === "lifecycle" && (data?.phase === "end" || data?.phase === "error")) {
+          if (data?.phase === "error" && data?.error) {
+            const errorMsg = data.error as string;
+            setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${errorMsg}` }]);
           }
+          setStreaming(false);
+          setStatusText(null);
+          currentAssistantRef.current = "";
+          isStreamingRef.current = false;
         }
       } catch {
-        // ignore parse errors
+        // ignore
       }
     };
 
-    return () => {
-      es.close();
-    };
+    return () => es.close();
   }, []);
 
   const sendMessage = useCallback(async (text: string) => {
     setMessages((prev) => [...prev, { role: "user", content: text }]);
     setStreaming(true);
-    setThinking(true);
+    setStatusText("Thinking...");
     currentAssistantRef.current = "";
+    isStreamingRef.current = false;
 
     try {
       const res = await fetch("/api/gateway", {
@@ -133,28 +114,21 @@ export function useGateway() {
 
       if (!res.ok) {
         const err = await res.json();
-        setMessages((prev) => [
-          ...prev,
-          { role: "assistant", content: `Error: ${err.error}` },
-        ]);
+        setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${err.error}` }]);
         setStreaming(false);
-        setThinking(false);
+        setStatusText(null);
       }
     } catch {
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: "Failed to reach the server." },
-      ]);
+      setMessages((prev) => [...prev, { role: "assistant", content: "Failed to reach the server." }]);
       setStreaming(false);
-      setThinking(false);
+      setStatusText(null);
     }
   }, []);
 
-  return { messages, sendMessage, streaming, connected, thinking, toolActivity, historyLoaded };
+  return { messages, sendMessage, streaming, connected, statusText, historyLoaded };
 }
 
 function formatToolName(name: string): string {
-  // Make tool names human-friendly
   const map: Record<string, string> = {
     "google-calendar-create": "Creating calendar event...",
     "google-calendar-list": "Checking calendar...",
@@ -163,16 +137,8 @@ function formatToolName(name: string): string {
     "github-create-issue": "Creating GitHub issue...",
     "github-create-pr": "Creating pull request...",
     "web-search": "Searching the web...",
-    "web-browse": "Browsing a page...",
     "bash": "Running a command...",
-    "file-read": "Reading a file...",
-    "file-write": "Writing a file...",
   };
-
   if (map[name]) return map[name];
-
-  // Generic formatting: snake_case/kebab-case → sentence
-  return name
-    .replace(/[-_]/g, " ")
-    .replace(/\b\w/g, (c) => c.toUpperCase()) + "...";
+  return name.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) + "...";
 }

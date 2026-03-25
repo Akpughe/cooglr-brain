@@ -6,9 +6,7 @@ import { MessageInput } from "./message-input";
 import { Badge } from "@/components/ui/badge";
 
 export function ChatPanel() {
-  const { messages, sendMessage, streaming, connected, thinking, toolActivity, historyLoaded } = useGateway();
-
-  const statusText = toolActivity || (thinking ? "Thinking..." : null);
+  const { messages, sendMessage, streaming, connected, statusText, historyLoaded } = useGateway();
 
   return (
     <div className="flex flex-col h-full">
