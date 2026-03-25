@@ -1,0 +1,89 @@
+"use client";
+
+import { useState, useEffect, useCallback, useRef } from "react";
+import type { ChatMessage } from "@/types/gateway";
+
+export function useGateway() {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [streaming, setStreaming] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const currentAssistantRef = useRef("");
+
+  useEffect(() => {
+    const es = new EventSource("/api/gateway");
+    eventSourceRef.current = es;
+
+    es.onopen = () => setConnected(true);
+    es.onerror = () => setConnected(false);
+
+    es.onmessage = (e) => {
+      try {
+        const event = JSON.parse(e.data);
+
+        if (event.event === "agent") {
+          const { kind, delta, status } = event.payload || {};
+
+          if (kind === "text-delta" && delta) {
+            currentAssistantRef.current += delta;
+            setMessages((prev) => {
+              const last = prev[prev.length - 1];
+              if (last?.role === "assistant") {
+                return [
+                  ...prev.slice(0, -1),
+                  { ...last, content: currentAssistantRef.current },
+                ];
+              }
+              return [
+                ...prev,
+                { role: "assistant", content: currentAssistantRef.current },
+              ];
+            });
+          }
+
+          if (status === "ok" || status === "error") {
+            setStreaming(false);
+            currentAssistantRef.current = "";
+          }
+        }
+      } catch {
+        // ignore parse errors
+      }
+    };
+
+    return () => {
+      es.close();
+    };
+  }, []);
+
+  const sendMessage = useCallback(async (text: string) => {
+    setMessages((prev) => [...prev, { role: "user", content: text }]);
+    setStreaming(true);
+    currentAssistantRef.current = "";
+
+    try {
+      const res = await fetch("/api/gateway", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ message: text }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        setMessages((prev) => [
+          ...prev,
+          { role: "assistant", content: `Error: ${err.error}` },
+        ]);
+        setStreaming(false);
+      }
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { role: "assistant", content: "Failed to reach the server." },
+      ]);
+      setStreaming(false);
+    }
+  }, []);
+
+  return { messages, sendMessage, streaming, connected };
+}
