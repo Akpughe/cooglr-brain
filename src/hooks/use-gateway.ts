@@ -52,10 +52,16 @@ export function useGateway() {
             setToolActivity(null);
           }
 
-          // Assistant text stream
+          // Assistant text stream — shows response appearing word by word
           if (stream === "assistant" && data?.text) {
             setThinking(false);
-            setToolActivity(null);
+            // Extract first sentence as activity hint if still early in response
+            const text = data.text as string;
+            if (text.length < 80 && !text.includes("\n")) {
+              setToolActivity(text);
+            } else {
+              setToolActivity(null);
+            }
             currentAssistantRef.current = data.text as string;
             setMessages((prev) => {
               const last = prev[prev.length - 1];
