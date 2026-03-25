@@ -65,7 +65,8 @@ export async function POST(request: NextRequest) {
       await supabase
         .from("email_campaigns")
         .update({ status: sentCount > 0 ? "sent" : "failed", sent_count: sentCount, gmail_message_id: lastMessageId, sent_at: new Date().toISOString() })
-        .eq("id", id);
+        .eq("id", id)
+        .eq("user_id", user.id);
     } else {
       await supabase
         .from("email_campaigns")

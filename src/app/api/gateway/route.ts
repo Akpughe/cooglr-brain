@@ -55,19 +55,21 @@ export async function GET(request: NextRequest) {
 
   const stream = new ReadableStream({
     start(controller) {
-      // Only subscribe to events for THIS user's session
+      let closed = false;
+
       const unsubscribe = gateway.onSessionEvent(sessionKey, (event) => {
+        if (closed) return;
         const data = JSON.stringify(event);
         controller.enqueue(encoder.encode(`data: ${data}\n\n`));
       });
 
-      // Keepalive
       const keepalive = setInterval(() => {
+        if (closed) return;
         controller.enqueue(encoder.encode(": keepalive\n\n"));
       }, 15000);
 
-      // Cleanup on close
       request.signal.addEventListener("abort", () => {
+        closed = true;
         unsubscribe();
         clearInterval(keepalive);
         controller.close();

@@ -128,6 +128,13 @@ export function useGateway() {
     currentTextRef.current = "";
     isStreamingRef.current = false;
 
+    // Safety timeout — if no lifecycle end arrives in 60s, unlock the UI
+    const safetyTimeout = setTimeout(() => {
+      setStreaming(false);
+      setStatusText(null);
+      isStreamingRef.current = false;
+    }, 60000);
+
     try {
       const res = await fetch("/api/gateway", {
         method: "POST",
@@ -136,15 +143,19 @@ export function useGateway() {
       });
 
       if (!res.ok) {
+        clearTimeout(safetyTimeout);
         const err = await res.json();
         setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${err.error}` }]);
         setStreaming(false);
         setStatusText(null);
+        isStreamingRef.current = false;
       }
     } catch {
+      clearTimeout(safetyTimeout);
       setMessages((prev) => [...prev, { role: "assistant", content: "Failed to reach the server." }]);
       setStreaming(false);
       setStatusText(null);
+      isStreamingRef.current = false;
     }
   }, []);
 
