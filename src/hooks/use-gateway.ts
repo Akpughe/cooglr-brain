@@ -45,8 +45,17 @@ export function useGateway() {
             });
           }
 
-          // Lifecycle events — end means the run is complete
-          if (stream === "lifecycle" && data?.phase === "end") {
+          // Lifecycle events — end or error means the run is complete
+          if (stream === "lifecycle" && (data?.phase === "end" || data?.phase === "error")) {
+            if (data?.phase === "error" && data?.error) {
+              // Show the error message to the user
+              const errorMsg = data.error as string;
+              setMessages((prev) => {
+                const last = prev[prev.length - 1];
+                if (last?.role === "assistant") return prev;
+                return [...prev, { role: "assistant", content: `Error: ${errorMsg}` }];
+              });
+            }
             setStreaming(false);
             currentAssistantRef.current = "";
           }
