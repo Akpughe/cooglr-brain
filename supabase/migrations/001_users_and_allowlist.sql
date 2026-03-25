@@ -42,7 +42,7 @@ create policy "Admins can manage allowlist"
   );
 
 insert into public.allowed_emails (email, role, department)
-values ('YOUR_EMAIL_HERE', 'admin', 'engineering');
+values ('tech@500chow.com', 'admin', 'engineering');
 
 create or replace function public.handle_new_user()
 returns trigger
