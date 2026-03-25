@@ -2,16 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getGateway } from "@/lib/gateway/connection";
 
-// POST /api/gateway — send a chat message (scoped to user session)
+// POST /api/gateway — send a chat message (scoped to user + chat session)
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
-  const { message } = await request.json();
+  const { message, sessionId } = await request.json();
   if (!message || typeof message !== "string") {
     return NextResponse.json({ error: "Message required" }, { status: 400 });
   }
@@ -19,10 +16,18 @@ export async function POST(request: NextRequest) {
   const gateway = getGateway();
 
   try {
-    if (!gateway.isConnected) {
-      await gateway.connect();
+    if (!gateway.isConnected) await gateway.connect();
+
+    // Update session's updated_at timestamp
+    if (sessionId) {
+      await supabase
+        .from("chat_sessions")
+        .update({ updated_at: new Date().toISOString() })
+        .eq("id", sessionId)
+        .eq("user_id", user.id);
     }
-    const response = await gateway.sendChat(message, user.id);
+
+    const response = await gateway.sendChat(message, user.id, sessionId);
     return NextResponse.json(response);
   } catch (err) {
     const errorMessage = err instanceof Error ? err.message : "Gateway error";
@@ -34,11 +39,9 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  if (!user) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
+  const sessionId = request.nextUrl.searchParams.get("sessionId") || undefined;
   const gateway = getGateway();
 
   if (!gateway.isConnected) {
@@ -50,7 +53,7 @@ export async function GET(request: NextRequest) {
     }
   }
 
-  const sessionKey = gateway.userSessionKey(user.id);
+  const sessionKey = gateway.userSessionKey(user.id, sessionId);
   const encoder = new TextEncoder();
 
   const stream = new ReadableStream({
@@ -59,8 +62,7 @@ export async function GET(request: NextRequest) {
 
       const unsubscribe = gateway.onSessionEvent(sessionKey, (event) => {
         if (closed) return;
-        const data = JSON.stringify(event);
-        controller.enqueue(encoder.encode(`data: ${data}\n\n`));
+        controller.enqueue(encoder.encode(`data: ${JSON.stringify(event)}\n\n`));
       });
 
       const keepalive = setInterval(() => {

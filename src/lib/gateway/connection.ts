@@ -158,24 +158,25 @@ export class GatewayConnection {
     };
   }
 
-  /** Build a per-user session key */
-  userSessionKey(userId: string): string {
+  /** Build a session key for a user + chat session */
+  userSessionKey(userId: string, chatSessionId?: string): string {
+    if (chatSessionId) return `agent:main:user-${userId}-${chatSessionId}`;
     return `agent:main:user-${userId}`;
   }
 
   /** Send a chat message scoped to a user's session */
-  async sendChat(message: string, userId: string): Promise<GatewayResponse> {
+  async sendChat(message: string, userId: string, chatSessionId?: string): Promise<GatewayResponse> {
     return this.sendRequest("chat.send", {
-      sessionKey: this.userSessionKey(userId),
+      sessionKey: this.userSessionKey(userId, chatSessionId),
       message,
       idempotencyKey: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
     });
   }
 
   /** Get chat history for a user's session */
-  async getChatHistory(userId: string): Promise<GatewayResponse> {
+  async getChatHistory(userId: string, chatSessionId?: string): Promise<GatewayResponse> {
     return this.sendRequest("chat.history", {
-      sessionKey: this.userSessionKey(userId),
+      sessionKey: this.userSessionKey(userId, chatSessionId),
     });
   }
 

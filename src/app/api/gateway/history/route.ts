@@ -1,12 +1,13 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getGateway } from "@/lib/gateway/connection";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const sessionId = request.nextUrl.searchParams.get("sessionId") || undefined;
   const gateway = getGateway();
 
   if (!gateway.isConnected) {
@@ -18,7 +19,7 @@ export async function GET() {
   }
 
   try {
-    const response = await gateway.getChatHistory(user.id);
+    const response = await gateway.getChatHistory(user.id, sessionId);
     if (!response.ok || !response.payload) return NextResponse.json([]);
 
     const payload = response.payload as { messages?: Array<{

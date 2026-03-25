@@ -9,7 +9,7 @@ export interface ProcessStep {
   timestamp: number;
 }
 
-export function useGateway() {
+export function useGateway(sessionId: string | null) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [connected, setConnected] = useState(false);
@@ -21,10 +21,38 @@ export function useGateway() {
   const isStreamingRef = useRef(false);
   const startTimeRef = useRef<number | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const esRef = useRef<EventSource | null>(null);
 
-  // Load chat history on mount
+  function startTimer() {
+    startTimeRef.current = Date.now();
+    setElapsedMs(0);
+    timerRef.current = setInterval(() => {
+      if (startTimeRef.current) setElapsedMs(Date.now() - startTimeRef.current);
+    }, 100);
+  }
+
+  function stopTimer() {
+    if (timerRef.current) clearInterval(timerRef.current);
+    timerRef.current = null;
+    startTimeRef.current = null;
+    setElapsedMs(0);
+  }
+
+  // Load history when session changes
   useEffect(() => {
-    fetch("/api/gateway/history")
+    setMessages([]);
+    setHistoryLoaded(false);
+    setStreaming(false);
+    setStatusText(null);
+    setProcessSteps([]);
+    isStreamingRef.current = false;
+
+    if (!sessionId) {
+      setHistoryLoaded(true);
+      return;
+    }
+
+    fetch(`/api/gateway/history?sessionId=${sessionId}`)
       .then((r) => r.json())
       .then((history: ChatMessage[]) => {
         if (Array.isArray(history) && history.length > 0) {
@@ -36,29 +64,15 @@ export function useGateway() {
         setHistoryLoaded(true);
       })
       .catch(() => setHistoryLoaded(true));
-  }, []);
+  }, [sessionId]);
 
-  // Elapsed time ticker
-  function startTimer() {
-    startTimeRef.current = Date.now();
-    setElapsedMs(0);
-    timerRef.current = setInterval(() => {
-      if (startTimeRef.current) {
-        setElapsedMs(Date.now() - startTimeRef.current);
-      }
-    }, 100);
-  }
-
-  function stopTimer() {
-    if (timerRef.current) clearInterval(timerRef.current);
-    timerRef.current = null;
-    startTimeRef.current = null;
-    setElapsedMs(0);
-  }
-
-  // SSE connection
+  // SSE connection — reconnects when session changes
   useEffect(() => {
-    const es = new EventSource("/api/gateway");
+    if (!sessionId) return;
+
+    const url = `/api/gateway?sessionId=${sessionId}`;
+    const es = new EventSource(url);
+    esRef.current = es;
 
     es.onopen = () => setConnected(true);
     es.onerror = () => {
@@ -74,29 +88,22 @@ export function useGateway() {
       try {
         const event = JSON.parse(e.data);
         if (event.event !== "agent") return;
-
         const { stream, data } = event.payload || {};
 
-        // Lifecycle start — begin thinking
         if (stream === "lifecycle" && data?.phase === "start") {
           setStatusText("Thinking...");
           setProcessSteps([{ label: "Processing your request", status: "running", timestamp: Date.now() }]);
           startTimer();
         }
 
-        // Assistant text stream
         if (stream === "assistant" && data?.text) {
           const rawText = data.text as string;
-
           if (isToolNoise(rawText)) {
-            // Tool output — add as a process step
             const hint = extractToolHint(rawText);
             if (hint) {
               setStatusText(hint);
               setProcessSteps((prev) => {
-                const updated = prev.map((s) =>
-                  s.status === "running" ? { ...s, status: "done" as const } : s
-                );
+                const updated = prev.map((s) => s.status === "running" ? { ...s, status: "done" as const } : s);
                 return [...updated, { label: hint, status: "running" as const, timestamp: Date.now() }];
               });
             }
@@ -104,16 +111,11 @@ export function useGateway() {
           }
 
           const displayText = cleanContent(rawText);
-
           if (displayText.trim()) {
-            // Mark all steps as done, add "Composing response"
-            setProcessSteps((prev) =>
-              prev.map((s) => (s.status === "running" ? { ...s, status: "done" as const } : s))
-            );
+            setProcessSteps((prev) => prev.map((s) => s.status === "running" ? { ...s, status: "done" as const } : s));
             setStatusText(null);
             stopTimer();
             currentTextRef.current = displayText;
-
             setMessages((prev) => {
               if (isStreamingRef.current && prev.length > 0) {
                 const last = prev[prev.length - 1];
@@ -127,32 +129,29 @@ export function useGateway() {
           }
         }
 
-        // Lifecycle end/error
         if (stream === "lifecycle" && (data?.phase === "end" || data?.phase === "error")) {
           if (data?.phase === "error" && data?.error) {
             setMessages((prev) => [...prev, { role: "assistant", content: `Error: ${data.error}` }]);
           }
           setStreaming(false);
           setStatusText(null);
-          setProcessSteps((prev) =>
-            prev.map((s) => (s.status === "running" ? { ...s, status: "done" as const } : s))
-          );
+          setProcessSteps((prev) => prev.map((s) => s.status === "running" ? { ...s, status: "done" as const } : s));
           stopTimer();
           currentTextRef.current = "";
           isStreamingRef.current = false;
         }
-      } catch {
-        // ignore
-      }
+      } catch { /* ignore */ }
     };
 
     return () => {
       es.close();
       stopTimer();
     };
-  }, []);
+  }, [sessionId]);
 
   const sendMessage = useCallback(async (text: string) => {
+    if (!sessionId) return;
+
     setMessages((prev) => [...prev, { role: "user", content: text }]);
     setStreaming(true);
     setStatusText("Thinking...");
@@ -172,9 +171,8 @@ export function useGateway() {
       const res = await fetch("/api/gateway", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: text }),
+        body: JSON.stringify({ message: text, sessionId }),
       });
-
       if (!res.ok) {
         clearTimeout(safetyTimeout);
         const err = await res.json();
@@ -194,7 +192,7 @@ export function useGateway() {
       isStreamingRef.current = false;
       stopTimer();
     }
-  }, []);
+  }, [sessionId]);
 
   return { messages, sendMessage, streaming, connected, statusText, processSteps, historyLoaded, elapsedMs };
 }
@@ -206,15 +204,7 @@ function cleanContent(text: string): string {
 }
 
 function isToolNoise(text: string): boolean {
-  const noise = [
-    /^(message_id|thread_id|Command exited|unknown flag)/i,
-    /^Usage:\s+gh\s/,
-    /^Flags:/,
-    /^\s*--\w+/,
-    /^\s*-\w,\s+--/,
-    /^\d+$/,
-    /^\(Command exited/,
-  ];
+  const noise = [/^(message_id|thread_id|Command exited|unknown flag)/i, /^Usage:\s+gh\s/, /^Flags:/, /^\s*--\w+/, /^\s*-\w,\s+--/, /^\d+$/, /^\(Command exited/];
   const lines = text.trim().split("\n");
   const noiseLines = lines.filter((line) => noise.some((p) => p.test(line.trim())));
   return noiseLines.length > lines.length * 0.5 && lines.length > 1;

@@ -5,8 +5,8 @@ import { MessageList } from "./message-list";
 import { MessageInput } from "./message-input";
 import { Badge } from "@/components/ui/badge";
 
-export function ChatPanel() {
-  const { messages, sendMessage, streaming, connected, statusText, processSteps, historyLoaded, elapsedMs } = useGateway();
+export function ChatPanel({ sessionId }: { sessionId: string }) {
+  const { messages, sendMessage, streaming, connected, statusText, processSteps, historyLoaded, elapsedMs } = useGateway(sessionId);
 
   const formatElapsed = (ms: number) => {
     const seconds = Math.floor(ms / 1000);
@@ -23,7 +23,6 @@ export function ChatPanel() {
       </div>
       <MessageList messages={messages} historyLoaded={historyLoaded} streaming={streaming} />
 
-      {/* Process steps / thinking indicator */}
       {streaming && (processSteps.length > 0 || statusText) && (
         <div className="px-4 py-3 border-t bg-muted/30 space-y-1">
           {processSteps.map((step, i) => (
