@@ -3,7 +3,6 @@
 import { useEffect, useRef } from "react";
 import type { ChatMessage } from "@/types/gateway";
 import { MessageBubble } from "./message-bubble";
-import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function MessageList({
   messages,
@@ -21,7 +20,7 @@ export function MessageList({
   }, [messages]);
 
   return (
-    <ScrollArea className="flex-1 p-4">
+    <div className="flex-1 overflow-y-auto p-4 min-h-0">
       <div className="space-y-4 max-w-4xl mx-auto">
         {!historyLoaded && (
           <div className="text-center text-muted-foreground mt-20">
@@ -43,6 +42,6 @@ export function MessageList({
         ))}
         <div ref={bottomRef} />
       </div>
-    </ScrollArea>
+    </div>
   );
 }
