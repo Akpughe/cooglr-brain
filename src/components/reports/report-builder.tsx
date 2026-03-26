@@ -184,139 +184,76 @@ export function ReportBuilder() {
 
   const hasConnections = connections.length > 0;
 
+  function formatCell(value: unknown): string {
+    if (value === null || value === undefined) return "—";
+    if (value instanceof Date) return value.toLocaleString();
+    if (typeof value === "object") return JSON.stringify(value);
+    const str = String(value);
+    // Format ISO dates nicely
+    if (/^\d{4}-\d{2}-\d{2}T/.test(str)) {
+      return new Date(str).toLocaleString();
+    }
+    return str;
+  }
+
   return (
     <div className="space-y-6">
-      {/* Data Source Indicator */}
-      <div className="flex items-center gap-3 flex-wrap">
-        <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Data Sources:</span>
-        {!hasConnections && (
-          <span className="text-xs text-muted-foreground">
-            No databases connected. <a href="/settings" className="text-primary hover:underline">Add one in Settings</a>
-          </span>
-        )}
-        {connections.map((conn) => (
-          <button
-            key={conn.id}
-            onClick={() => selectConnection(conn)}
-            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs border transition-colors ${
-              activeConnection?.id === conn.id
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-muted hover:bg-accent border-border"
-            }`}
-          >
-            <span className="w-2 h-2 rounded-full bg-green-500" />
-            {conn.name}
-          </button>
-        ))}
-        {schemaLoaded && tableCount > 0 && (
-          <span className="text-xs text-muted-foreground">{tableCount} tables available</span>
-        )}
-      </div>
-
-      {/* Ask in plain English */}
-      {hasConnections && (
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex gap-2">
-              <Input
-                placeholder='Ask anything... e.g. "Show me the top 10 customers by order count"'
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                onKeyDown={handleKeyDown}
-                disabled={loading || !activeConnection}
-                className="flex-1"
-              />
-              <Button onClick={generateAndRun} disabled={loading || !activeConnection || !prompt.trim()}>
-                {loading ? "Generating..." : "Generate Report"}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Generated SQL (collapsible) */}
-      {generatedSQL && (
-        <div className="text-xs">
-          <button
-            onClick={() => setShowSQL(!showSQL)}
-            className="text-muted-foreground hover:text-foreground flex items-center gap-1"
-          >
-            <span>{showSQL ? "▼" : "▶"}</span>
-            <span>Generated SQL</span>
-          </button>
-          {showSQL && (
-            <pre className="mt-2 p-3 bg-muted rounded-lg overflow-x-auto text-xs font-mono">
-              {generatedSQL}
-            </pre>
+      {/* Top section — centered like the page title */}
+      <div className="max-w-4xl mx-auto space-y-4">
+        {/* Data Source Indicator */}
+        <div className="flex items-center gap-3 flex-wrap">
+          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Data Sources:</span>
+          {!hasConnections && (
+            <span className="text-xs text-muted-foreground">
+              No databases connected. <a href="/settings" className="text-primary hover:underline">Add one in Settings</a>
+            </span>
+          )}
+          {connections.map((conn) => (
+            <button
+              key={conn.id}
+              onClick={() => selectConnection(conn)}
+              className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs border transition-colors ${
+                activeConnection?.id === conn.id
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-muted hover:bg-accent border-border"
+              }`}
+            >
+              <span className="w-2 h-2 rounded-full bg-green-500" />
+              {conn.name}
+            </button>
+          ))}
+          {schemaLoaded && tableCount > 0 && (
+            <span className="text-xs text-muted-foreground">{tableCount} tables</span>
           )}
         </div>
-      )}
 
-      {error && (
-        <Card className="border-destructive">
-          <CardContent className="p-4 text-sm text-destructive">{error}</CardContent>
-        </Card>
-      )}
+        {/* Ask in plain English */}
+        {hasConnections && (
+          <div className="flex gap-2">
+            <Input
+              placeholder='Ask anything... e.g. "Show me the top 10 customers by order count"'
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={handleKeyDown}
+              disabled={loading || !activeConnection}
+              className="flex-1 h-11"
+            />
+            <Button onClick={generateAndRun} disabled={loading || !activeConnection || !prompt.trim()} className="h-11 px-6">
+              {loading ? "Generating..." : "Generate Report"}
+            </Button>
+          </div>
+        )}
 
-      {/* Results */}
-      {result && (
-        <Card>
-          <CardHeader className="pb-3">
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-base">Results</CardTitle>
-                <CardDescription>{result.rowCount} rows returned</CardDescription>
-              </div>
-              <div className="flex gap-2 items-center">
-                <Input
-                  placeholder="Report name..."
-                  value={reportName}
-                  onChange={(e) => setReportName(e.target.value)}
-                  className="w-40 h-8 text-xs"
-                />
-                <Button size="sm" variant="outline" onClick={saveReport} disabled={!reportName.trim()}>
-                  Save
-                </Button>
-                <Button size="sm" variant="outline" onClick={exportToSheets} disabled={exporting}>
-                  {exporting ? "Exporting..." : "Export to Sheets"}
-                </Button>
-              </div>
-            </div>
-          </CardHeader>
-          <CardContent className="p-0">
-            <div className="border-t overflow-auto max-h-[500px]">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    {result.columns.map((col) => (
-                      <TableHead key={col} className="font-mono text-xs whitespace-nowrap">{col}</TableHead>
-                    ))}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {result.rows.map((row, i) => (
-                    <TableRow key={i}>
-                      {result.columns.map((col) => (
-                        <TableCell key={col} className="font-mono text-xs whitespace-nowrap">
-                          {String(row[col] ?? "NULL")}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+        {error && (
+          <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive">
+            {error}
+          </div>
+        )}
 
-      {/* Saved Reports */}
-      {saved.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-base">Saved Reports</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
+        {/* Saved Reports */}
+        {saved.length > 0 && !result && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-muted-foreground">Saved Reports</p>
             {saved.map((r) => (
               <div key={r.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors">
                 <div className="min-w-0 flex-1">
@@ -329,8 +266,82 @@ export function ReportBuilder() {
                 </div>
               </div>
             ))}
-          </CardContent>
-        </Card>
+          </div>
+        )}
+      </div>
+
+      {/* Results — full width */}
+      {result && (
+        <div className="space-y-3">
+          {/* Actions bar */}
+          <div className="max-w-4xl mx-auto flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <span className="text-sm font-medium">{result.rowCount} rows</span>
+              {generatedSQL && (
+                <button
+                  onClick={() => setShowSQL(!showSQL)}
+                  className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+                >
+                  <span>{showSQL ? "▼" : "▶"}</span>
+                  <span>SQL</span>
+                </button>
+              )}
+            </div>
+            <div className="flex gap-2 items-center">
+              <Input
+                placeholder="Report name..."
+                value={reportName}
+                onChange={(e) => setReportName(e.target.value)}
+                className="w-44 h-8 text-xs"
+              />
+              <Button size="sm" variant="outline" onClick={saveReport} disabled={!reportName.trim()}>
+                Save
+              </Button>
+              <Button size="sm" variant="outline" onClick={exportToSheets} disabled={exporting}>
+                {exporting ? "Exporting..." : "Export to Sheets"}
+              </Button>
+            </div>
+          </div>
+
+          {/* SQL preview */}
+          {showSQL && generatedSQL && (
+            <div className="max-w-4xl mx-auto">
+              <pre className="p-3 bg-muted rounded-lg overflow-x-auto text-xs font-mono">
+                {generatedSQL}
+              </pre>
+            </div>
+          )}
+
+          {/* Full-width table */}
+          <div className="border rounded-lg overflow-hidden mx-2">
+            <div className="overflow-auto max-h-[calc(100vh-320px)]">
+              <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="text-xs text-muted-foreground w-12">#</TableHead>
+                    {result.columns.map((col) => (
+                      <TableHead key={col} className="text-xs font-semibold whitespace-nowrap px-4">
+                        {col}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {result.rows.map((row, i) => (
+                    <TableRow key={i} className="hover:bg-muted/30">
+                      <TableCell className="text-xs text-muted-foreground w-12">{i + 1}</TableCell>
+                      {result.columns.map((col) => (
+                        <TableCell key={col} className="text-sm whitespace-nowrap px-4">
+                          {formatCell(row[col])}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
