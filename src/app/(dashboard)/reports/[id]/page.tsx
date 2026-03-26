@@ -65,7 +65,15 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
 
     // If no initial query, load history
     if (!initialQuery) {
-      fetch(`/api/reports/runs?sessionId=${sessionId}`).then((r) => r.json()).then(setRuns);
+      fetch(`/api/reports/runs?sessionId=${sessionId}`)
+        .then((r) => r.json())
+        .then((data: ReportRun[]) => {
+          // Map generated_report from DB to cachedReport for the component
+          setRuns(data.map((r) => ({
+            ...r,
+            cachedReport: (r as unknown as Record<string, unknown>).generated_report as Record<string, unknown> | null || null,
+          })));
+        });
     }
   }, [sessionId, initialQuery]);
 
@@ -100,10 +108,19 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
     try {
       updateRun(runId, { thinkingStep: "Analyzing your data and planning the query..." });
 
+      // Build conversation context from previous runs
+      const previousRuns = runs
+        .filter((r) => r.id !== runId && !r.loading && r.generated_sql)
+        .map((r) => ({ prompt: r.prompt, sql: r.generated_sql, rowCount: r.result_row_count }));
+
       const genRes = await fetch("/api/reports/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: text, connectionId: connections[0].id }),
+        body: JSON.stringify({
+          prompt: text,
+          connectionId: connections[0].id,
+          conversationHistory: previousRuns,
+        }),
       });
 
       if (!genRes.ok) {

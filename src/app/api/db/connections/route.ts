@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
-import { encrypt, decrypt } from "@/lib/crypto";
+import { encrypt } from "@/lib/crypto";
+import { createDbAdapter } from "@/lib/db-adapter";
 
-// GET — list user's database connections (without connection strings)
+// GET — list user's database connections
 export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -24,28 +25,20 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { name, connectionString, dbType } = await request.json();
-
   if (!name || !connectionString) {
     return NextResponse.json({ error: "Name and connection string required" }, { status: 400 });
   }
 
-  // Test the connection — try SSL first, then without
-  const { Client } = await import("pg");
-  let connected = false;
-  for (const sslOpt of [{ rejectUnauthorized: false }, false as const]) {
-    const testClient = new Client({ connectionString, ssl: sslOpt });
-    try {
-      await testClient.connect();
-      await testClient.query("SELECT 1");
-      connected = true;
-      await testClient.end().catch(() => {});
-      break;
-    } catch {
-      await testClient.end().catch(() => {});
-    }
-  }
-  if (!connected) {
-    return NextResponse.json({ error: "Connection test failed: could not connect to database" }, { status: 400 });
+  const type = dbType || "postgres";
+
+  // Test connection
+  try {
+    const adapter = await createDbAdapter(type, connectionString);
+    await adapter.testConnection();
+    await adapter.close();
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Connection failed";
+    return NextResponse.json({ error: `Connection test failed: ${msg}` }, { status: 400 });
   }
 
   const serviceClient = await createServiceClient();
@@ -55,16 +48,33 @@ export async function POST(request: NextRequest) {
       user_id: user.id,
       name,
       encrypted_connection_string: encrypt(connectionString),
-      db_type: dbType || "postgres",
+      db_type: type,
     })
     .select("id, name, db_type, is_active, created_at")
     .single();
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
+}
+
+// PATCH — toggle active/inactive
+export async function PATCH(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { id, is_active } = await request.json();
+  if (!id || typeof is_active !== "boolean") {
+    return NextResponse.json({ error: "id and is_active required" }, { status: 400 });
   }
 
-  return NextResponse.json(data);
+  await supabase
+    .from("database_connections")
+    .update({ is_active, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .eq("user_id", user.id);
+
+  return NextResponse.json({ ok: true });
 }
 
 // DELETE — remove a database connection
@@ -74,12 +84,6 @@ export async function DELETE(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { id } = await request.json();
-
-  await supabase
-    .from("database_connections")
-    .delete()
-    .eq("id", id)
-    .eq("user_id", user.id);
-
+  await supabase.from("database_connections").delete().eq("id", id).eq("user_id", user.id);
   return NextResponse.json({ ok: true });
 }

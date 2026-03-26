@@ -7,10 +7,17 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { prompt, connectionId } = await request.json();
+  const { prompt, connectionId, conversationHistory } = await request.json();
   if (!prompt || !connectionId) {
     return NextResponse.json({ error: "Prompt and connectionId required" }, { status: 400 });
   }
+
+  // Build conversation context
+  const historyContext = (conversationHistory || [])
+    .map((h: { prompt: string; sql: string; rowCount: number }) =>
+      `Previous query: "${h.prompt}" → SQL: ${h.sql} → Returned ${h.rowCount} rows`
+    )
+    .join("\n");
 
   const { data: connection } = await supabase
     .from("database_connections")
@@ -217,7 +224,11 @@ ${foreignKeys || "None found"}
 SAMPLE DATA:
 ${sampleData || "No samples available"}
 
+CONVERSATION HISTORY (previous queries in this session):
+${historyContext || "None — this is the first query"}
+
 USER REQUEST: "${prompt}"
+Note: If the user references "these", "those", "the same", etc., they are referring to results from previous queries above.
 
 ANALYSIS PLAN:
 ${planContext || "Include all relevant related data"}

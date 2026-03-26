@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { decrypt } from "@/lib/crypto";
+import { createDbAdapter } from "@/lib/db-adapter";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -25,39 +26,16 @@ export async function POST(request: NextRequest) {
   try {
     connectionString = decrypt(connection.encrypted_connection_string);
   } catch {
-    return NextResponse.json({ error: "Failed to decrypt connection. Key may have been rotated." }, { status: 500 });
+    return NextResponse.json({ error: "Failed to decrypt connection." }, { status: 500 });
   }
 
-  const { Client } = await import("pg");
-
-  // Try SSL first, fall back to no SSL
-  for (const sslOpt of [{ rejectUnauthorized: false }, false as const]) {
-    const client = new Client({ connectionString, ssl: sslOpt, statement_timeout: 30000 });
-    try {
-      await client.connect();
-      await client.query("BEGIN READ ONLY");
-      // Strip trailing semicolons and whitespace before wrapping
-      const cleanQuery = query.replace(/;\s*$/, "").trim();
-      const result = await client.query(
-        `SELECT * FROM (${cleanQuery}) AS _user_query LIMIT 1000`
-      );
-      await client.query("COMMIT");
-      await client.end();
-
-      return NextResponse.json({
-        columns: result.fields.map((f: { name: string }) => f.name),
-        rows: result.rows,
-        rowCount: result.rowCount,
-      });
-    } catch (err) {
-      await client.end().catch(() => {});
-      const msg = err instanceof Error ? err.message : "";
-      // If it's an SSL error, try the next option
-      if (msg.includes("SSL") || msg.includes("ssl")) continue;
-      // Otherwise it's a real query error
-      return NextResponse.json({ error: msg || "Query failed" }, { status: 500 });
-    }
+  try {
+    const adapter = await createDbAdapter(connection.db_type, connectionString);
+    const result = await adapter.query(query);
+    await adapter.close();
+    return NextResponse.json(result);
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Query failed";
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
-
-  return NextResponse.json({ error: "Could not connect to database" }, { status: 500 });
 }

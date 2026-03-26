@@ -15,6 +15,8 @@ interface ReportSession {
 interface DbConnection {
   id: string;
   name: string;
+  db_type: string;
+  is_active: boolean;
 }
 
 export default function ReportsPage() {
@@ -26,7 +28,7 @@ export default function ReportsPage() {
 
   useEffect(() => {
     fetch("/api/reports/sessions").then((r) => r.json()).then(setSessions);
-    fetch("/api/db/connections").then((r) => r.json()).then(setConnections);
+    fetch("/api/db/connections").then((r) => r.json()).then((all: DbConnection[]) => setConnections(all.filter((c) => c.is_active)));
   }, []);
 
   async function startReport() {
