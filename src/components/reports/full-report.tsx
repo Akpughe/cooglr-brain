@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -42,18 +42,30 @@ const CHART_COLORS = ["#2563eb", "#7c3aed", "#db2777", "#ea580c", "#16a34a", "#0
 export function FullReport({
   prompt,
   result,
+  runId,
+  cachedReport,
   onClose,
   onExport,
+  onReportGenerated,
 }: {
   prompt: string;
   result: QueryResult;
+  runId: string;
+  cachedReport?: ReportData | null;
   onClose: () => void;
   onExport: () => void;
+  onReportGenerated?: (runId: string, report: ReportData) => void;
 }) {
-  const [report, setReport] = useState<ReportData | null>(null);
+  const [report, setReport] = useState<ReportData | null>(cachedReport || null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [generated, setGenerated] = useState(false);
+  const [exporting, setExporting] = useState(false);
+
+  useEffect(() => {
+    if (!report && !loading) {
+      generate();
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function generate() {
     setLoading(true);
@@ -77,7 +89,8 @@ export function FullReport({
       } else {
         const data = await res.json();
         setReport(data);
-        setGenerated(true);
+        // Cache the report
+        if (onReportGenerated) onReportGenerated(runId, data);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed");
@@ -85,9 +98,16 @@ export function FullReport({
     setLoading(false);
   }
 
-  // Auto-generate on mount
-  if (!generated && !loading && !report) {
-    generate();
+  async function downloadPDF() {
+    if (!report) return;
+    setExporting(true);
+    try {
+      const { generateReportPDF } = await import("@/lib/pdf");
+      generateReportPDF(report, result, prompt);
+    } catch (err) {
+      alert("PDF generation failed: " + (err instanceof Error ? err.message : "Unknown error"));
+    }
+    setExporting(false);
   }
 
   if (loading) {
@@ -124,7 +144,7 @@ export function FullReport({
   if (!report) return null;
 
   return (
-    <div className="space-y-6 py-4" id="full-report">
+    <div className="space-y-6 py-4">
       {/* Header */}
       <div className="flex items-start justify-between">
         <div>
@@ -135,7 +155,9 @@ export function FullReport({
         </div>
         <div className="flex gap-2">
           <Button size="sm" variant="outline" onClick={onExport}>Export to Sheets</Button>
-          <Button size="sm" variant="outline" onClick={() => window.print()}>Export PDF</Button>
+          <Button size="sm" variant="outline" onClick={downloadPDF} disabled={exporting}>
+            {exporting ? "Generating..." : "Download PDF"}
+          </Button>
           <Button size="sm" variant="ghost" onClick={onClose}>Close</Button>
         </div>
       </div>

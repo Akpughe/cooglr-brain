@@ -55,3 +55,21 @@ export async function POST(request: NextRequest) {
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json(data);
 }
+
+// PATCH — save generated report to a run
+export async function PATCH(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { runId, generatedReport } = await request.json();
+  if (!runId) return NextResponse.json({ error: "runId required" }, { status: 400 });
+
+  await supabase
+    .from("report_runs")
+    .update({ generated_report: generatedReport })
+    .eq("id", runId)
+    .eq("user_id", user.id);
+
+  return NextResponse.json({ ok: true });
+}

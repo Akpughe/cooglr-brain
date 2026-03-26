@@ -34,6 +34,7 @@ interface ReportRun {
   summaryParts?: { text: string; bold?: boolean }[];
   expanded?: boolean;
   showFullReport?: boolean;
+  cachedReport?: Record<string, unknown> | null;
 }
 
 export default function ReportSessionPage({ params }: { params: Promise<{ id: string }> }) {
@@ -284,8 +285,8 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
                         <span className="text-sm font-medium">{formatNumber(run.result_row_count)} rows · {run.result_columns.length} columns</span>
                       </div>
                       <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                        <Button size="sm" variant="default" className="h-7 text-xs" onClick={() => updateRun(run.id, { showFullReport: true })}>
-                          Generate Report
+                        <Button size="sm" variant="default" className="h-7 text-xs" onClick={() => updateRun(run.id, { showFullReport: !run.showFullReport })}>
+                          {run.showFullReport ? "Hide Report" : run.cachedReport ? "View Report" : "Generate Report"}
                         </Button>
                         <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => exportToSheets(run)}>
                           Export to Sheets
@@ -333,8 +334,19 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
                     <FullReport
                       prompt={run.prompt}
                       result={run.result}
+                      runId={run.id}
+                      cachedReport={run.cachedReport as never}
                       onClose={() => updateRun(run.id, { showFullReport: false })}
                       onExport={() => exportToSheets(run)}
+                      onReportGenerated={(id, report) => {
+                        updateRun(id, { cachedReport: report as unknown as Record<string, unknown> });
+                        // Save to DB for future visits
+                        fetch("/api/reports/runs", {
+                          method: "PATCH",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({ runId: id, generatedReport: report }),
+                        }).catch(() => {});
+                      }}
                     />
                   )}
                 </div>
