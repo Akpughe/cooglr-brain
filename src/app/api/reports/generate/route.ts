@@ -161,7 +161,52 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "AI API key not configured" }, { status: 500 });
   }
 
-  const aiPrompt = `You are a senior business intelligence analyst writing PostgreSQL queries. Your queries should be comprehensive and insightful — you NEVER return bare IDs when human-readable data is available.
+  // Two-step AI approach: Plan first, then generate SQL
+
+  const planPrompt = `You are a senior business intelligence analyst. The user asked: "${prompt}"
+
+Given this database schema:
+${schema}
+
+And these relationships:
+${foreignKeys || "None found"}
+
+And sample data:
+${sampleData || "No samples available"}
+
+THINK about what the user REALLY wants to know. Go beyond the literal request:
+- If they ask for "most ordered items" → they also want revenue, order count, average order value
+- If they ask for "recent orders" → they want customer names, items ordered, amounts, statuses
+- If they ask for "customers" → they want order history, total spend, last order date
+- If they ask for "revenue" → they want breakdowns by product, category, time period
+
+List EXACTLY which tables to JOIN and which columns to include. Think about what a CEO would want.
+Output a JSON object with:
+{"tables": ["Table1", "Table2"], "key_columns": ["col1", "col2"], "aggregations": ["SUM(amount)", "COUNT(*)"], "reasoning": "brief explanation"}
+
+ONLY output the JSON, nothing else.`;
+
+  try {
+    const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`;
+
+    // Step 1: Plan
+    const planRes = await fetch(geminiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: planPrompt }] }],
+        generationConfig: { temperature: 0.2, maxOutputTokens: 500 },
+      }),
+    });
+
+    let planContext = "";
+    if (planRes.ok) {
+      const planData = await planRes.json();
+      planContext = planData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+    }
+
+    // Step 2: Generate SQL using the plan
+    const sqlPrompt = `You are a PostgreSQL expert. Generate a comprehensive query.
 
 DATABASE SCHEMA:
 ${schema}
@@ -169,54 +214,45 @@ ${schema}
 FOREIGN KEY RELATIONSHIPS:
 ${foreignKeys || "None found"}
 
-SAMPLE DATA FROM KEY TABLES:
+SAMPLE DATA:
 ${sampleData || "No samples available"}
 
 USER REQUEST: "${prompt}"
 
-CRITICAL RULES:
-1. Output ONLY raw SQL — no markdown, no code fences, no explanation, no semicolons
-2. Use double quotes for ALL table and column names (they are PascalCase/case-sensitive)
-3. BE COMPREHENSIVE — JOIN every related table that adds useful context:
-   - Orders → JOIN OrderItem for item details (names, quantities, prices)
-   - Orders → JOIN Customer/User for customer names and contact info
-   - Orders → JOIN Product/Menu for product names and categories
-   - Orders → JOIN Business/Store for business names and locations
-   - Always resolve foreign key IDs into human-readable names
-4. NEVER return just IDs — always JOIN to get names, descriptions, amounts
-5. Include ALL relevant columns: amounts, quantities, names, statuses, dates, categories
-6. Use string_agg() or array_agg() to combine child rows (e.g., order items) into a single column when useful
-7. Use meaningful aliases: "customer_name", "total_amount", "item_count", "items_ordered", "business_name"
-8. Format currency values, format dates with to_char() for readability
-9. Include aggregations (COUNT, SUM, AVG) when they make the report more insightful
-10. ORDER BY the most relevant column (usually date DESC, amount DESC, or count DESC)
-11. LIMIT to 50 by default unless the user specifies otherwise
-12. Think: "What would a CEO or operations manager want to see in this report?"
+ANALYSIS PLAN:
+${planContext || "Include all relevant related data"}
+
+OUTPUT RULES:
+- Output ONLY raw SQL — no markdown, no code fences, no explanation, no semicolons
+- Use double quotes for ALL table/column names (they are PascalCase/case-sensitive)
+- ALWAYS JOIN related tables for complete data — never return bare foreign key IDs
+- Include items, quantities, prices, names, emails, statuses, dates — everything relevant
+- For "items" data: use string_agg() to list item names/quantities in a readable column
+- For monetary values: include individual amounts AND totals/sums
+- Use meaningful aliases that a non-technical person would understand
+- ORDER BY the most useful column (date DESC, amount DESC, count DESC)
+- LIMIT 50 unless user specifies
+- The query should tell a COMPLETE STORY — not just answer the literal question but provide full context
 
 SQL:`;
 
-  try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: aiPrompt }] }],
-          generationConfig: { temperature: 0.1, maxOutputTokens: 1000 },
-        }),
-      }
-    );
+    const sqlRes = await fetch(geminiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: sqlPrompt }] }],
+        generationConfig: { temperature: 0.1, maxOutputTokens: 1500 },
+      }),
+    });
 
-    if (!res.ok) {
-      const err = await res.json();
+    if (!sqlRes.ok) {
+      const err = await sqlRes.json();
       return NextResponse.json({ error: err.error?.message || "AI generation failed" }, { status: 500 });
     }
 
-    const data = await res.json();
+    const data = await sqlRes.json();
     let sql = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
 
-    // Clean up
     sql = sql.replace(/^```sql?\n?/i, "").replace(/\n?```$/i, "").replace(/;\s*$/, "").trim();
 
     if (!sql) {
