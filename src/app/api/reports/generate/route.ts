@@ -31,20 +31,20 @@ export async function POST(request: NextRequest) {
   const { Client } = await import("pg");
   let schema = "";
   let foreignKeys = "";
+  let sampleData = "";
 
   for (const sslOpt of [{ rejectUnauthorized: false }, false as const]) {
-    const client = new Client({ connectionString, ssl: sslOpt, statement_timeout: 15000 });
+    const client = new Client({ connectionString, ssl: sslOpt, statement_timeout: 20000 });
     try {
       await client.connect();
 
-      // Get tables with ALL columns and their types
+      // Get tables with ALL columns
       const tablesResult = await client.query(`
         SELECT
           t.table_name,
           string_agg(
             c.column_name || ' ' || c.data_type ||
-            CASE WHEN c.is_nullable = 'NO' THEN ' NOT NULL' ELSE '' END ||
-            CASE WHEN c.column_default IS NOT NULL THEN ' DEFAULT' ELSE '' END,
+            CASE WHEN c.is_nullable = 'NO' THEN ' NOT NULL' ELSE '' END,
             ', ' ORDER BY c.ordinal_position
           ) as columns
         FROM information_schema.tables t
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
         `"${r.table_name}" (${r.columns})`
       ).join("\n");
 
-      // Get foreign key relationships
+      // Get ALL foreign key relationships
       const fkResult = await client.query(`
         SELECT
           tc.table_name AS from_table,
@@ -76,7 +76,75 @@ export async function POST(request: NextRequest) {
         `"${r.from_table}"."${r.from_column}" -> "${r.to_table}"."${r.to_column}"`
       ).join("\n");
 
-      // Get a sample of 3 rows from the most relevant table to understand data patterns
+      // Get sample data from tables that seem relevant to the user's prompt
+      const keywords = prompt.toLowerCase().split(/\s+/);
+      const relevantTables = tablesResult.rows
+        .filter((r: { table_name: string }) => {
+          const name = r.table_name.toLowerCase();
+          return keywords.some((k: string) =>
+            name.includes(k) || k.includes(name) ||
+            (k === "orders" && name === "order") ||
+            (k === "order" && name.includes("order")) ||
+            (k === "customers" && name.includes("customer")) ||
+            (k === "users" && name.includes("user")) ||
+            (k === "products" && name.includes("product")) ||
+            (k === "items" && name.includes("item"))
+          );
+        })
+        .map((r: { table_name: string }) => r.table_name)
+        .slice(0, 5);
+
+      // Also add common related tables
+      const alwaysSample = ["Order", "OrderItem", "Customer", "Product", "User", "Business"];
+      const tablesToSample = [...new Set([...relevantTables, ...alwaysSample])];
+
+      const samples: string[] = [];
+      for (const tableName of tablesToSample) {
+        try {
+          const sampleResult = await client.query(
+            `SELECT * FROM "${tableName}" ORDER BY "createdAt" DESC LIMIT 2`
+          );
+          if (sampleResult.rows.length > 0) {
+            const cols = sampleResult.fields.map((f: { name: string }) => f.name);
+            samples.push(
+              `-- "${tableName}" sample (${cols.length} columns: ${cols.join(", ")}):\n` +
+              sampleResult.rows.map((row: Record<string, unknown>) =>
+                cols.map((c: string) => {
+                  const v = row[c];
+                  if (v === null) return "NULL";
+                  if (typeof v === "object") return "{}";
+                  const s = String(v);
+                  return s.length > 50 ? s.substring(0, 50) + "..." : s;
+                }).join(" | ")
+              ).join("\n")
+            );
+          }
+        } catch {
+          // Table might not have createdAt, try without ORDER
+          try {
+            const sampleResult = await client.query(
+              `SELECT * FROM "${tableName}" LIMIT 2`
+            );
+            if (sampleResult.rows.length > 0) {
+              const cols = sampleResult.fields.map((f: { name: string }) => f.name);
+              samples.push(
+                `-- "${tableName}" sample (${cols.length} columns: ${cols.join(", ")}):\n` +
+                sampleResult.rows.map((row: Record<string, unknown>) =>
+                  cols.map((c: string) => {
+                    const v = row[c];
+                    if (v === null) return "NULL";
+                    if (typeof v === "object") return "{}";
+                    const s = String(v);
+                    return s.length > 50 ? s.substring(0, 50) + "..." : s;
+                  }).join(" | ")
+                ).join("\n")
+              );
+            }
+          } catch { /* skip */ }
+        }
+      }
+      sampleData = samples.join("\n\n");
+
       await client.end();
       break;
     } catch {
@@ -93,7 +161,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "AI API key not configured" }, { status: 500 });
   }
 
-  const aiPrompt = `You are an expert PostgreSQL analyst. Generate the best possible query for the user's request.
+  const aiPrompt = `You are a senior business intelligence analyst writing PostgreSQL queries. Your queries should be comprehensive and insightful — you NEVER return bare IDs when human-readable data is available.
 
 DATABASE SCHEMA:
 ${schema}
@@ -101,22 +169,29 @@ ${schema}
 FOREIGN KEY RELATIONSHIPS:
 ${foreignKeys || "None found"}
 
+SAMPLE DATA FROM KEY TABLES:
+${sampleData || "No samples available"}
+
 USER REQUEST: "${prompt}"
 
-INSTRUCTIONS:
-- Generate a single PostgreSQL SELECT statement
-- Output ONLY the raw SQL — no markdown, no explanation, no code fences, no semicolons
-- Use double quotes for all table and column names (they are case-sensitive)
-- JOIN related tables when it makes the result more useful and complete
-- When the user asks about "orders", include relevant details like amounts, items, dates, customer info — not just IDs
-- When the user asks about "customers" or "users", include names, emails, counts — not just IDs
-- Select human-readable columns, not just foreign key IDs
-- Use meaningful aliases: "total_amount", "order_count", "customer_name" etc.
-- Format dates with to_char() when appropriate
-- Include aggregations (COUNT, SUM, AVG) when they make the result more insightful
-- ORDER BY the most relevant column (usually date DESC or count DESC)
-- Always LIMIT to a reasonable number (default 50 unless the user specifies)
-- Think about what a business analyst would actually want to see
+CRITICAL RULES:
+1. Output ONLY raw SQL — no markdown, no code fences, no explanation, no semicolons
+2. Use double quotes for ALL table and column names (they are PascalCase/case-sensitive)
+3. BE COMPREHENSIVE — JOIN every related table that adds useful context:
+   - Orders → JOIN OrderItem for item details (names, quantities, prices)
+   - Orders → JOIN Customer/User for customer names and contact info
+   - Orders → JOIN Product/Menu for product names and categories
+   - Orders → JOIN Business/Store for business names and locations
+   - Always resolve foreign key IDs into human-readable names
+4. NEVER return just IDs — always JOIN to get names, descriptions, amounts
+5. Include ALL relevant columns: amounts, quantities, names, statuses, dates, categories
+6. Use string_agg() or array_agg() to combine child rows (e.g., order items) into a single column when useful
+7. Use meaningful aliases: "customer_name", "total_amount", "item_count", "items_ordered", "business_name"
+8. Format currency values, format dates with to_char() for readability
+9. Include aggregations (COUNT, SUM, AVG) when they make the report more insightful
+10. ORDER BY the most relevant column (usually date DESC, amount DESC, or count DESC)
+11. LIMIT to 50 by default unless the user specifies otherwise
+12. Think: "What would a CEO or operations manager want to see in this report?"
 
 SQL:`;
 
