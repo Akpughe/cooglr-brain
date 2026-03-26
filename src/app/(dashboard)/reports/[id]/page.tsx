@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
+import { FullReport } from "@/components/reports/full-report";
 
 interface DbConnection {
   id: string;
@@ -32,6 +33,7 @@ interface ReportRun {
   thinkingStep?: string;
   summaryParts?: { text: string; bold?: boolean }[];
   expanded?: boolean;
+  showFullReport?: boolean;
 }
 
 export default function ReportSessionPage({ params }: { params: Promise<{ id: string }> }) {
@@ -282,6 +284,9 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
                         <span className="text-sm font-medium">{formatNumber(run.result_row_count)} rows · {run.result_columns.length} columns</span>
                       </div>
                       <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                        <Button size="sm" variant="default" className="h-7 text-xs" onClick={() => updateRun(run.id, { showFullReport: true })}>
+                          Generate Report
+                        </Button>
                         <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => exportToSheets(run)}>
                           Export to Sheets
                         </Button>
@@ -322,6 +327,16 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
                       </div>
                     )}
                   </div>
+
+                  {/* Full McKinsey-style report */}
+                  {run.showFullReport && run.result && (
+                    <FullReport
+                      prompt={run.prompt}
+                      result={run.result}
+                      onClose={() => updateRun(run.id, { showFullReport: false })}
+                      onExport={() => exportToSheets(run)}
+                    />
+                  )}
                 </div>
               )}
 
