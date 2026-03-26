@@ -30,6 +30,8 @@ interface ReportRun {
   result?: QueryResult | null;
   loading?: boolean;
   thinkingStep?: string;
+  summaryParts?: { text: string; bold?: boolean }[];
+  expanded?: boolean;
 }
 
 export default function ReportSessionPage({ params }: { params: Promise<{ id: string }> }) {
@@ -41,38 +43,26 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
   const [connections, setConnections] = useState<DbConnection[]>([]);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
-  const [activeResult, setActiveResult] = useState<{ run: ReportRun; result: QueryResult } | null>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
   const initialRan = useRef(false);
 
   useEffect(() => {
     fetch("/api/db/connections").then((r) => r.json()).then(setConnections);
-    fetch(`/api/reports/runs?sessionId=${sessionId}`).then((r) => r.json()).then((data) => {
-      setRuns(data);
-    });
+    fetch(`/api/reports/runs?sessionId=${sessionId}`).then((r) => r.json()).then(setRuns);
   }, [sessionId]);
 
-  // Show initial query immediately and run it once connections load
   useEffect(() => {
     if (initialQuery && !initialRan.current) {
-      // Show the query bubble immediately with loading state
-      const placeholder: ReportRun = {
-        id: `init-${Date.now()}`,
-        prompt: initialQuery,
-        generated_sql: null,
-        result_columns: [],
-        result_row_count: 0,
-        error: null,
-        created_at: new Date().toISOString(),
-        loading: true,
+      setRuns([{
+        id: `init-${Date.now()}`, prompt: initialQuery, generated_sql: null,
+        result_columns: [], result_row_count: 0, error: null,
+        created_at: new Date().toISOString(), loading: true,
         thinkingStep: "Understanding your question...",
-      };
-      setRuns([placeholder]);
+      }]);
       initialRan.current = true;
     }
   }, [initialQuery]);
 
-  // Actually execute once connections are loaded
   useEffect(() => {
     if (initialQuery && initialRan.current && connections.length > 0 && runs.length === 1 && runs[0]?.loading) {
       executeQuery(initialQuery, runs[0].id);
@@ -81,39 +71,26 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [runs, activeResult]);
+  }, [runs]);
 
   async function runQuery(text: string) {
     if (!text.trim() || connections.length === 0) return;
     setLoading(true);
     setPrompt("");
-    setActiveResult(null);
-
     const runId = `run-${Date.now()}`;
-    const placeholder: ReportRun = {
-      id: runId,
-      prompt: text,
-      generated_sql: null,
-      result_columns: [],
-      result_row_count: 0,
-      error: null,
-      created_at: new Date().toISOString(),
-      loading: true,
+    setRuns((prev) => [...prev, {
+      id: runId, prompt: text, generated_sql: null,
+      result_columns: [], result_row_count: 0, error: null,
+      created_at: new Date().toISOString(), loading: true,
       thinkingStep: "Understanding your question...",
-    };
-    setRuns((prev) => [...prev, placeholder]);
+    }]);
     await executeQuery(text, runId);
     setLoading(false);
   }
 
   async function executeQuery(text: string, runId: string) {
     try {
-      // Step 1: Thinking
-      updateRun(runId, { thinkingStep: "Analyzing database schema and relationships..." });
-      await sleep(300);
-
-      // Step 2: Generate SQL
-      updateRun(runId, { thinkingStep: "Generating optimized query..." });
+      updateRun(runId, { thinkingStep: "Analyzing your data and planning the query..." });
 
       const genRes = await fetch("/api/reports/generate", {
         method: "POST",
@@ -130,8 +107,6 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
       }
 
       const { sql } = await genRes.json();
-
-      // Step 3: Executing
       updateRun(runId, { generated_sql: sql, thinkingStep: "Running query against database..." });
 
       const queryRes = await fetch("/api/db/query", {
@@ -151,13 +126,9 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
           generated_sql: sql,
           result_columns: result.columns,
           result_row_count: result.rowCount || 0,
-          result,
-          loading: false,
-          thinkingStep: undefined,
-        });
-        setActiveResult({
-          run: { id: runId, prompt: text, generated_sql: sql, result_columns: result.columns, result_row_count: result.rowCount || 0, error: null, created_at: new Date().toISOString() },
-          result,
+          result, loading: false, thinkingStep: undefined,
+          summaryParts: buildSummary(text, result),
+          expanded: true,
         });
         saveRun(text, sql, result.columns, result.rowCount || 0, null);
       }
@@ -169,157 +140,184 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
     setLoading(false);
   }
 
+  function buildSummary(prompt: string, result: QueryResult): { text: string; bold?: boolean }[] {
+    const parts: { text: string; bold?: boolean }[] = [];
+    const count = result.rowCount || 0;
+    parts.push({ text: `Found ` });
+    parts.push({ text: `${count} results`, bold: true });
+    parts.push({ text: ` for "${prompt}". ` });
+
+    // Add numeric highlights
+    for (const col of result.columns) {
+      const values = result.rows.map((r) => r[col]).filter((v) => typeof v === "number" || (typeof v === "string" && !isNaN(Number(v)) && v !== ""));
+      if (values.length === result.rows.length && values.length > 0) {
+        const lc = col.toLowerCase();
+        if (lc.includes("revenue") || lc.includes("amount") || lc.includes("total") || lc.includes("price") || lc.includes("count") || lc.includes("quantity")) {
+          const total = values.map(Number).reduce((a, b) => a + b, 0);
+          parts.push({ text: `Total ${col.replace(/_/g, " ")}: ` });
+          parts.push({ text: formatNumber(total), bold: true });
+          parts.push({ text: ". " });
+        }
+      }
+    }
+    return parts;
+  }
+
   function updateRun(id: string, updates: Partial<ReportRun>) {
     setRuns((prev) => prev.map((r) => (r.id === id ? { ...r, ...updates } : r)));
+  }
+
+  function toggleExpand(id: string) {
+    setRuns((prev) => prev.map((r) => (r.id === id ? { ...r, expanded: !r.expanded } : r)));
   }
 
   async function saveRun(prompt: string, sql: string | null, columns: string[], rowCount: number, error: string | null) {
     await fetch("/api/reports/runs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        sessionId,
-        prompt,
-        generatedSql: sql,
-        resultColumns: columns,
-        resultRowCount: rowCount,
-        error,
-      }),
+      body: JSON.stringify({ sessionId, prompt, generatedSql: sql, resultColumns: columns, resultRowCount: rowCount, error }),
     });
   }
 
-  async function rerunQuery(run: ReportRun) {
-    if (!run.generated_sql || connections.length === 0) return;
-    const queryRes = await fetch("/api/db/query", {
+  async function exportToSheets(run: ReportRun) {
+    if (!run.result) return;
+    const res = await fetch("/api/reports/export", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ connectionId: connections[0].id, query: run.generated_sql }),
+      body: JSON.stringify({ title: run.prompt, columns: run.result.columns, rows: run.result.rows }),
     });
-    if (queryRes.ok) {
-      const result = await queryRes.json();
-      setActiveResult({ run, result });
-    }
+    const data = await res.json();
+    if (res.ok && data.url) window.open(data.url, "_blank");
+    else alert(data.error || "Export failed. Make sure Google is connected in Settings.");
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      runQuery(prompt);
-    }
-  }
-
-  function formatCell(value: unknown): string {
-    if (value === null || value === undefined) return "—";
-    if (typeof value === "object") return JSON.stringify(value);
-    const str = String(value);
-    if (/^\d{4}-\d{2}-\d{2}T/.test(str)) return new Date(str).toLocaleString();
-    return str;
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); runQuery(prompt); }
   }
 
   return (
     <div className="flex flex-col h-full">
-      {/* Results area */}
       <div className="flex-1 overflow-y-auto min-h-0 p-6">
-        <div className="max-w-5xl mx-auto space-y-4">
+        <div className="max-w-5xl mx-auto space-y-5">
           {runs.map((run) => (
             <div key={run.id} className="space-y-3">
-              {/* User prompt bubble */}
+              {/* User prompt */}
               <div className="flex justify-end">
                 <div className="bg-primary text-primary-foreground rounded-2xl px-4 py-2.5 text-sm max-w-lg">
                   {run.prompt}
                 </div>
               </div>
 
-              {/* Loading / thinking steps */}
+              {/* Loading */}
               {run.loading && (
-                <div className="space-y-2">
+                <div className="space-y-3 max-w-xl">
                   <div className="flex items-center gap-2.5">
-                    <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center">
-                      <span className="inline-block w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-                    </div>
-                    <span className="text-sm text-muted-foreground">{run.thinkingStep || "Processing..."}</span>
+                    <span className="inline-block w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                    <span className="text-sm text-muted-foreground">{run.thinkingStep}</span>
                   </div>
-                  {/* Shimmer placeholder for results */}
-                  <div className="space-y-2 pl-8">
-                    <div className="h-3 bg-muted rounded animate-pulse w-3/4" />
-                    <div className="h-3 bg-muted rounded animate-pulse w-1/2" />
-                    <div className="h-3 bg-muted rounded animate-pulse w-2/3" />
+                  <div className="space-y-2 ml-6">
+                    <div className="h-3 bg-muted rounded-full animate-pulse w-4/5" />
+                    <div className="h-3 bg-muted rounded-full animate-pulse w-3/5" />
+                    <div className="h-3 bg-muted rounded-full animate-pulse w-2/3" />
+                    <div className="h-8 bg-muted rounded animate-pulse w-full mt-3" />
+                    <div className="h-8 bg-muted rounded animate-pulse w-full" />
+                    <div className="h-8 bg-muted rounded animate-pulse w-full" />
                   </div>
                 </div>
               )}
 
               {/* Error */}
               {run.error && !run.loading && (
-                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive ml-8">
+                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive max-w-xl">
                   {run.error}
                 </div>
               )}
 
-              {/* Success summary */}
-              {!run.loading && !run.error && run.result_row_count > 0 && (
-                <button
-                  onClick={() => run.result ? setActiveResult({ run, result: run.result }) : rerunQuery(run)}
-                  className="w-full text-left p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors ml-8 max-w-xl"
-                >
-                  <div className="flex items-center justify-between">
-                    <div className="text-sm">
-                      <span className="font-medium">{run.result_row_count} rows</span>
-                      <span className="text-muted-foreground ml-2">
-                        {run.result_columns.slice(0, 4).join(", ")}
-                        {run.result_columns.length > 4 && ` +${run.result_columns.length - 4} more`}
-                      </span>
-                    </div>
-                    <span className="text-xs text-primary">View results →</span>
+              {/* Results */}
+              {!run.loading && !run.error && run.result && (
+                <div className="space-y-3">
+                  {/* Summary preamble */}
+                  {run.summaryParts && (
+                    <p className="text-sm leading-relaxed">
+                      {run.summaryParts.map((part, i) => (
+                        part.bold
+                          ? <strong key={i}>{part.text}</strong>
+                          : <span key={i}>{part.text}</span>
+                      ))}
+                    </p>
+                  )}
+
+                  {/* Accordion */}
+                  <div className="border rounded-lg overflow-hidden">
+                    <button
+                      onClick={() => toggleExpand(run.id)}
+                      className="w-full text-left px-4 py-3 bg-muted/30 hover:bg-muted/50 transition-colors flex items-center justify-between"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">{run.expanded ? "▼" : "▶"}</span>
+                        <span className="text-sm font-medium">{formatNumber(run.result_row_count)} rows · {run.result_columns.length} columns</span>
+                      </div>
+                      <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
+                        <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => exportToSheets(run)}>
+                          Export to Sheets
+                        </Button>
+                        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => {
+                          if (run.generated_sql) navigator.clipboard.writeText(run.generated_sql);
+                        }}>
+                          Copy SQL
+                        </Button>
+                      </div>
+                    </button>
+
+                    {run.expanded && (
+                      <div className="overflow-auto max-h-[55vh] border-t">
+                        <Table>
+                          <TableHeader>
+                            <TableRow className="bg-muted/30">
+                              <TableHead className="text-xs text-muted-foreground w-12 sticky top-0 bg-muted/30">#</TableHead>
+                              {run.result.columns.map((col) => (
+                                <TableHead key={col} className="text-xs font-semibold whitespace-nowrap px-4 sticky top-0 bg-muted/30">
+                                  {col.replace(/_/g, " ")}
+                                </TableHead>
+                              ))}
+                            </TableRow>
+                          </TableHeader>
+                          <TableBody>
+                            {run.result.rows.map((row, i) => (
+                              <TableRow key={i} className="hover:bg-muted/20">
+                                <TableCell className="text-xs text-muted-foreground w-12">{i + 1}</TableCell>
+                                {run.result!.columns.map((col) => (
+                                  <TableCell key={col} className="text-sm whitespace-nowrap px-4">
+                                    {formatCell(row[col])}
+                                  </TableCell>
+                                ))}
+                              </TableRow>
+                            ))}
+                          </TableBody>
+                        </Table>
+                      </div>
+                    )}
                   </div>
-                </button>
+                </div>
+              )}
+
+              {/* Past runs without loaded result data */}
+              {!run.loading && !run.error && !run.result && run.result_row_count > 0 && (
+                <div className="p-3 rounded-lg bg-muted/30 text-sm max-w-xl">
+                  <span className="font-medium">{formatNumber(run.result_row_count)} rows</span>
+                  <span className="text-muted-foreground ml-2">
+                    {run.result_columns.slice(0, 4).join(", ")}
+                    {run.result_columns.length > 4 && ` +${run.result_columns.length - 4} more`}
+                  </span>
+                </div>
               )}
             </div>
           ))}
-
-          {/* Active result table */}
-          {activeResult && (
-            <div className="space-y-3 mt-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-medium">{activeResult.result.rowCount} rows · {activeResult.result.columns.length} columns</span>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="ghost" onClick={() => setActiveResult(null)}>Close</Button>
-                  <Button size="sm" variant="outline" onClick={() => {
-                    if (activeResult.run.generated_sql) navigator.clipboard.writeText(activeResult.run.generated_sql);
-                  }}>Copy SQL</Button>
-                </div>
-              </div>
-              <div className="border rounded-lg overflow-hidden">
-                <div className="overflow-auto max-h-[55vh]">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className="bg-muted/50">
-                        <TableHead className="text-xs text-muted-foreground w-12">#</TableHead>
-                        {activeResult.result.columns.map((col) => (
-                          <TableHead key={col} className="text-xs font-semibold whitespace-nowrap px-4">{col}</TableHead>
-                        ))}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {activeResult.result.rows.map((row, i) => (
-                        <TableRow key={i} className="hover:bg-muted/30">
-                          <TableCell className="text-xs text-muted-foreground w-12">{i + 1}</TableCell>
-                          {activeResult.result.columns.map((col) => (
-                            <TableCell key={col} className="text-sm whitespace-nowrap px-4">{formatCell(row[col])}</TableCell>
-                          ))}
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
-              </div>
-            </div>
-          )}
-
           <div ref={bottomRef} />
         </div>
       </div>
 
-      {/* Input bar at bottom */}
+      {/* Input bar */}
       <div className="border-t p-4">
         <div className="max-w-3xl mx-auto flex gap-2">
           {connections.length > 0 && (
@@ -345,6 +343,17 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
   );
 }
 
-function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function formatCell(value: unknown): string {
+  if (value === null || value === undefined) return "—";
+  if (typeof value === "number") return formatNumber(value);
+  if (typeof value === "object") return JSON.stringify(value);
+  const str = String(value);
+  if (/^\d{4}-\d{2}-\d{2}T/.test(str)) return new Date(str).toLocaleString();
+  if (/^\d+(\.\d+)?$/.test(str) && str.length > 3) return formatNumber(Number(str));
+  return str;
+}
+
+function formatNumber(n: number): string {
+  if (Number.isInteger(n)) return n.toLocaleString();
+  return n.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2 });
 }
