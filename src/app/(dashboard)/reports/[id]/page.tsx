@@ -49,11 +49,9 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
 
   useEffect(() => {
     fetch("/api/db/connections").then((r) => r.json()).then(setConnections);
-    fetch(`/api/reports/runs?sessionId=${sessionId}`).then((r) => r.json()).then(setRuns);
-  }, [sessionId]);
 
-  // Show the initial query bubble immediately
-  useEffect(() => {
+    // If we have an initial query, show it immediately as a loading bubble
+    // and DON'T load history (this is a fresh session)
     if (initialQuery && !initialRan.current) {
       initialRan.current = true;
       setRuns([{
@@ -62,10 +60,13 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
         created_at: new Date().toISOString(), loading: true,
         thinkingStep: "Understanding your question...",
       }]);
+    } else {
+      // Revisiting — load past runs from DB
+      fetch(`/api/reports/runs?sessionId=${sessionId}`).then((r) => r.json()).then(setRuns);
     }
-  }, [initialQuery]);
+  }, [sessionId, initialQuery]);
 
-  // Execute the initial query once connections are loaded (only once)
+  // Execute the initial query once connections load (only once)
   useEffect(() => {
     if (initialQuery && initialRan.current && !initialExecuted.current && connections.length > 0) {
       initialExecuted.current = true;
@@ -182,6 +183,25 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ sessionId, prompt, generatedSql: sql, resultColumns: columns, resultRowCount: rowCount, error }),
     });
+  }
+
+  async function rerunQuery(run: ReportRun) {
+    if (!run.generated_sql || connections.length === 0) return;
+    updateRun(run.id, { loading: true, thinkingStep: "Re-running query..." });
+    const queryRes = await fetch("/api/db/query", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ connectionId: connections[0].id, query: run.generated_sql }),
+    });
+    if (queryRes.ok) {
+      const result = await queryRes.json();
+      updateRun(run.id, {
+        result, expanded: true, loading: false, thinkingStep: undefined,
+        summaryParts: buildSummary(run.prompt, result),
+      });
+    } else {
+      updateRun(run.id, { loading: false, thinkingStep: undefined });
+    }
   }
 
   async function exportToSheets(run: ReportRun) {
@@ -306,15 +326,21 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
                 </div>
               )}
 
-              {/* Past runs without loaded result data */}
+              {/* Past runs without loaded result data — clickable to re-run */}
               {!run.loading && !run.error && !run.result && run.result_row_count > 0 && (
-                <div className="p-3 rounded-lg bg-muted/30 text-sm max-w-xl">
-                  <span className="font-medium">{formatNumber(run.result_row_count)} rows</span>
-                  <span className="text-muted-foreground ml-2">
-                    {run.result_columns.slice(0, 4).join(", ")}
-                    {run.result_columns.length > 4 && ` +${run.result_columns.length - 4} more`}
-                  </span>
-                </div>
+                <button
+                  onClick={() => rerunQuery(run)}
+                  className="w-full text-left p-3 rounded-lg border bg-muted/30 hover:bg-muted/50 transition-colors max-w-xl flex items-center justify-between"
+                >
+                  <div>
+                    <span className="text-sm font-medium">{formatNumber(run.result_row_count)} rows</span>
+                    <span className="text-muted-foreground text-sm ml-2">
+                      {run.result_columns.slice(0, 4).map((c) => c.replace(/_/g, " ")).join(", ")}
+                      {run.result_columns.length > 4 && ` +${run.result_columns.length - 4} more`}
+                    </span>
+                  </div>
+                  <span className="text-xs text-primary">Load results →</span>
+                </button>
               )}
             </div>
           ))}

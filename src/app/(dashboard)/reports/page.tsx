@@ -22,6 +22,7 @@ export default function ReportsPage() {
   const [connections, setConnections] = useState<DbConnection[]>([]);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
+  const [statusText, setStatusText] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -32,8 +33,8 @@ export default function ReportsPage() {
   async function startReport() {
     if (!prompt.trim() || connections.length === 0) return;
     setLoading(true);
+    setStatusText("Creating report session...");
 
-    // Create a new report session
     const res = await fetch("/api/reports/sessions", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -42,24 +43,22 @@ export default function ReportsPage() {
 
     if (res.ok) {
       const session = await res.json();
-      // Navigate to the report view with the initial prompt
+      setStatusText("Redirecting...");
       router.push(`/reports/${session.id}?q=${encodeURIComponent(prompt.trim())}`);
+    } else {
+      setLoading(false);
+      setStatusText(null);
     }
-    setLoading(false);
   }
 
   function handleKeyDown(e: React.KeyboardEvent) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      startReport();
-    }
+    if (e.key === "Enter") { e.preventDefault(); startReport(); }
   }
 
   const hasConnections = connections.length > 0;
 
   return (
     <div className="flex flex-col h-full">
-      {/* Centered input area */}
       <div className="flex-1 flex flex-col items-center justify-center px-6">
         <div className="w-full max-w-2xl space-y-6">
           <div className="text-center space-y-2">
@@ -67,13 +66,9 @@ export default function ReportsPage() {
             <p className="text-muted-foreground">Ask a question about your data in plain English</p>
           </div>
 
-          {/* Data source pills */}
           <div className="flex items-center justify-center gap-2">
             {connections.map((conn) => (
-              <span
-                key={conn.id}
-                className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-primary text-primary-foreground"
-              >
+              <span key={conn.id} className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-primary text-primary-foreground">
                 <span className="w-2 h-2 rounded-full bg-green-400" />
                 {conn.name}
               </span>
@@ -85,28 +80,45 @@ export default function ReportsPage() {
             )}
           </div>
 
-          {/* Input */}
-          {hasConnections && (
+          {hasConnections && !loading && (
             <div className="flex gap-2">
               <Input
                 placeholder='e.g. "Show me the top 10 orders with customer details and order items"'
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={handleKeyDown}
-                disabled={loading}
                 className="flex-1 h-12 text-base"
                 autoFocus
               />
-              <Button onClick={startReport} disabled={loading || !prompt.trim()} className="h-12 px-6">
-                {loading ? "Starting..." : "Generate"}
+              <Button onClick={startReport} disabled={!prompt.trim()} className="h-12 px-6">
+                Generate
               </Button>
+            </div>
+          )}
+
+          {/* Loading transition */}
+          {loading && (
+            <div className="space-y-4">
+              <div className="flex justify-end">
+                <div className="bg-primary text-primary-foreground rounded-2xl px-4 py-2.5 text-sm max-w-lg">
+                  {prompt}
+                </div>
+              </div>
+              <div className="flex items-center gap-2.5">
+                <span className="inline-block w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                <span className="text-sm text-muted-foreground">{statusText}</span>
+              </div>
+              <div className="space-y-2 ml-6">
+                <div className="h-3 bg-muted rounded-full animate-pulse w-4/5" />
+                <div className="h-3 bg-muted rounded-full animate-pulse w-3/5" />
+                <div className="h-3 bg-muted rounded-full animate-pulse w-2/3" />
+              </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Report history at the bottom */}
-      {sessions.length > 0 && (
+      {sessions.length > 0 && !loading && (
         <div className="border-t px-6 py-4">
           <div className="max-w-2xl mx-auto">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Recent Reports</p>
