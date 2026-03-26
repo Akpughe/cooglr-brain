@@ -39,39 +39,38 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q");
 
-  const [runs, setRuns] = useState<ReportRun[]>([]);
+  // Initialize with the query bubble showing immediately if we have one
+  const [runs, setRuns] = useState<ReportRun[]>(() => {
+    if (initialQuery) {
+      return [{
+        id: `init-${Date.now()}`, prompt: initialQuery, generated_sql: null,
+        result_columns: [], result_row_count: 0, error: null,
+        created_at: new Date().toISOString(), loading: true,
+        thinkingStep: "Understanding your question...",
+      }];
+    }
+    return [];
+  });
   const [connections, setConnections] = useState<DbConnection[]>([]);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
-  const initialRan = useRef(false);
   const initialExecuted = useRef(false);
 
   useEffect(() => {
     fetch("/api/db/connections").then((r) => r.json()).then(setConnections);
 
-    // If we have an initial query, show it immediately as a loading bubble
-    // and DON'T load history (this is a fresh session)
-    if (initialQuery && !initialRan.current) {
-      initialRan.current = true;
-      setRuns([{
-        id: `init-${Date.now()}`, prompt: initialQuery, generated_sql: null,
-        result_columns: [], result_row_count: 0, error: null,
-        created_at: new Date().toISOString(), loading: true,
-        thinkingStep: "Understanding your question...",
-      }]);
-    } else {
-      // Revisiting — load past runs from DB
+    // If no initial query, load history
+    if (!initialQuery) {
       fetch(`/api/reports/runs?sessionId=${sessionId}`).then((r) => r.json()).then(setRuns);
     }
   }, [sessionId, initialQuery]);
 
   // Execute the initial query once connections load (only once)
   useEffect(() => {
-    if (initialQuery && initialRan.current && !initialExecuted.current && connections.length > 0) {
+    if (initialQuery && !initialExecuted.current && connections.length > 0 && runs.length > 0 && runs[0]?.loading) {
       initialExecuted.current = true;
-      const runId = runs[0]?.id;
-      if (runId) executeQuery(initialQuery, runId);
+      executeQuery(initialQuery, runs[0].id);
     }
   }, [connections]); // eslint-disable-line react-hooks/exhaustive-deps
 

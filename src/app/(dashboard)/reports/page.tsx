@@ -22,7 +22,6 @@ export default function ReportsPage() {
   const [connections, setConnections] = useState<DbConnection[]>([]);
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
-  const [statusText, setStatusText] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -33,7 +32,6 @@ export default function ReportsPage() {
   async function startReport() {
     if (!prompt.trim() || connections.length === 0) return;
     setLoading(true);
-    setStatusText("Creating report session...");
 
     const res = await fetch("/api/reports/sessions", {
       method: "POST",
@@ -43,11 +41,10 @@ export default function ReportsPage() {
 
     if (res.ok) {
       const session = await res.json();
-      setStatusText("Redirecting...");
       router.push(`/reports/${session.id}?q=${encodeURIComponent(prompt.trim())}`);
+      // Don't reset loading — let navigation handle it
     } else {
       setLoading(false);
-      setStatusText(null);
     }
   }
 
@@ -80,45 +77,26 @@ export default function ReportsPage() {
             )}
           </div>
 
-          {hasConnections && !loading && (
+          {hasConnections && (
             <div className="flex gap-2">
               <Input
                 placeholder='e.g. "Show me the top 10 orders with customer details and order items"'
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
                 onKeyDown={handleKeyDown}
+                disabled={loading}
                 className="flex-1 h-12 text-base"
                 autoFocus
               />
-              <Button onClick={startReport} disabled={!prompt.trim()} className="h-12 px-6">
-                Generate
+              <Button onClick={startReport} disabled={loading || !prompt.trim()} className="h-12 px-6">
+                {loading ? "Starting..." : "Generate"}
               </Button>
-            </div>
-          )}
-
-          {/* Loading transition */}
-          {loading && (
-            <div className="space-y-4">
-              <div className="flex justify-end">
-                <div className="bg-primary text-primary-foreground rounded-2xl px-4 py-2.5 text-sm max-w-lg">
-                  {prompt}
-                </div>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <span className="inline-block w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
-                <span className="text-sm text-muted-foreground">{statusText}</span>
-              </div>
-              <div className="space-y-2 ml-6">
-                <div className="h-3 bg-muted rounded-full animate-pulse w-4/5" />
-                <div className="h-3 bg-muted rounded-full animate-pulse w-3/5" />
-                <div className="h-3 bg-muted rounded-full animate-pulse w-2/3" />
-              </div>
             </div>
           )}
         </div>
       </div>
 
-      {sessions.length > 0 && !loading && (
+      {sessions.length > 0 && (
         <div className="border-t px-6 py-4">
           <div className="max-w-2xl mx-auto">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Recent Reports</p>
@@ -127,7 +105,7 @@ export default function ReportsPage() {
                 <button
                   key={s.id}
                   onClick={() => router.push(`/reports/${s.id}`)}
-                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-accent transition-colors flex items-center justify-between group"
+                  className="w-full text-left px-3 py-2 rounded-lg hover:bg-accent transition-colors flex items-center justify-between"
                 >
                   <span className="text-sm truncate">{s.name}</span>
                   <span className="text-xs text-muted-foreground">{new Date(s.updated_at).toLocaleDateString()}</span>
