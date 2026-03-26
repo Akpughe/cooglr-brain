@@ -1,14 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
-} from "@/components/ui/select";
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
@@ -16,6 +11,7 @@ import {
 interface DbConnection {
   id: string;
   name: string;
+  db_type: string;
 }
 
 interface QueryResult {
@@ -34,43 +30,116 @@ interface SavedReport {
 
 export function ReportBuilder() {
   const [connections, setConnections] = useState<DbConnection[]>([]);
-  const [selectedDb, setSelectedDb] = useState<string>("");
-  const [query, setQuery] = useState("");
+  const [activeConnection, setActiveConnection] = useState<DbConnection | null>(null);
+  const [schemaLoaded, setSchemaLoaded] = useState(false);
+  const [tableCount, setTableCount] = useState(0);
+  const [prompt, setPrompt] = useState("");
+  const [generatedSQL, setGeneratedSQL] = useState<string | null>(null);
   const [result, setResult] = useState<QueryResult | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [querying, setQuerying] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
-  const [reportName, setReportName] = useState("");
   const [saved, setSaved] = useState<SavedReport[]>([]);
+  const [reportName, setReportName] = useState("");
+  const [showSQL, setShowSQL] = useState(false);
 
   useEffect(() => {
-    fetch("/api/db/connections").then((r) => r.json()).then(setConnections);
+    fetch("/api/db/connections").then((r) => r.json()).then((data) => {
+      setConnections(data);
+      if (data.length === 1) selectConnection(data[0]);
+    });
     fetch("/api/reports").then((r) => r.json()).then(setSaved);
   }, []);
 
-  async function runQuery() {
-    if (!selectedDb || !query.trim()) return;
-    setQuerying(true);
+  const selectConnection = useCallback(async (conn: DbConnection) => {
+    setActiveConnection(conn);
+    setSchemaLoaded(false);
+    try {
+      const res = await fetch(`/api/db/schema?connectionId=${conn.id}`);
+      if (res.ok) {
+        const tables = await res.json();
+        setTableCount(tables.length);
+      }
+    } catch { /* ignore */ }
+    setSchemaLoaded(true);
+  }, []);
+
+  async function generateAndRun() {
+    if (!activeConnection || !prompt.trim()) return;
+    setLoading(true);
     setError(null);
     setResult(null);
+    setGeneratedSQL(null);
+
+    try {
+      const aiRes = await fetch("/api/reports/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: prompt.trim(),
+          connectionId: activeConnection.id,
+          dbType: activeConnection.db_type,
+        }),
+      });
+
+      if (!aiRes.ok) {
+        const err = await aiRes.json();
+        setError(err.error || "Failed to generate query");
+        setLoading(false);
+        return;
+      }
+
+      const { sql } = await aiRes.json();
+      setGeneratedSQL(sql);
+
+      const queryRes = await fetch("/api/db/query", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ connectionId: activeConnection.id, query: sql }),
+      });
+
+      const data = await queryRes.json();
+      if (!queryRes.ok) setError(data.error || "Query failed");
+      else setResult(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
+    }
+    setLoading(false);
+  }
+
+  async function runSavedReport(report: SavedReport) {
+    if (!report.connection_id) return;
+    setLoading(true);
+    setError(null);
+    setResult(null);
+    setGeneratedSQL(report.query_text);
+    setPrompt(report.description || report.name);
+
+    const conn = connections.find((c) => c.id === report.connection_id);
+    if (conn) setActiveConnection(conn);
 
     const res = await fetch("/api/db/query", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ connectionId: selectedDb, query: query.trim() }),
+      body: JSON.stringify({ connectionId: report.connection_id, query: report.query_text }),
     });
     const data = await res.json();
     if (!res.ok) setError(data.error);
     else setResult(data);
-    setQuerying(false);
+    setLoading(false);
   }
 
   async function saveReport() {
-    if (!reportName.trim() || !query.trim()) return;
+    if (!reportName.trim() || !generatedSQL || !activeConnection) return;
     const res = await fetch("/api/reports", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: reportName, connectionId: selectedDb || null, queryText: query }),
+      body: JSON.stringify({
+        name: reportName,
+        description: prompt,
+        connectionId: activeConnection.id,
+        queryText: generatedSQL,
+      }),
     });
     if (res.ok) {
       const report = await res.json();
@@ -85,7 +154,11 @@ export function ReportBuilder() {
     const res = await fetch("/api/reports/export", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: reportName || "Report", columns: result.columns, rows: result.rows }),
+      body: JSON.stringify({
+        title: reportName || prompt || "Report",
+        columns: result.columns,
+        rows: result.rows,
+      }),
     });
     const data = await res.json();
     if (res.ok && data.url) window.open(data.url, "_blank");
@@ -93,13 +166,7 @@ export function ReportBuilder() {
     setExporting(false);
   }
 
-  async function loadSaved(report: SavedReport) {
-    setQuery(report.query_text);
-    if (report.connection_id) setSelectedDb(report.connection_id);
-    setReportName(report.name);
-  }
-
-  async function deleteSaved(id: string) {
+  async function deleteReport(id: string) {
     await fetch("/api/reports", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
@@ -108,75 +175,121 @@ export function ReportBuilder() {
     setSaved((prev) => prev.filter((r) => r.id !== id));
   }
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      generateAndRun();
+    }
+  }
+
+  const hasConnections = connections.length > 0;
+
   return (
     <div className="space-y-6">
-      {saved.length > 0 && (
+      {/* Data Source Indicator */}
+      <div className="flex items-center gap-3 flex-wrap">
+        <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Data Sources:</span>
+        {!hasConnections && (
+          <span className="text-xs text-muted-foreground">
+            No databases connected. <a href="/settings" className="text-primary hover:underline">Add one in Settings</a>
+          </span>
+        )}
+        {connections.map((conn) => (
+          <button
+            key={conn.id}
+            onClick={() => selectConnection(conn)}
+            className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs border transition-colors ${
+              activeConnection?.id === conn.id
+                ? "bg-primary text-primary-foreground border-primary"
+                : "bg-muted hover:bg-accent border-border"
+            }`}
+          >
+            <span className="w-2 h-2 rounded-full bg-green-500" />
+            {conn.name}
+          </button>
+        ))}
+        {schemaLoaded && tableCount > 0 && (
+          <span className="text-xs text-muted-foreground">{tableCount} tables available</span>
+        )}
+      </div>
+
+      {/* Ask in plain English */}
+      {hasConnections && (
         <Card>
-          <CardHeader>
-            <CardTitle>Saved Reports</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {saved.map((r) => (
-              <div key={r.id} className="flex items-center justify-between p-2 border rounded">
-                <div>
-                  <p className="font-medium text-sm">{r.name}</p>
-                  {r.description && <p className="text-xs text-muted-foreground">{r.description}</p>}
-                </div>
-                <div className="flex gap-2">
-                  <Button size="sm" variant="outline" onClick={() => loadSaved(r)}>Load</Button>
-                  <Button size="sm" variant="ghost" onClick={() => deleteSaved(r.id)}>Delete</Button>
-                </div>
-              </div>
-            ))}
+          <CardContent className="p-4">
+            <div className="flex gap-2">
+              <Input
+                placeholder='Ask anything... e.g. "Show me the top 10 customers by order count"'
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                onKeyDown={handleKeyDown}
+                disabled={loading || !activeConnection}
+                className="flex-1"
+              />
+              <Button onClick={generateAndRun} disabled={loading || !activeConnection || !prompt.trim()}>
+                {loading ? "Generating..." : "Generate Report"}
+              </Button>
+            </div>
           </CardContent>
         </Card>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Report Builder</CardTitle>
-          <CardDescription>Select a database, write a query, and generate a report.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-2">
-            <Select value={selectedDb} onValueChange={(v) => v && setSelectedDb(v)}>
-              <SelectTrigger className="w-[250px]">
-                <SelectValue placeholder="Select database..." />
-              </SelectTrigger>
-              <SelectContent>
-                {connections.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-            <Input placeholder="Report name" value={reportName} onChange={(e) => setReportName(e.target.value)} className="flex-1" />
-          </div>
+      {/* Generated SQL (collapsible) */}
+      {generatedSQL && (
+        <div className="text-xs">
+          <button
+            onClick={() => setShowSQL(!showSQL)}
+            className="text-muted-foreground hover:text-foreground flex items-center gap-1"
+          >
+            <span>{showSQL ? "▼" : "▶"}</span>
+            <span>Generated SQL</span>
+          </button>
+          {showSQL && (
+            <pre className="mt-2 p-3 bg-muted rounded-lg overflow-x-auto text-xs font-mono">
+              {generatedSQL}
+            </pre>
+          )}
+        </div>
+      )}
 
-          <Textarea value={query} onChange={(e) => setQuery(e.target.value)} placeholder="SELECT * FROM users LIMIT 10" className="font-mono text-sm" rows={4} />
+      {error && (
+        <Card className="border-destructive">
+          <CardContent className="p-4 text-sm text-destructive">{error}</CardContent>
+        </Card>
+      )}
 
-          <div className="flex gap-2">
-            <Button onClick={runQuery} disabled={querying || !selectedDb || !query.trim()}>
-              {querying ? "Running..." : "Run Query"}
-            </Button>
-            {result && (
-              <>
-                <Button variant="outline" onClick={saveReport} disabled={!reportName.trim()}>Save Report</Button>
-                <Button variant="outline" onClick={exportToSheets} disabled={exporting}>
-                  {exporting ? "Exporting..." : "Export to Google Sheets"}
+      {/* Results */}
+      {result && (
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-base">Results</CardTitle>
+                <CardDescription>{result.rowCount} rows returned</CardDescription>
+              </div>
+              <div className="flex gap-2 items-center">
+                <Input
+                  placeholder="Report name..."
+                  value={reportName}
+                  onChange={(e) => setReportName(e.target.value)}
+                  className="w-40 h-8 text-xs"
+                />
+                <Button size="sm" variant="outline" onClick={saveReport} disabled={!reportName.trim()}>
+                  Save
                 </Button>
-              </>
-            )}
-          </div>
-
-          {error && <p className="text-sm text-destructive">{error}</p>}
-
-          {result && (
-            <div className="border rounded-lg overflow-auto max-h-[400px]">
+                <Button size="sm" variant="outline" onClick={exportToSheets} disabled={exporting}>
+                  {exporting ? "Exporting..." : "Export to Sheets"}
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent className="p-0">
+            <div className="border-t overflow-auto max-h-[500px]">
               <Table>
                 <TableHeader>
                   <TableRow>
                     {result.columns.map((col) => (
-                      <TableHead key={col} className="font-mono text-xs">{col}</TableHead>
+                      <TableHead key={col} className="font-mono text-xs whitespace-nowrap">{col}</TableHead>
                     ))}
                   </TableRow>
                 </TableHeader>
@@ -184,17 +297,41 @@ export function ReportBuilder() {
                   {result.rows.map((row, i) => (
                     <TableRow key={i}>
                       {result.columns.map((col) => (
-                        <TableCell key={col} className="font-mono text-xs">{String(row[col] ?? "NULL")}</TableCell>
+                        <TableCell key={col} className="font-mono text-xs whitespace-nowrap">
+                          {String(row[col] ?? "NULL")}
+                        </TableCell>
                       ))}
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              <div className="p-2 text-xs text-muted-foreground border-t">{result.rowCount} rows</div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Saved Reports */}
+      {saved.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">Saved Reports</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            {saved.map((r) => (
+              <div key={r.id} className="flex items-center justify-between p-3 border rounded-lg hover:bg-accent/50 transition-colors">
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium text-sm">{r.name}</p>
+                  {r.description && <p className="text-xs text-muted-foreground truncate">{r.description}</p>}
+                </div>
+                <div className="flex gap-2 ml-2">
+                  <Button size="sm" variant="outline" onClick={() => runSavedReport(r)}>Run</Button>
+                  <Button size="sm" variant="ghost" onClick={() => deleteReport(r.id)}>Delete</Button>
+                </div>
+              </div>
+            ))}
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

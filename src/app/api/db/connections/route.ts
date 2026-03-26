@@ -29,17 +29,23 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Name and connection string required" }, { status: 400 });
   }
 
-  // Test the connection before saving
+  // Test the connection — try SSL first, then without
   const { Client } = await import("pg");
-  const testClient = new Client({ connectionString, ssl: { rejectUnauthorized: false } });
-  try {
-    await testClient.connect();
-    await testClient.query("SELECT 1");
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : "Connection failed";
-    return NextResponse.json({ error: `Connection test failed: ${msg}` }, { status: 400 });
-  } finally {
-    await testClient.end().catch(() => {});
+  let connected = false;
+  for (const sslOpt of [{ rejectUnauthorized: false }, false as const]) {
+    const testClient = new Client({ connectionString, ssl: sslOpt });
+    try {
+      await testClient.connect();
+      await testClient.query("SELECT 1");
+      connected = true;
+      await testClient.end().catch(() => {});
+      break;
+    } catch {
+      await testClient.end().catch(() => {});
+    }
+  }
+  if (!connected) {
+    return NextResponse.json({ error: "Connection test failed: could not connect to database" }, { status: 400 });
   }
 
   const serviceClient = await createServiceClient();
