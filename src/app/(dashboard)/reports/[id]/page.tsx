@@ -45,29 +45,34 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const initialRan = useRef(false);
+  const initialExecuted = useRef(false);
 
   useEffect(() => {
     fetch("/api/db/connections").then((r) => r.json()).then(setConnections);
     fetch(`/api/reports/runs?sessionId=${sessionId}`).then((r) => r.json()).then(setRuns);
   }, [sessionId]);
 
+  // Show the initial query bubble immediately
   useEffect(() => {
     if (initialQuery && !initialRan.current) {
+      initialRan.current = true;
       setRuns([{
         id: `init-${Date.now()}`, prompt: initialQuery, generated_sql: null,
         result_columns: [], result_row_count: 0, error: null,
         created_at: new Date().toISOString(), loading: true,
         thinkingStep: "Understanding your question...",
       }]);
-      initialRan.current = true;
     }
   }, [initialQuery]);
 
+  // Execute the initial query once connections are loaded (only once)
   useEffect(() => {
-    if (initialQuery && initialRan.current && connections.length > 0 && runs.length === 1 && runs[0]?.loading) {
-      executeQuery(initialQuery, runs[0].id);
+    if (initialQuery && initialRan.current && !initialExecuted.current && connections.length > 0) {
+      initialExecuted.current = true;
+      const runId = runs[0]?.id;
+      if (runId) executeQuery(initialQuery, runId);
     }
-  }, [connections, runs, initialQuery]);
+  }, [connections]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
