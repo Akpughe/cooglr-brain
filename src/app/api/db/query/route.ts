@@ -36,8 +36,10 @@ export async function POST(request: NextRequest) {
     try {
       await client.connect();
       await client.query("BEGIN READ ONLY");
+      // Strip trailing semicolons and whitespace before wrapping
+      const cleanQuery = query.replace(/;\s*$/, "").trim();
       const result = await client.query(
-        `SELECT * FROM (${query}) AS _user_query LIMIT 1000`
+        `SELECT * FROM (${cleanQuery}) AS _user_query LIMIT 1000`
       );
       await client.query("COMMIT");
       await client.end();
