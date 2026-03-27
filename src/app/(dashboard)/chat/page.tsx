@@ -19,10 +19,10 @@ export default function ChatPage() {
   const [loading, setLoading] = useState(true);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editName, setEditName] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
   const editRef = useRef<HTMLInputElement>(null);
   const initializedRef = useRef(false);
 
-  // Load sessions once on mount
   useEffect(() => {
     if (initializedRef.current) return;
     initializedRef.current = true;
@@ -34,7 +34,6 @@ export default function ChatPage() {
           setSessions(data);
           setActiveSessionId(data[0].id);
         } else {
-          // Create first session
           const res = await fetch("/api/chat/sessions", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -71,9 +70,7 @@ export default function ChatPage() {
     });
     setSessions((prev) => {
       const remaining = prev.filter((s) => s.id !== id);
-      if (activeSessionId === id) {
-        setActiveSessionId(remaining[0]?.id || null);
-      }
+      if (activeSessionId === id) setActiveSessionId(remaining[0]?.id || null);
       return remaining;
     });
   }
@@ -95,91 +92,118 @@ export default function ChatPage() {
     setTimeout(() => editRef.current?.focus(), 50);
   }
 
-  // Called by ChatPanel after first AI response to auto-name the session
   function handleAutoName(sessionId: string, firstMessage: string) {
     const session = sessions.find((s) => s.id === sessionId);
     if (!session || session.name !== "New Chat") return;
-
-    // Use first 40 chars of the user's first message as the name
     const autoName = firstMessage.length > 40 ? firstMessage.substring(0, 40) + "..." : firstMessage;
     renameSession(sessionId, autoName);
   }
 
+  const filteredSessions = searchQuery
+    ? sessions.filter((s) => s.name.toLowerCase().includes(searchQuery.toLowerCase()))
+    : sessions;
+
   if (loading) {
-    return <div className="flex items-center justify-center h-full text-muted-foreground">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-full">
+        <div className="w-5 h-5 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+      </div>
+    );
   }
 
   return (
     <div className="flex h-full overflow-hidden">
       {/* Session sidebar */}
-      <div className="w-56 border-r bg-muted/20 flex flex-col shrink-0 h-full">
-        <div className="p-3 border-b">
-          <Button onClick={createSession} className="w-full" size="sm">
-            + New Chat
+      <div className="w-[260px] border-r border-border bg-muted/20 flex flex-col shrink-0 h-full">
+        {/* Header */}
+        <div className="p-3 space-y-2 shrink-0">
+          <Button onClick={createSession} className="w-full rounded-xl h-9 text-xs font-medium" size="sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-1.5">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            New Chat
           </Button>
+          {sessions.length > 3 && (
+            <Input
+              placeholder="Search chats..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="h-8 text-xs rounded-lg bg-background/50"
+            />
+          )}
         </div>
-        <div className="flex-1 overflow-y-auto">
-          {sessions.map((session) => (
-            <div
-              key={session.id}
-              className={cn(
-                "group flex items-center gap-1 px-3 py-2 cursor-pointer hover:bg-accent text-sm",
-                activeSessionId === session.id && "bg-accent"
-              )}
-              onClick={() => setActiveSessionId(session.id)}
-            >
-              {editingId === session.id ? (
-                <Input
-                  ref={editRef}
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                  onBlur={() => renameSession(session.id, editName)}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") renameSession(session.id, editName);
-                    if (e.key === "Escape") setEditingId(null);
-                  }}
-                  className="h-6 text-xs px-1"
-                  onClick={(e) => e.stopPropagation()}
-                />
-              ) : (
-                <>
-                  <span
-                    className="truncate flex-1"
-                    onDoubleClick={(e) => {
-                      e.stopPropagation();
-                      startEditing(session.id, session.name);
+
+        {/* Session list */}
+        <div className="flex-1 overflow-y-auto px-2 pb-2">
+          {filteredSessions.length === 0 && searchQuery && (
+            <p className="text-xs text-muted-foreground text-center py-4">No chats found</p>
+          )}
+          <div className="space-y-0.5">
+            {filteredSessions.map((session) => (
+              <div
+                key={session.id}
+                className={cn(
+                  "group relative flex items-center rounded-lg cursor-pointer transition-all",
+                  activeSessionId === session.id
+                    ? "bg-card shadow-warm"
+                    : "hover:bg-muted/50"
+                )}
+                onClick={() => setActiveSessionId(session.id)}
+              >
+                {editingId === session.id ? (
+                  <Input
+                    ref={editRef}
+                    value={editName}
+                    onChange={(e) => setEditName(e.target.value)}
+                    onBlur={() => renameSession(session.id, editName)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") renameSession(session.id, editName);
+                      if (e.key === "Escape") setEditingId(null);
                     }}
-                  >
-                    {session.name}
-                  </span>
-                  <div className="opacity-0 group-hover:opacity-100 flex items-center gap-0.5">
-                    <button
-                      className="text-muted-foreground hover:text-foreground text-[10px] px-1"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        startEditing(session.id, session.name);
-                      }}
-                      title="Rename"
-                    >
-                      &#9998;
-                    </button>
-                    {sessions.length > 1 && (
+                    className="h-8 text-xs px-2 mx-1 my-1 rounded-md"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                ) : (
+                  <div className="flex items-center w-full px-3 py-2.5">
+                    <div className="flex-1 min-w-0">
+                      <p className={cn(
+                        "text-[13px] truncate",
+                        activeSessionId === session.id ? "font-medium text-foreground" : "text-muted-foreground"
+                      )}>
+                        {session.name}
+                      </p>
+                      <p className="text-[10px] text-muted-foreground/60 mt-0.5">
+                        {formatSessionDate(session.updated_at)}
+                      </p>
+                    </div>
+                    <div className="opacity-0 group-hover:opacity-100 flex items-center gap-0.5 ml-1 transition-opacity">
                       <button
-                        className="text-muted-foreground hover:text-destructive text-xs px-1"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          deleteSession(session.id);
-                        }}
-                        title="Delete"
+                        className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                        onClick={(e) => { e.stopPropagation(); startEditing(session.id, session.name); }}
+                        title="Rename"
                       >
-                        &times;
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                        </svg>
                       </button>
-                    )}
+                      {sessions.length > 1 && (
+                        <button
+                          className="p-1 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+                          onClick={(e) => { e.stopPropagation(); deleteSession(session.id); }}
+                          title="Delete"
+                        >
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                          </svg>
+                        </button>
+                      )}
+                    </div>
                   </div>
-                </>
-              )}
-            </div>
-          ))}
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -193,10 +217,29 @@ export default function ChatPage() {
           />
         ) : (
           <div className="flex items-center justify-center h-full text-muted-foreground">
-            Create a new chat to get started.
+            <div className="text-center">
+              <p className="text-lg font-medium mb-1">No chat selected</p>
+              <p className="text-sm">Create a new chat to get started</p>
+            </div>
           </div>
         )}
       </div>
     </div>
   );
+}
+
+function formatSessionDate(dateStr: string): string {
+  const date = new Date(dateStr);
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) {
+    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  } else if (diffDays === 1) {
+    return "Yesterday";
+  } else if (diffDays < 7) {
+    return date.toLocaleDateString([], { weekday: "short" });
+  }
+  return date.toLocaleDateString([], { month: "short", day: "numeric" });
 }
