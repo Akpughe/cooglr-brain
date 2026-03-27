@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -48,41 +49,53 @@ export function InviteForm({ onInvited }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex gap-2 items-end flex-wrap">
-      <div className="flex-1 min-w-[200px]">
-        <Input
-          type="email"
-          placeholder="email@company.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          required
-        />
-      </div>
-      <Select value={role} onValueChange={(v) => v && setRole(v)}>
-        <SelectTrigger className="w-[120px]">
-          <SelectValue />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectItem value={ROLES.MEMBER}>Member</SelectItem>
-          <SelectItem value={ROLES.ADMIN}>Admin</SelectItem>
-        </SelectContent>
-      </Select>
-      <Select value={department} onValueChange={(v) => v && setDepartment(v)}>
-        <SelectTrigger className="w-[150px]">
-          <SelectValue placeholder="Department" />
-        </SelectTrigger>
-        <SelectContent>
-          {DEPARTMENTS.map((d) => (
-            <SelectItem key={d} value={d}>
-              {d.charAt(0).toUpperCase() + d.slice(1)}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-      <Button type="submit" disabled={loading}>
-        Add User
-      </Button>
-      {error && <p className="text-sm text-destructive w-full">{error}</p>}
-    </form>
+    <Card className="rounded-xl shadow-warm">
+      <CardHeader className="pb-4">
+        <CardTitle className="text-base font-semibold">Invite User</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <form onSubmit={handleSubmit} className="flex gap-2 items-end flex-wrap">
+          <div className="flex-1 min-w-[200px]">
+            <Input
+              type="email"
+              placeholder="email@company.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="rounded-lg"
+            />
+          </div>
+          <Select value={role} onValueChange={(v) => v && setRole(v)}>
+            <SelectTrigger className="w-[120px] rounded-lg">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ROLES.MEMBER}>Member</SelectItem>
+              <SelectItem value={ROLES.ADMIN}>Admin</SelectItem>
+            </SelectContent>
+          </Select>
+          <Select value={department} onValueChange={(v) => v && setDepartment(v)}>
+            <SelectTrigger className="w-[150px] rounded-lg">
+              <SelectValue placeholder="Department" />
+            </SelectTrigger>
+            <SelectContent>
+              {DEPARTMENTS.map((d) => (
+                <SelectItem key={d} value={d}>
+                  {d.charAt(0).toUpperCase() + d.slice(1)}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <Button
+            type="submit"
+            disabled={loading}
+            className="rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground"
+          >
+            Add User
+          </Button>
+          {error && <p className="text-sm text-destructive w-full mt-1">{error}</p>}
+        </form>
+      </CardContent>
+    </Card>
   );
 }

@@ -7,6 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import type { ExternalAccount } from "@/types/accounts";
 import { OAUTH_PROVIDERS } from "@/types/accounts";
 
+function ProviderIcon({ icon, name }: { icon: string; name: string }) {
+  return (
+    <div className="w-9 h-9 rounded-lg bg-muted border border-border/60 flex items-center justify-center text-xs font-semibold text-foreground/70 shrink-0">
+      {icon}
+    </div>
+  );
+}
+
 export function AccountConnections() {
   const [accounts, setAccounts] = useState<ExternalAccount[]>([]);
   const [loading, setLoading] = useState(true);
@@ -36,7 +44,7 @@ export function AccountConnections() {
   const providers = Object.values(OAUTH_PROVIDERS);
 
   return (
-    <Card>
+    <Card className="rounded-xl shadow-warm">
       <CardHeader>
         <CardTitle>Connected Accounts</CardTitle>
         <CardDescription>
@@ -44,18 +52,16 @@ export function AccountConnections() {
           Your credentials are encrypted and only used when you make requests.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-2">
         {providers.map((provider) => {
           const connected = accounts.find((a) => a.provider === provider.id);
           return (
             <div
               key={provider.id}
-              className="flex items-center justify-between p-3 border rounded-lg"
+              className="flex items-center justify-between p-3 rounded-xl border border-border/60 hover:bg-muted/50 transition-colors"
             >
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded bg-muted flex items-center justify-center text-xs font-bold">
-                  {provider.icon}
-                </div>
+                <ProviderIcon icon={provider.icon} name={provider.name} />
                 <div>
                   <p className="font-medium text-sm">{provider.name}</p>
                   {connected ? (
@@ -68,17 +74,27 @@ export function AccountConnections() {
                 </div>
               </div>
               <div className="flex items-center gap-2">
-                {connected && <Badge variant="secondary">Connected</Badge>}
+                {connected && (
+                  <Badge className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15">
+                    Connected
+                  </Badge>
+                )}
                 {connected ? (
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => disconnect(provider.id)}
+                    className="rounded-lg"
                   >
                     Disconnect
                   </Button>
                 ) : (
-                  <Button size="sm" onClick={() => connect(provider.id)} disabled={loading}>
+                  <Button
+                    size="sm"
+                    onClick={() => connect(provider.id)}
+                    disabled={loading}
+                    className="rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground"
+                  >
                     Connect
                   </Button>
                 )}

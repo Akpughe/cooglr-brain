@@ -86,7 +86,7 @@ export function DbConnections() {
   const selectedType = DB_TYPES.find((t) => t.value === dbType) || DB_TYPES[0];
 
   return (
-    <Card>
+    <Card className="rounded-xl shadow-warm">
       <CardHeader>
         <CardTitle>Database Connections</CardTitle>
         <CardDescription>
@@ -103,12 +103,13 @@ export function DbConnections() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
+                className="rounded-lg"
               />
             </div>
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">Type</label>
               <Select value={dbType} onValueChange={(v) => v && setDbType(v)}>
-                <SelectTrigger className="w-[140px]">
+                <SelectTrigger className="w-[140px] rounded-lg">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -126,9 +127,13 @@ export function DbConnections() {
               onChange={(e) => setConnectionString(e.target.value)}
               type="password"
               required
-              className="flex-1"
+              className="flex-1 rounded-lg"
             />
-            <Button type="submit" disabled={adding}>
+            <Button
+              type="submit"
+              disabled={adding}
+              className="rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground"
+            >
               {adding ? "Testing..." : "Add Connection"}
             </Button>
           </div>
@@ -140,13 +145,15 @@ export function DbConnections() {
             {connections.map((conn) => (
               <div
                 key={conn.id}
-                className={`flex items-center justify-between p-3 border rounded-lg transition-colors ${
-                  conn.is_active ? "" : "opacity-50"
+                className={`flex items-center justify-between p-3 rounded-xl border border-border/60 transition-colors ${
+                  conn.is_active ? "hover:bg-muted/50" : "opacity-50"
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-8 h-8 rounded flex items-center justify-center text-xs font-bold ${
-                    conn.is_active ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"
+                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold ${
+                    conn.is_active
+                      ? "bg-primary/10 text-primary border border-primary/20"
+                      : "bg-muted text-muted-foreground border border-border/60"
                   }`}>
                     {conn.db_type === "clickhouse" ? "CH" : "PG"}
                   </div>
@@ -156,13 +163,21 @@ export function DbConnections() {
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Badge variant={conn.is_active ? "default" : "secondary"}>
+                  <Badge
+                    variant={conn.is_active ? "default" : "secondary"}
+                    className={
+                      conn.is_active
+                        ? "bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15"
+                        : "bg-muted text-muted-foreground border border-border/60"
+                    }
+                  >
                     {conn.is_active ? "Active" : "Inactive"}
                   </Badge>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => toggleActive(conn.id, conn.is_active)}
+                    className="rounded-lg border-border/60 hover:border-primary/40 hover:bg-primary/5 hover:text-primary"
                   >
                     {conn.is_active ? "Disable" : "Enable"}
                   </Button>
@@ -170,6 +185,7 @@ export function DbConnections() {
                     variant="ghost"
                     size="sm"
                     onClick={() => removeConnection(conn.id)}
+                    className="text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                   >
                     Remove
                   </Button>
