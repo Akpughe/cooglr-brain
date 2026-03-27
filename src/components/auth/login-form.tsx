@@ -49,10 +49,9 @@ export function LoginForm() {
   }
 
   return (
-    <Card className="w-full max-w-md">
-      <CardHeader className="text-center">
-        <CardTitle className="text-2xl">500Claw Platform</CardTitle>
-        <CardDescription>Sign in to access your workspace</CardDescription>
+    <Card className="w-full border-border shadow-warm">
+      <CardHeader className="sr-only">
+        <CardTitle>Sign In</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
         <Button

@@ -29,7 +29,7 @@ export function MessageInput({ onSend, disabled }: Props) {
   }
 
   return (
-    <div className="border-t p-4">
+    <div className="border-t border-border p-4 shrink-0 bg-background">
       <div className="flex gap-2 items-end max-w-4xl mx-auto">
         <Textarea
           ref={textareaRef}
@@ -37,11 +37,15 @@ export function MessageInput({ onSend, disabled }: Props) {
           onChange={(e) => setValue(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="Type a message... (Enter to send, Shift+Enter for new line)"
-          className="min-h-[44px] max-h-[200px] resize-none"
+          className="min-h-[44px] max-h-[200px] resize-none rounded-xl bg-muted/50 border-border focus:bg-background transition-colors"
           rows={1}
           disabled={disabled}
         />
-        <Button onClick={handleSend} disabled={disabled || !value.trim()}>
+        <Button
+          onClick={handleSend}
+          disabled={disabled || !value.trim()}
+          className="rounded-xl px-5"
+        >
           Send
         </Button>
       </div>

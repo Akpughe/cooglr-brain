@@ -21,7 +21,6 @@ export function ChatPanel({ sessionId, onFirstMessage }: Props) {
   };
 
   function handleSend(text: string) {
-    // Auto-name on first message in a new session
     if (!firstMessageSentRef.current && onFirstMessage) {
       firstMessageSentRef.current = true;
       onFirstMessage(text);
@@ -31,22 +30,30 @@ export function ChatPanel({ sessionId, onFirstMessage }: Props) {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="border-b px-4 py-2 flex items-center justify-between">
-        <h2 className="font-semibold">Chat</h2>
-        <Badge variant={connected ? "default" : "destructive"}>
+      {/* Header */}
+      <div className="border-b border-border px-4 py-2.5 flex items-center justify-between shrink-0">
+        <h2 className="font-semibold text-sm text-foreground">Chat</h2>
+        <Badge
+          variant={connected ? "secondary" : "destructive"}
+          className="text-[10px] font-medium"
+        >
+          <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${connected ? "bg-green-500" : "bg-red-500"}`} />
           {connected ? "Connected" : "Disconnected"}
         </Badge>
       </div>
+
+      {/* Messages */}
       <MessageList messages={messages} historyLoaded={historyLoaded} streaming={streaming} />
 
+      {/* Process steps */}
       {streaming && (processSteps.length > 0 || statusText) && (
-        <div className="px-4 py-3 border-t bg-muted/30 space-y-1">
+        <div className="px-4 py-2.5 border-t border-border bg-muted/30 space-y-1 shrink-0">
           {processSteps.map((step, i) => (
             <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
               {step.status === "running" ? (
-                <span className="inline-block w-3 h-3 rounded-full border-2 border-green-500 border-t-transparent animate-spin" />
+                <span className="inline-block w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
               ) : (
-                <span className="inline-block w-3 h-3 text-green-500">&#10003;</span>
+                <span className="text-green-500 text-xs">&#10003;</span>
               )}
               <span>{step.label}</span>
               {step.status === "running" && elapsedMs > 0 && (
@@ -56,13 +63,14 @@ export function ChatPanel({ sessionId, onFirstMessage }: Props) {
           ))}
           {statusText && processSteps.every((s) => s.status === "done") && (
             <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <span className="inline-block w-3 h-3 rounded-full border-2 border-green-500 border-t-transparent animate-spin" />
+              <span className="inline-block w-3 h-3 rounded-full border-2 border-primary border-t-transparent animate-spin" />
               <span>{statusText}</span>
             </div>
           )}
         </div>
       )}
 
+      {/* Input */}
       <MessageInput onSend={handleSend} disabled={streaming} />
     </div>
   );
