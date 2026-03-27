@@ -240,39 +240,39 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-[#faf8f5]">
       <div className="flex-1 overflow-y-auto min-h-0 p-6">
         <div className="max-w-5xl mx-auto space-y-5">
           {runs.map((run) => (
             <div key={run.id} className="space-y-3">
-              {/* User prompt */}
+              {/* User prompt bubble */}
               <div className="flex justify-end">
-                <div className="bg-primary text-primary-foreground rounded-2xl px-4 py-2.5 text-sm max-w-lg">
+                <div className="bg-[#c2410c] text-white rounded-[20px] rounded-br-[4px] px-4 py-2.5 text-sm max-w-lg shadow-sm">
                   {run.prompt}
                 </div>
               </div>
 
-              {/* Loading */}
+              {/* Loading shimmer */}
               {run.loading && (
                 <div className="space-y-3 max-w-xl">
                   <div className="flex items-center gap-2.5">
-                    <span className="inline-block w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                    <span className="inline-block w-4 h-4 rounded-full border-2 border-[#c2410c] border-t-transparent animate-spin" />
                     <span className="text-sm text-muted-foreground">{run.thinkingStep}</span>
                   </div>
                   <div className="space-y-2 ml-6">
-                    <div className="h-3 bg-muted rounded-full animate-pulse w-4/5" />
-                    <div className="h-3 bg-muted rounded-full animate-pulse w-3/5" />
-                    <div className="h-3 bg-muted rounded-full animate-pulse w-2/3" />
-                    <div className="h-8 bg-muted rounded animate-pulse w-full mt-3" />
-                    <div className="h-8 bg-muted rounded animate-pulse w-full" />
-                    <div className="h-8 bg-muted rounded animate-pulse w-full" />
+                    <div className="h-3 bg-[#f5f2ed]/80 rounded-full animate-pulse w-4/5" />
+                    <div className="h-3 bg-[#f5f2ed]/80 rounded-full animate-pulse w-3/5" />
+                    <div className="h-3 bg-[#f5f2ed]/80 rounded-full animate-pulse w-2/3" />
+                    <div className="h-8 bg-[#f5f2ed]/80 rounded-xl animate-pulse w-full mt-3" />
+                    <div className="h-8 bg-[#f5f2ed]/80 rounded-xl animate-pulse w-full" />
+                    <div className="h-8 bg-[#f5f2ed]/80 rounded-xl animate-pulse w-full" />
                   </div>
                 </div>
               )}
 
               {/* Error */}
               {run.error && !run.loading && (
-                <div className="p-3 rounded-lg bg-destructive/10 border border-destructive/20 text-sm text-destructive max-w-xl">
+                <div className="p-3 rounded-xl bg-destructive/5 border border-destructive/20 text-sm text-destructive max-w-xl">
                   {run.error}
                 </div>
               )}
@@ -282,48 +282,63 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
                 <div className="space-y-3">
                   {/* Summary preamble */}
                   {run.summaryParts && (
-                    <p className="text-sm leading-relaxed">
+                    <p className="text-sm leading-relaxed text-foreground">
                       {run.summaryParts.map((part, i) => (
                         part.bold
-                          ? <strong key={i}>{part.text}</strong>
+                          ? <strong key={i} className="text-[#c2410c]">{part.text}</strong>
                           : <span key={i}>{part.text}</span>
                       ))}
                     </p>
                   )}
 
-                  {/* Accordion */}
-                  <div className="border rounded-lg overflow-hidden">
+                  {/* Result accordion */}
+                  <div className="rounded-xl border border-[#e7e0d5] overflow-hidden shadow-[0_1px_4px_0_rgba(139,90,43,0.08)]">
                     <button
                       onClick={() => toggleExpand(run.id)}
-                      className="w-full text-left px-4 py-3 bg-muted/30 hover:bg-muted/50 transition-colors flex items-center justify-between"
+                      className="w-full text-left px-4 py-3 bg-[#f5f2ed]/50 hover:bg-[#f5f2ed] transition-colors flex items-center justify-between"
                     >
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-muted-foreground">{run.expanded ? "▼" : "▶"}</span>
                         <span className="text-sm font-medium">{formatNumber(run.result_row_count)} rows · {run.result_columns.length} columns</span>
                       </div>
                       <div className="flex gap-2" onClick={(e) => e.stopPropagation()}>
-                        <Button size="sm" variant="default" className="h-7 text-xs" onClick={() => updateRun(run.id, { showFullReport: !run.showFullReport })}>
+                        <Button
+                          size="sm"
+                          variant="default"
+                          className="h-7 text-xs rounded-lg bg-[#c2410c] hover:bg-[#a83509] text-white"
+                          onClick={() => updateRun(run.id, { showFullReport: !run.showFullReport })}
+                        >
                           {run.showFullReport ? "Hide Report" : run.cachedReport ? "View Report" : "Generate Report"}
                         </Button>
-                        <Button size="sm" variant="outline" className="h-7 text-xs" onClick={() => exportToSheets(run)}>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="h-7 text-xs rounded-lg border-[#e7e0d5] hover:bg-[#f5f2ed]"
+                          onClick={() => exportToSheets(run)}
+                        >
                           Export to Sheets
                         </Button>
-                        <Button size="sm" variant="ghost" className="h-7 text-xs" onClick={() => {
-                          if (run.generated_sql) navigator.clipboard.writeText(run.generated_sql);
-                        }}>
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          className="h-7 text-xs rounded-lg hover:bg-[#f5f2ed]"
+                          onClick={() => {
+                            if (run.generated_sql) navigator.clipboard.writeText(run.generated_sql);
+                          }}
+                        >
                           Copy SQL
                         </Button>
                       </div>
                     </button>
 
                     {run.expanded && (
-                      <div className="overflow-auto max-h-[55vh] border-t">
+                      <div className="overflow-auto max-h-[55vh] border-t border-[#e7e0d5]">
                         <Table>
                           <TableHeader>
-                            <TableRow className="bg-muted/30">
-                              <TableHead className="text-xs text-muted-foreground w-12 sticky top-0 bg-muted/30">#</TableHead>
+                            <TableRow className="bg-[#f5f2ed]/60">
+                              <TableHead className="text-xs text-muted-foreground w-12 sticky top-0 bg-[#f5f2ed]/60">#</TableHead>
                               {run.result.columns.map((col) => (
-                                <TableHead key={col} className="text-xs font-semibold whitespace-nowrap px-4 sticky top-0 bg-muted/30">
+                                <TableHead key={col} className="text-xs font-semibold whitespace-nowrap px-4 sticky top-0 bg-[#f5f2ed]/60">
                                   {col.replace(/_/g, " ")}
                                 </TableHead>
                               ))}
@@ -331,7 +346,7 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
                           </TableHeader>
                           <TableBody>
                             {run.result.rows.map((row, i) => (
-                              <TableRow key={i} className="hover:bg-muted/20">
+                              <TableRow key={i} className="hover:bg-[#f5f2ed]/40">
                                 <TableCell className="text-xs text-muted-foreground w-12">{i + 1}</TableCell>
                                 {run.result!.columns.map((col) => (
                                   <TableCell key={col} className="text-sm whitespace-nowrap px-4">
@@ -373,7 +388,7 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
               {!run.loading && !run.error && !run.result && run.result_row_count > 0 && (
                 <button
                   onClick={() => rerunQuery(run)}
-                  className="w-full text-left p-3 rounded-lg border bg-muted/30 hover:bg-muted/50 transition-colors max-w-xl flex items-center justify-between"
+                  className="w-full text-left p-3 rounded-xl border border-[#e7e0d5] bg-[#f5f2ed]/40 hover:bg-[#f5f2ed] transition-colors max-w-xl flex items-center justify-between"
                 >
                   <div>
                     <span className="text-sm font-medium">{formatNumber(run.result_row_count)} rows</span>
@@ -382,7 +397,7 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
                       {run.result_columns.length > 4 && ` +${run.result_columns.length - 4} more`}
                     </span>
                   </div>
-                  <span className="text-xs text-primary">Load results →</span>
+                  <span className="text-xs text-[#c2410c] font-medium">Load results →</span>
                 </button>
               )}
             </div>
@@ -391,11 +406,11 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
         </div>
       </div>
 
-      {/* Input bar */}
-      <div className="border-t p-4">
+      {/* Bottom input bar */}
+      <div className="bg-[#faf8f5] border-t border-[#e7e0d5] p-4">
         <div className="max-w-3xl mx-auto flex gap-2">
           {connections.length > 0 && (
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-muted border shrink-0 self-center">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs bg-[#f5f2ed] border border-[#e7e0d5] shrink-0 self-center text-foreground">
               <span className="w-2 h-2 rounded-full bg-green-500" />
               {connections[0]?.name}
             </span>
@@ -406,9 +421,13 @@ export default function ReportSessionPage({ params }: { params: Promise<{ id: st
             onChange={(e) => setPrompt(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={loading}
-            className="flex-1"
+            className="flex-1 rounded-xl border-[#e7e0d5] bg-white focus-visible:ring-[#c2410c]/30"
           />
-          <Button onClick={() => runQuery(prompt)} disabled={loading || !prompt.trim()}>
+          <Button
+            onClick={() => runQuery(prompt)}
+            disabled={loading || !prompt.trim()}
+            className="rounded-lg bg-[#c2410c] hover:bg-[#a83509] text-white"
+          >
             {loading ? "Running..." : "Run"}
           </Button>
         </div>
