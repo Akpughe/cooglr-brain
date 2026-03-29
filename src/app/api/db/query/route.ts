@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
 
   const { data: connection } = await supabase
     .from("database_connections")
-    .select("encrypted_connection_string, db_type")
+    .select("encrypted_connection_string, db_type, selected_database")
     .eq("id", connectionId)
     .eq("user_id", user.id)
     .single();
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
   }
 
   try {
-    const adapter = await createDbAdapter(connection.db_type, connectionString);
+    const adapter = await createDbAdapter(connection.db_type, connectionString, connection.selected_database || undefined);
     const result = await adapter.query(query);
     await adapter.close();
     return NextResponse.json(result);

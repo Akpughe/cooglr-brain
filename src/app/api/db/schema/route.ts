@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
   const { data: connection } = await supabase
     .from("database_connections")
-    .select("encrypted_connection_string, db_type")
+    .select("encrypted_connection_string, db_type, selected_database")
     .eq("id", connectionId)
     .eq("user_id", user.id)
     .single();
@@ -28,11 +28,12 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const adapter = await createDbAdapter(connection.db_type, connectionString);
+    const adapter = await createDbAdapter(connection.db_type, connectionString, connection.selected_database || undefined);
     const schema = await adapter.getSchema();
     await adapter.close();
     return NextResponse.json(schema);
-  } catch {
-    return NextResponse.json({ error: "Failed to fetch schema" }, { status: 500 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : "Unknown error";
+    return NextResponse.json({ error: `Failed to fetch schema: ${msg}` }, { status: 500 });
   }
 }

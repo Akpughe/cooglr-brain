@@ -11,7 +11,7 @@ export async function GET() {
 
   const { data } = await supabase
     .from("database_connections")
-    .select("id, name, db_type, is_active, created_at")
+    .select("id, name, db_type, is_active, created_at, selected_database")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
@@ -24,16 +24,16 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { name, connectionString, dbType } = await request.json();
+  const { name, connectionString, dbType, selectedDatabase } = await request.json();
   if (!name || !connectionString) {
     return NextResponse.json({ error: "Name and connection string required" }, { status: 400 });
   }
 
   const type = dbType || "postgres";
 
-  // Test connection
+  // Test connection (with selected database if provided)
   try {
-    const adapter = await createDbAdapter(type, connectionString);
+    const adapter = await createDbAdapter(type, connectionString, selectedDatabase || undefined);
     await adapter.testConnection();
     await adapter.close();
   } catch (err) {
@@ -49,8 +49,9 @@ export async function POST(request: NextRequest) {
       name,
       encrypted_connection_string: encrypt(connectionString),
       db_type: type,
+      selected_database: selectedDatabase || null,
     })
-    .select("id, name, db_type, is_active, created_at")
+    .select("id, name, db_type, is_active, created_at, selected_database")
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

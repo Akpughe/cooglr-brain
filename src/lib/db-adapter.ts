@@ -16,6 +16,7 @@ export interface SchemaTable {
 
 export interface DbAdapter {
   testConnection(): Promise<void>;
+  listDatabases(): Promise<string[]>;
   getSchema(): Promise<SchemaTable[]>;
   query(sql: string): Promise<QueryResult>;
   close(): Promise<void>;
@@ -45,6 +46,12 @@ export async function createPostgresAdapter(connectionString: string): Promise<D
   return {
     async testConnection() {
       await client!.query("SELECT 1");
+    },
+
+    async listDatabases() {
+      // Postgres connects to a specific database already, return just that one
+      const result = await client!.query("SELECT current_database() as db");
+      return [result.rows[0].db];
     },
 
     async getSchema() {
@@ -87,7 +94,7 @@ export async function createPostgresAdapter(connectionString: string): Promise<D
 
 // ---- ClickHouse Adapter ----
 
-export async function createClickHouseAdapter(connectionString: string): Promise<DbAdapter> {
+export async function createClickHouseAdapter(connectionString: string, selectedDatabase?: string): Promise<DbAdapter> {
   const { createClient } = await import("@clickhouse/client");
 
   // Parse connection string: clickhouse://user:pass@host:port/database
@@ -97,8 +104,11 @@ export async function createClickHouseAdapter(connectionString: string): Promise
   try {
     const url = new URL(connectionString);
     if (url.protocol === "clickhouse:" || url.protocol === "ch:") {
+      const secure = url.searchParams.get("secure") === "true" || url.port === "443";
+      const scheme = secure ? "https" : "http";
+      const defaultPort = secure ? "443" : "8123";
       config = {
-        url: `http://${url.hostname}:${url.port || "8123"}`,
+        url: `${scheme}://${url.hostname}:${url.port || defaultPort}`,
         username: url.username || "default",
         password: url.password || "",
         database: url.pathname.replace("/", "") || "default",
@@ -116,23 +126,54 @@ export async function createClickHouseAdapter(connectionString: string): Promise
     config = { url: connectionString };
   }
 
-  const client = createClient(config);
+  // Override database if user selected one
+  if (selectedDatabase) {
+    config.database = selectedDatabase;
+  }
+
+  // For HTTPS connections, use keep_alive and let Node handle TLS
+  const client = createClient({
+    ...config,
+    keep_alive: { enabled: true },
+  });
+
+  // Track which database to query schema from
+  const dbName = config.database && config.database !== "default" ? config.database : null;
 
   return {
     async testConnection() {
       await client.query({ query: "SELECT 1" });
     },
 
+    async listDatabases() {
+      const result = await client.query({
+        query: `SELECT name FROM system.databases WHERE name NOT IN ('system', 'information_schema', 'INFORMATION_SCHEMA', 'default') ORDER BY name`,
+        format: "JSONEachRow",
+      });
+      const rows = await result.json<{ name: string }>();
+      return rows.map((r) => r.name);
+    },
+
     async getSchema() {
+      // If a specific database is set, use it; otherwise query all non-system databases
+      const dbFilter = dbName
+        ? `database = '${dbName}'`
+        : `database NOT IN ('system', 'information_schema', 'INFORMATION_SCHEMA')`;
+
+      // If querying a specific database, just use table name; otherwise prefix with database
+      const tableNameExpr = dbName
+        ? `table`
+        : `concat(database, '.', table)`;
+
       const result = await client.query({
         query: `
           SELECT
-            table as table_name,
+            ${tableNameExpr} as table_name,
             groupArray(concat(name, ' ', type)) as column_list
           FROM system.columns
-          WHERE database = currentDatabase()
-          GROUP BY table
-          ORDER BY table
+          WHERE ${dbFilter}
+          GROUP BY database, table
+          ORDER BY database, table
         `,
         format: "JSONEachRow",
       });
@@ -167,12 +208,12 @@ export async function createClickHouseAdapter(connectionString: string): Promise
 
 // ---- Factory ----
 
-export async function createDbAdapter(dbType: string, connectionString: string): Promise<DbAdapter> {
+export async function createDbAdapter(dbType: string, connectionString: string, selectedDatabase?: string): Promise<DbAdapter> {
   switch (dbType) {
     case "postgres":
       return createPostgresAdapter(connectionString);
     case "clickhouse":
-      return createClickHouseAdapter(connectionString);
+      return createClickHouseAdapter(connectionString, selectedDatabase);
     default:
       throw new Error(`Unsupported database type: ${dbType}`);
   }
