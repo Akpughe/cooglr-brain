@@ -2,9 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface Props {
   greeting: string;
@@ -28,14 +26,6 @@ interface Stats {
   reports: number;
   chats: number;
 }
-
-const SECTION_EMOJI: Record<string, string> = {
-  repos: "\uD83D\uDCC1",
-  tickets: "\uD83D\uDCCB",
-  reports: "\uD83D\uDCCA",
-  emails: "\u2709\uFE0F",
-  chat: "\uD83D\uDCAC",
-};
 
 export function DashboardContent({ greeting, firstName, hasGithub, hasGoogle, hasDatabase }: Props) {
   const router = useRouter();
@@ -65,182 +55,302 @@ export function DashboardContent({ greeting, firstName, hasGithub, hasGoogle, ha
 
   return (
     <div className="h-full overflow-y-auto">
-      <div className="max-w-4xl mx-auto p-6 space-y-8">
+      <div className="max-w-[960px] mx-auto px-8 py-10">
 
-        {/* Greeting */}
-        <div>
-          <h1 className="text-2xl font-semibold tracking-tight">{greeting}, {firstName}</h1>
-          <p className="text-muted-foreground text-sm mt-1">Here&apos;s an overview of your workspace</p>
+        {/* Hero greeting */}
+        <div className="mb-10">
+          <p className="text-muted-foreground text-sm mb-1">{greeting}</p>
+          <h1 className="text-[28px] font-semibold tracking-[-0.04em] text-foreground leading-tight">
+            {firstName}
+          </h1>
         </div>
 
-        {/* Setup Checklist */}
-        {!setupComplete && (
-          <Card className="border-primary/20 bg-gradient-to-br from-primary/[0.03] to-transparent shadow-warm">
-            <CardContent className="p-5">
-              <div className="flex items-start justify-between mb-4">
+        {/* Bento grid */}
+        <div className="grid grid-cols-12 gap-3">
+
+          {/* Setup card — spans full width when incomplete */}
+          {!setupComplete && (
+            <div className="col-span-12 rounded-2xl bg-card border border-border p-6 shadow-surface">
+              <div className="flex items-center justify-between mb-5">
                 <div>
-                  <h3 className="font-semibold text-sm">Complete your setup</h3>
-                  <p className="text-xs text-muted-foreground mt-0.5">{setupProgress} of 3 integrations connected</p>
+                  <h2 className="text-[15px] font-medium text-foreground">Get started</h2>
+                  <p className="text-xs text-muted-foreground mt-0.5">Connect your tools to unlock the full platform</p>
                 </div>
-                <div className="flex items-center gap-1">
-                  {[hasGithub, hasGoogle, hasDatabase].map((done, i) => (
-                    <div key={i} className={`w-8 h-1.5 rounded-full transition-colors ${done ? "bg-primary" : "bg-border"}`} />
-                  ))}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground tabular-nums">{setupProgress}/3</span>
+                  <div className="w-20 h-1.5 rounded-full bg-border overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-primary transition-all duration-500 ease-out"
+                      style={{ width: `${(setupProgress / 3) * 100}%` }}
+                    />
+                  </div>
                 </div>
               </div>
-
-              <div className="space-y-2">
-                <SetupItem
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <SetupCard
                   done={hasGithub}
-                  emoji={"\uD83D\uDC19"}
-                  label="Connect GitHub"
-                  description="View repos, manage PRs, create issues"
+                  title="GitHub"
+                  description="Repos, PRs, and issues"
                   href="/settings"
+                  icon={<path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/>}
                 />
-                <SetupItem
+                <SetupCard
                   done={hasGoogle}
-                  emoji={"G"}
-                  label="Connect Google"
-                  description="Send emails, manage calendar, export to Sheets"
+                  title="Google"
+                  description="Email, calendar, and sheets"
                   href="/settings"
-                  isText
+                  icon={<><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></>}
                 />
-                <SetupItem
+                <SetupCard
                   done={hasDatabase}
-                  emoji={"\uD83D\uDDC4\uFE0F"}
-                  label="Connect a database"
-                  description="Generate AI-powered reports from your data"
+                  title="Database"
+                  description="Run queries and reports"
                   href="/settings"
+                  icon={<><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/><path d="M3 12c0 1.66 4 3 9 3s9-1.34 9-3"/></>}
                 />
               </div>
-            </CardContent>
-          </Card>
-        )}
+            </div>
+          )}
 
-        {/* Stats Row */}
-        <div className="grid grid-cols-3 gap-4">
-          <StatCard label="Open Tickets" value={loading ? "\u2014" : String(stats.tickets)} onClick={() => router.push("/tickets")} />
-          <StatCard label="Reports" value={loading ? "\u2014" : String(stats.reports)} onClick={() => router.push("/reports")} />
-          <StatCard label="Chat Sessions" value={loading ? "\u2014" : String(stats.chats)} onClick={() => router.push("/chat")} />
-        </div>
-
-        {/* Quick Actions */}
-        <div>
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Quick Actions</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <QuickAction label="New Chat" emoji={"\uD83D\uDCAC"} onClick={() => router.push("/chat")} />
-            <QuickAction label="New Report" emoji={"\uD83D\uDCCA"} onClick={() => router.push("/reports")} />
-            <QuickAction label="Create Ticket" emoji={"\uD83D\uDCCB"} onClick={() => router.push("/tickets")} />
-            <QuickAction label="View Repos" emoji={"\uD83D\uDCC1"} onClick={() => router.push("/repos")} />
+          {/* Stat tiles */}
+          <div className="col-span-12 md:col-span-4">
+            <StatTile
+              label="Open Tickets"
+              value={loading ? null : stats.tickets}
+              onClick={() => router.push("/tickets")}
+              accent="text-amber-600 dark:text-amber-400"
+              bgAccent="bg-amber-500/8 dark:bg-amber-500/10"
+            />
           </div>
-        </div>
+          <div className="col-span-12 md:col-span-4">
+            <StatTile
+              label="Reports"
+              value={loading ? null : stats.reports}
+              onClick={() => router.push("/reports")}
+              accent="text-primary"
+              bgAccent="bg-primary/8 dark:bg-primary/10"
+            />
+          </div>
+          <div className="col-span-12 md:col-span-4">
+            <StatTile
+              label="Chats"
+              value={loading ? null : stats.chats}
+              onClick={() => router.push("/chat")}
+              accent="text-emerald-600 dark:text-emerald-400"
+              bgAccent="bg-emerald-500/8 dark:bg-emerald-500/10"
+            />
+          </div>
 
-        {/* Recent Activity */}
-        <div>
-          <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Recent Activity</h3>
-          {loading && (
-            <div className="space-y-3">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="h-14 bg-muted/50 rounded-xl animate-pulse" />
-              ))}
-            </div>
-          )}
-          {!loading && activities.length === 0 && (
-            <Card className="shadow-warm">
-              <CardContent className="p-8 text-center">
-                <p className="text-lg mb-1">{"\uD83D\uDC4B"}</p>
-                <p className="text-sm font-medium">No recent activity yet</p>
-                <p className="text-xs text-muted-foreground mt-1">Start by exploring the platform — try the chat or create a report!</p>
-              </CardContent>
-            </Card>
-          )}
-          {!loading && activities.length > 0 && (
+          {/* Quick actions */}
+          <div className="col-span-12 md:col-span-5 rounded-2xl bg-card border border-border p-5 shadow-surface">
+            <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/60 mb-3">
+              Quick Actions
+            </h3>
             <div className="space-y-1">
-              {activities.slice(0, 8).map((a) => (
-                <div key={a.id} className="flex items-start gap-3 p-3 rounded-xl hover:bg-muted/50 transition-colors">
-                  <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-sm shrink-0">
-                    {SECTION_EMOJI[a.section] || "\u2022"}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{a.title}</p>
-                    {a.description && <p className="text-xs text-muted-foreground truncate">{a.description}</p>}
-                  </div>
-                  <span className="text-[10px] text-muted-foreground shrink-0 mt-0.5">{timeAgo(a.created_at)}</span>
-                </div>
-              ))}
+              <ActionRow icon="chat" label="Start a new chat" onClick={() => router.push("/chat")} />
+              <ActionRow icon="reports" label="Generate a report" onClick={() => router.push("/reports")} />
+              <ActionRow icon="tickets" label="Create a ticket" onClick={() => router.push("/tickets")} />
+              <ActionRow icon="repos" label="Browse repositories" onClick={() => router.push("/repos")} />
             </div>
-          )}
+          </div>
+
+          {/* Activity feed */}
+          <div className="col-span-12 md:col-span-7 rounded-2xl bg-card border border-border p-5 shadow-surface">
+            <h3 className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground/60 mb-3">
+              Recent Activity
+            </h3>
+
+            {loading && (
+              <div className="space-y-3">
+                {[1, 2, 3, 4, 5].map((i) => (
+                  <div key={i} className="flex items-center gap-3">
+                    <div className="w-7 h-7 rounded-lg skeleton shrink-0" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="h-3 skeleton" style={{ width: `${60 + i * 5}%` }} />
+                      <div className="h-2.5 skeleton" style={{ width: `${30 + i * 3}%` }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {!loading && activities.length === 0 && (
+              <div className="py-10 text-center">
+                <div className="w-10 h-10 rounded-xl bg-muted flex items-center justify-center mx-auto mb-3">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-muted-foreground/50">
+                    <path d="M12 8v4l3 3" strokeLinecap="round" strokeLinejoin="round"/>
+                    <circle cx="12" cy="12" r="10"/>
+                  </svg>
+                </div>
+                <p className="text-sm text-muted-foreground">No activity yet</p>
+                <p className="text-xs text-muted-foreground/60 mt-1">Your recent actions will appear here</p>
+              </div>
+            )}
+
+            {!loading && activities.length > 0 && (
+              <div className="space-y-0.5">
+                {activities.slice(0, 7).map((a, i) => (
+                  <div
+                    key={a.id}
+                    className={cn(
+                      "flex items-center gap-3 py-2 px-2 -mx-2 rounded-lg transition-colors duration-150 hover:bg-muted/40",
+                      i === 0 && "bg-muted/20"
+                    )}
+                  >
+                    <ActivityIcon section={a.section} />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[13px] text-foreground truncate">{a.title}</p>
+                      {a.description && (
+                        <p className="text-[11px] text-muted-foreground/70 truncate mt-0.5">{a.description}</p>
+                      )}
+                    </div>
+                    <span className="text-[11px] text-muted-foreground/50 tabular-nums shrink-0">
+                      {timeAgo(a.created_at)}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function SetupItem({ done, emoji, label, description, href, isText }: {
-  done: boolean; emoji: string; label: string; description: string; href: string; isText?: boolean;
+/* ---- Sub-components ---- */
+
+function SetupCard({ done, title, description, href, icon }: {
+  done: boolean; title: string; description: string; href: string; icon: React.ReactNode;
 }) {
   return (
     <a
       href={href}
-      className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
-        done ? "bg-muted/30 opacity-60" : "bg-card hover:bg-muted/50 border border-border hover:border-primary/20"
-      }`}
+      className={cn(
+        "group flex items-center gap-3 rounded-xl px-4 py-3 transition-all duration-150 border",
+        done
+          ? "border-transparent bg-muted/30 opacity-60"
+          : "border-border hover:border-primary/20 hover:bg-muted/30"
+      )}
     >
-      <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${
-        done ? "bg-green-500/10 text-green-600" : "bg-muted"
-      }`}>
+      <div className={cn(
+        "w-9 h-9 rounded-lg flex items-center justify-center shrink-0 transition-colors",
+        done ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-muted text-muted-foreground"
+      )}>
         {done ? (
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <polyline points="20 6 9 17 4 12"/>
           </svg>
         ) : (
-          isText
-            ? <span className="text-sm font-bold text-muted-foreground">{emoji}</span>
-            : <span className="text-base">{emoji}</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            {icon}
+          </svg>
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <p className={`text-sm font-medium ${done ? "line-through text-muted-foreground" : ""}`}>{label}</p>
-        <p className="text-xs text-muted-foreground">{description}</p>
+        <p className={cn(
+          "text-[13px] font-medium",
+          done ? "line-through text-muted-foreground" : "text-foreground"
+        )}>{title}</p>
+        <p className="text-[11px] text-muted-foreground">{description}</p>
       </div>
       {!done && (
-        <Badge variant="outline" className="text-[10px] shrink-0 border-primary/30 text-primary">Connect</Badge>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          className="text-muted-foreground/30 group-hover:text-primary transition-colors shrink-0"
+        >
+          <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+        </svg>
       )}
     </a>
   );
 }
 
-function StatCard({ label, value, onClick }: { label: string; value: string; onClick: () => void }) {
+function StatTile({ label, value, onClick, accent, bgAccent }: {
+  label: string; value: number | null; onClick: () => void; accent: string; bgAccent: string;
+}) {
   return (
-    <Card className="cursor-pointer hover:shadow-warm-md transition-all hover:-translate-y-0.5 shadow-warm" onClick={onClick}>
-      <CardContent className="p-5">
-        <p className="text-3xl font-bold tracking-tight">{value}</p>
-        <p className="text-xs text-muted-foreground mt-1.5">{label}</p>
-      </CardContent>
-    </Card>
+    <button
+      onClick={onClick}
+      className="w-full rounded-2xl bg-card border border-border p-5 shadow-surface text-left transition-all duration-150 hover:shadow-surface-md hover:border-primary/15 group cursor-pointer"
+    >
+      <div className="flex items-center justify-between mb-4">
+        <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center", bgAccent)}>
+          <div className={cn("w-2 h-2 rounded-full", accent.replace("text-", "bg-"))} />
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+          className="text-muted-foreground/0 group-hover:text-muted-foreground/40 transition-all duration-150 -translate-x-1 group-hover:translate-x-0"
+        >
+          <polyline points="9 18 15 12 9 6"/>
+        </svg>
+      </div>
+      {value === null ? (
+        <div className="h-9 w-14 skeleton mb-1" />
+      ) : (
+        <p className="text-[32px] font-semibold tracking-[-0.04em] text-foreground leading-none tabular-nums">
+          {value}
+        </p>
+      )}
+      <p className="text-xs text-muted-foreground mt-1.5">{label}</p>
+    </button>
   );
 }
 
-function QuickAction({ label, emoji, onClick }: { label: string; emoji: string; onClick: () => void }) {
+function ActionRow({ icon, label, onClick }: {
+  icon: string; label: string; onClick: () => void;
+}) {
+  const iconPaths: Record<string, React.ReactNode> = {
+    chat: <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>,
+    reports: <><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></>,
+    tickets: <><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></>,
+    repos: <><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/></>,
+  };
+
   return (
-    <Button
-      variant="outline"
-      className="h-auto py-4 px-4 flex flex-col items-center gap-2 rounded-xl border-border hover:bg-muted/50 hover:border-primary/20 hover:-translate-y-0.5 transition-all"
+    <button
       onClick={onClick}
+      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-muted/50 transition-all duration-150 group text-left cursor-pointer"
     >
-      <span className="text-xl">{emoji}</span>
-      <span className="text-xs font-medium">{label}</span>
-    </Button>
+      <div className="w-7 h-7 rounded-lg bg-muted/60 flex items-center justify-center shrink-0 group-hover:bg-primary/10 transition-colors duration-150">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"
+          className="text-muted-foreground group-hover:text-primary transition-colors duration-150"
+        >
+          {iconPaths[icon]}
+        </svg>
+      </div>
+      <span className="text-[13px] text-foreground flex-1">{label}</span>
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+        className="text-muted-foreground/0 group-hover:text-muted-foreground/40 transition-all duration-150 shrink-0"
+      >
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </button>
+  );
+}
+
+function ActivityIcon({ section }: { section: string }) {
+  const map: Record<string, React.ReactNode> = {
+    chat: <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>,
+    repos: <><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/></>,
+    tickets: <><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/></>,
+    reports: <><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></>,
+    emails: <><rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></>,
+  };
+  return (
+    <div className="w-7 h-7 rounded-lg bg-muted/50 flex items-center justify-center shrink-0">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground/60">
+        {map[section] || <circle cx="12" cy="12" r="4"/>}
+      </svg>
+    </div>
   );
 }
 
 function timeAgo(dateStr: string): string {
   const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
-  if (seconds < 60) return "just now";
+  if (seconds < 60) return "now";
   const minutes = Math.floor(seconds / 60);
-  if (minutes < 60) return `${minutes}m ago`;
+  if (minutes < 60) return `${minutes}m`;
   const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 24) return `${hours}h`;
   const days = Math.floor(hours / 24);
-  return `${days}d ago`;
+  return `${days}d`;
 }
