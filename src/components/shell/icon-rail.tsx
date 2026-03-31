@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useWorkspace } from "@/lib/workspace/context";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 import * as LucideIcons from "lucide-react";
-import { Plus, Settings, MessageSquare } from "lucide-react";
+import { Plus, Settings, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { AppCatalogModal } from "./app-catalog-modal";
@@ -25,33 +25,40 @@ export function IconRail() {
 
   function getIcon(iconName: string) {
     const Icon = (LucideIcons as any)[iconName];
-    return Icon ? <Icon className="w-[18px] h-[18px]" /> : <MessageSquare className="w-[18px] h-[18px]" />;
+    return Icon ? <Icon className="w-[18px] h-[18px]" /> : <Sparkles className="w-[18px] h-[18px]" />;
   }
 
   return (
     <>
-      <div className="w-[52px] min-w-[52px] h-full flex flex-col items-center py-3 gap-1 border-r"
+      <div
+        className="w-[52px] min-w-[52px] h-full flex flex-col items-center py-3 gap-1 border-r"
         style={{ background: "var(--rail-bg)", borderColor: "var(--sidebar-hover)" }}
       >
-        {/* Workspace switcher */}
-        <WorkspaceSwitcher activeWorkspace={workspace} />
+        {/* Workspace avatar */}
+        <div className="mb-1">
+          <WorkspaceSwitcher activeWorkspace={workspace} />
+        </div>
 
-        {/* AI Home (platform) */}
-        <div className="mt-3">
+        {/* AI Home */}
+        <div className="relative mt-2">
+          {isActive("") && (
+            <div
+              className="absolute left-[-7px] top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-full"
+              style={{ background: "var(--shell-accent)" }}
+            />
+          )}
           <Link
             href={workspaceBase}
             title="AI Home"
             className={cn(
               "w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-all duration-150",
-              isActive("") ? "border-2" : "hover:opacity-80"
+              isActive("") ? "bg-black/[0.06] dark:bg-white/[0.08]" : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
             )}
             style={{
               color: isActive("") ? "var(--rail-icon-active)" : "var(--rail-icon)",
-              background: isActive("") ? "var(--sidebar-bg)" : "transparent",
-              borderColor: isActive("") ? "var(--rail-icon-active)" : "transparent",
             }}
           >
-            <MessageSquare className="w-[18px] h-[18px]" />
+            <Sparkles className="w-[18px] h-[18px]" />
           </Link>
         </div>
 
@@ -60,30 +67,35 @@ export function IconRail() {
 
         {/* Installed apps */}
         {installedApps.map((app) => (
-          <Link
-            key={app.id}
-            href={`${workspaceBase}${app.route}`}
-            title={app.name}
-            className={cn(
-              "w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-all duration-150",
-              isActive(app.route) ? "border-2" : "hover:opacity-80"
+          <div key={app.id} className="relative">
+            {isActive(app.route) && (
+              <div
+                className="absolute left-[-7px] top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-full"
+                style={{ background: "var(--shell-accent)" }}
+              />
             )}
-            style={{
-              color: isActive(app.route) ? "var(--rail-icon-active)" : "var(--rail-icon)",
-              background: isActive(app.route) ? "var(--sidebar-bg)" : "transparent",
-              borderColor: isActive(app.route) ? "var(--rail-icon-active)" : "transparent",
-            }}
-          >
-            {getIcon(app.icon)}
-          </Link>
+            <Link
+              href={`${workspaceBase}${app.route}`}
+              title={app.name}
+              className={cn(
+                "w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-all duration-150",
+                isActive(app.route) ? "bg-black/[0.06] dark:bg-white/[0.08]" : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+              )}
+              style={{
+                color: isActive(app.route) ? "var(--rail-icon-active)" : "var(--rail-icon)",
+              }}
+            >
+              {getIcon(app.icon)}
+            </Link>
+          </div>
         ))}
 
         {/* Add app button */}
         <button
           onClick={() => setCatalogOpen(true)}
           title="Add app"
-          className="w-[38px] h-[38px] rounded-[10px] border-2 border-dashed flex items-center justify-center mt-1 hover:opacity-80 transition-opacity"
-          style={{ borderColor: "var(--rail-icon)", color: "var(--rail-icon)" }}
+          className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center mt-1 transition-all duration-150 border border-transparent hover:border-dashed hover:border-current opacity-40 hover:opacity-70"
+          style={{ color: "var(--rail-icon)" }}
         >
           <Plus className="w-4 h-4" />
         </button>
@@ -92,24 +104,33 @@ export function IconRail() {
         <div className="flex-1" />
 
         {/* Settings */}
-        <Link
-          href={`${workspaceBase}/settings`}
-          title="Settings"
-          className={cn(
-            "w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-all duration-150",
-            isActive("/settings") ? "border-2" : "hover:opacity-80"
+        <div className="relative">
+          {isActive("/settings") && (
+            <div
+              className="absolute left-[-7px] top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-full"
+              style={{ background: "var(--shell-accent)" }}
+            />
           )}
-          style={{
-            color: isActive("/settings") ? "var(--rail-icon-active)" : "var(--rail-icon)",
-            background: isActive("/settings") ? "var(--sidebar-bg)" : "transparent",
-            borderColor: isActive("/settings") ? "var(--rail-icon-active)" : "transparent",
-          }}
-        >
-          <Settings className="w-[18px] h-[18px]" />
-        </Link>
+          <Link
+            href={`${workspaceBase}/settings`}
+            title="Settings"
+            className={cn(
+              "w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-all duration-150",
+              isActive("/settings") ? "bg-black/[0.06] dark:bg-white/[0.08]" : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+            )}
+            style={{
+              color: isActive("/settings") ? "var(--rail-icon-active)" : "var(--rail-icon)",
+            }}
+          >
+            <Settings className="w-[18px] h-[18px]" />
+          </Link>
+        </div>
 
         {/* User avatar */}
-        <div className="w-[30px] h-[30px] rounded-full bg-foreground mt-1 cursor-pointer" title="User settings" />
+        <div
+          className="w-[30px] h-[30px] rounded-full bg-foreground mt-2 cursor-pointer transition-transform duration-150 hover:scale-105 shadow-sm"
+          title="User settings"
+        />
       </div>
 
       {catalogOpen && (
