@@ -4,7 +4,9 @@ import { createHmac, randomBytes } from "crypto";
 
 function generateInviteToken(): string {
   const raw = randomBytes(32).toString("hex");
-  const hmac = createHmac("sha256", process.env.CREDENTIAL_ENCRYPTION_KEY || "fallback");
+  const key = process.env.CREDENTIAL_ENCRYPTION_KEY;
+  if (!key) throw new Error("CREDENTIAL_ENCRYPTION_KEY is required");
+  const hmac = createHmac("sha256", key);
   return hmac.update(raw).digest("hex");
 }
 
@@ -134,6 +136,18 @@ export async function PATCH(
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  // Verify owner
+  const { data: membership } = await supabase
+    .from("workspace_members")
+    .select("role")
+    .eq("workspace_id", id)
+    .eq("user_id", user.id)
+    .single();
+
+  if (membership?.role !== "owner") {
+    return NextResponse.json({ error: "Only owners can manage invites" }, { status: 403 });
+  }
 
   const { inviteId, action } = await request.json();
 

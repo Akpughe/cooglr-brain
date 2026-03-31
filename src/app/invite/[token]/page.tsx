@@ -51,6 +51,21 @@ export default async function InvitePage({
     redirect(`/login?redirect=/invite/${token}`);
   }
 
+  // Verify the authenticated user's email matches the invite
+  if (user.email?.toLowerCase() !== invite.email.toLowerCase()) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center space-y-4">
+          <h1 className="text-xl font-semibold">Wrong Account</h1>
+          <p className="text-muted-foreground">
+            This invite was sent to <strong>{invite.email}</strong>. Please sign in with that email.
+          </p>
+          <a href="/login" className="text-primary underline">Switch account</a>
+        </div>
+      </div>
+    );
+  }
+
   const workspaceId = invite.workspace_id;
 
   const { data: existingMembership } = await supabase

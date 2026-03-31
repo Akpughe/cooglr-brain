@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { useWorkspace, useIsOwner } from "@/lib/workspace/context";
 import * as LucideIcons from "lucide-react";
 import { X, MessageSquare } from "lucide-react";
@@ -13,6 +14,7 @@ interface AppCatalogModalProps {
 export function AppCatalogModal({ onClose }: AppCatalogModalProps) {
   const { workspace, installedApps } = useWorkspace();
   const isOwner = useIsOwner();
+  const router = useRouter();
   const [allApps, setAllApps] = useState<AppManifest[]>([]);
   const [installing, setInstalling] = useState<string | null>(null);
 
@@ -36,7 +38,8 @@ export function AppCatalogModal({ onClose }: AppCatalogModalProps) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ appId }),
     });
-    window.location.reload();
+    router.refresh();
+    onClose();
   }
 
   const builtIn = allApps.filter((a) => a.category === "built_in");

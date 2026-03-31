@@ -8,6 +8,7 @@ import { Plus, Settings, MessageSquare } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { AppCatalogModal } from "./app-catalog-modal";
+import Link from "next/link";
 
 export function IconRail() {
   const pathname = usePathname();
@@ -37,7 +38,7 @@ export function IconRail() {
 
         {/* AI Home (platform) */}
         <div className="mt-3">
-          <a
+          <Link
             href={workspaceBase}
             title="AI Home"
             className={cn(
@@ -51,7 +52,7 @@ export function IconRail() {
             }}
           >
             <MessageSquare className="w-[18px] h-[18px]" />
-          </a>
+          </Link>
         </div>
 
         {/* Divider */}
@@ -59,7 +60,7 @@ export function IconRail() {
 
         {/* Installed apps */}
         {installedApps.map((app) => (
-          <a
+          <Link
             key={app.id}
             href={`${workspaceBase}${app.route}`}
             title={app.name}
@@ -74,7 +75,7 @@ export function IconRail() {
             }}
           >
             {getIcon(app.icon)}
-          </a>
+          </Link>
         ))}
 
         {/* Add app button */}
@@ -91,7 +92,7 @@ export function IconRail() {
         <div className="flex-1" />
 
         {/* Settings */}
-        <a
+        <Link
           href={`${workspaceBase}/settings`}
           title="Settings"
           className={cn(
@@ -105,7 +106,7 @@ export function IconRail() {
           }}
         >
           <Settings className="w-[18px] h-[18px]" />
-        </a>
+        </Link>
 
         {/* User avatar */}
         <div className="w-[30px] h-[30px] rounded-full bg-foreground mt-1 cursor-pointer" title="User settings" />
