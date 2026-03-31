@@ -1,5 +1,6 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { InviteAcceptClient } from "./invite-accept-client";
 
 export default async function InvitePage({
   params,
@@ -8,8 +9,7 @@ export default async function InvitePage({
 }) {
   const { token } = await params;
 
-  // Use service client for invite lookup — this page is publicly accessible
-  // (unauthenticated users land here), so RLS would block the query
+  // Use service client for invite lookup — publicly accessible page
   const serviceClient = await createServiceClient();
 
   // Verify token
@@ -23,10 +23,11 @@ export default async function InvitePage({
   if (!invite) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 animate-in fade-in duration-500">
+          <div className="w-14 h-14 bg-muted rounded-2xl flex items-center justify-center mx-auto text-muted-foreground text-xl">?</div>
           <h1 className="text-xl font-semibold">Invalid or Expired Invite</h1>
-          <p className="text-muted-foreground">This invite link is no longer valid.</p>
-          <a href="/login" className="text-primary underline">Go to login</a>
+          <p className="text-muted-foreground text-sm">This invite link is no longer valid.</p>
+          <a href="/login" className="inline-block text-sm text-primary hover:underline">Go to login</a>
         </div>
       </div>
     );
@@ -40,41 +41,55 @@ export default async function InvitePage({
 
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 animate-in fade-in duration-500">
+          <div className="w-14 h-14 bg-muted rounded-2xl flex items-center justify-center mx-auto text-muted-foreground text-xl">⏰</div>
           <h1 className="text-xl font-semibold">Invite Expired</h1>
-          <p className="text-muted-foreground">Ask the workspace owner to send a new invite.</p>
+          <p className="text-muted-foreground text-sm">Ask the workspace owner to send a new invite.</p>
         </div>
       </div>
     );
   }
 
-  // Now check auth with the regular client (has user's JWT)
+  const workspaceName = (invite.workspaces as any)?.name || "a workspace";
+  const workspaceSlug = (invite.workspaces as any)?.slug || "";
+  const workspaceInitial = workspaceName[0]?.toUpperCase() || "W";
+
+  // Check if user is authenticated
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/login?redirect=/invite/${token}`);
+    // Not authenticated — show invite landing page with Google sign-in
+    return (
+      <InviteAcceptClient
+        token={token}
+        workspaceName={workspaceName}
+        workspaceInitial={workspaceInitial}
+        inviteEmail={invite.email}
+        authenticated={false}
+      />
+    );
   }
 
-  // Verify the authenticated user's email matches the invite
+  // Authenticated — verify email matches
   if (user.email?.toLowerCase() !== invite.email.toLowerCase()) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-4">
+        <div className="text-center space-y-4 max-w-sm animate-in fade-in duration-500">
+          <div className="w-14 h-14 bg-foreground rounded-2xl flex items-center justify-center mx-auto text-background text-xl font-bold">{workspaceInitial}</div>
           <h1 className="text-xl font-semibold">Wrong Account</h1>
-          <p className="text-muted-foreground">
-            This invite was sent to <strong>{invite.email}</strong>. Please sign in with that email.
+          <p className="text-muted-foreground text-sm">
+            This invite was sent to <strong>{invite.email}</strong>. You&apos;re signed in as <strong>{user.email}</strong>.
           </p>
-          <a href="/login" className="text-primary underline">Switch account</a>
+          <p className="text-muted-foreground text-sm">Sign out and sign in with the correct Google account.</p>
         </div>
       </div>
     );
   }
 
+  // Email matches — auto-accept the invite
   const workspaceId = invite.workspace_id;
 
-  // Use service client for membership operations — the user may not be
-  // a member yet, so RLS SELECT on workspace_members would return nothing
   const { data: existingMembership } = await serviceClient
     .from("workspace_members")
     .select("id")
@@ -95,6 +110,5 @@ export default async function InvitePage({
     .update({ status: "accepted" })
     .eq("id", invite.id);
 
-  const slug = (invite.workspaces as any)?.slug;
-  redirect(`/${slug || ""}`);
+  redirect(`/${workspaceSlug}`);
 }
