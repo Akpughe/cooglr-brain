@@ -118,31 +118,8 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // Authenticated + on /onboarding but has workspaces → redirect to workspace
-  if (user && pathname === "/onboarding") {
-    const svc = getServiceClient();
-
-    const { data: firstMembership } = await svc
-      .from("workspace_members")
-      .select("workspace_id")
-      .eq("user_id", user.id)
-      .limit(1)
-      .single();
-
-    if (firstMembership) {
-      const { data: ws } = await svc
-        .from("workspaces")
-        .select("slug")
-        .eq("id", firstMembership.workspace_id)
-        .single();
-
-      if (ws) {
-        const url = request.nextUrl.clone();
-        url.pathname = `/${ws.slug}`;
-        return NextResponse.redirect(url);
-      }
-    }
-  }
+  // /onboarding is always accessible to authenticated users —
+  // they may be creating their first workspace OR an additional one
 
   // Set active_workspace_id cookie when navigating to a workspace path
   if (user && !isPublicPath && pathname !== "/" && pathname !== "/onboarding") {

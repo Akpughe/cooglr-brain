@@ -8,13 +8,6 @@ export default async function OnboardingPage() {
 
   if (!user) redirect("/login");
 
-  const { count } = await supabase
-    .from("workspace_members")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", user.id);
-
-  if (count && count > 0) redirect("/");
-
   const { data: profile } = await supabase
     .from("profiles")
     .select("full_name, avatar_url, email")
