@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
+import { formatMember } from "@/lib/workspace/helpers";
 
 // GET /api/workspaces/[id]/members
 export async function GET(
@@ -11,6 +12,18 @@ export async function GET(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  // Verify membership
+  const { data: callerMembership } = await supabase
+    .from("workspace_members")
+    .select("id")
+    .eq("workspace_id", id)
+    .eq("user_id", user.id)
+    .single();
+
+  if (!callerMembership) {
+    return NextResponse.json({ error: "Not a member of this workspace" }, { status: 403 });
+  }
+
   const { data: members, error } = await supabase
     .from("workspace_members")
     .select(`
@@ -21,15 +34,7 @@ export async function GET(
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  const formatted = (members || []).map((m) => ({
-    id: m.id,
-    userId: m.user_id,
-    fullName: (m.profiles as any)?.full_name || "",
-    email: (m.profiles as any)?.email || "",
-    avatarUrl: (m.profiles as any)?.avatar_url || null,
-    role: m.role,
-    joinedAt: m.joined_at,
-  }));
+  const formatted = (members || []).map(formatMember);
 
   return NextResponse.json({ members: formatted });
 }

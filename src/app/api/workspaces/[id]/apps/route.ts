@@ -11,6 +11,18 @@ export async function GET(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  // Verify membership
+  const { data: callerMembership } = await supabase
+    .from("workspace_members")
+    .select("id")
+    .eq("workspace_id", id)
+    .eq("user_id", user.id)
+    .single();
+
+  if (!callerMembership) {
+    return NextResponse.json({ error: "Not a member of this workspace" }, { status: 403 });
+  }
+
   const { data, error } = await supabase
     .from("workspace_apps")
     .select(`

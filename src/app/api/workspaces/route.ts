@@ -1,14 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { WORKSPACE_SLUG_REGEX, WORKSPACE_NAME_MAX_LENGTH } from "@/lib/constants";
-
-function slugify(name: string): string {
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-|-$/g, "")
-    .slice(0, 50);
-}
+import { slugify } from "@/lib/workspace/helpers";
 
 // GET /api/workspaces — list user's workspaces
 export async function GET() {

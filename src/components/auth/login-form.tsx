@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 const INPUT =
@@ -13,13 +14,18 @@ export function LoginForm() {
   const [error, setError] = useState<string | null>(null);
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const supabase = createClient();
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const redirectTo = searchParams.get("redirect");
 
   async function signInWithGoogle() {
     setLoading(true);
     setError(null);
+    const callbackUrl = new URL(`${window.location.origin}/callback`);
+    if (redirectTo) callbackUrl.searchParams.set("next", redirectTo);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${window.location.origin}/callback` },
+      options: { redirectTo: callbackUrl.toString() },
     });
     if (error) setError(error.message);
     setLoading(false);
@@ -32,7 +38,11 @@ export function LoginForm() {
 
     if (mode === "signin") {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) setError(error.message);
+      if (error) {
+        setError(error.message);
+      } else if (redirectTo) {
+        router.push(redirectTo);
+      }
     } else {
       const { error } = await supabase.auth.signUp({
         email,

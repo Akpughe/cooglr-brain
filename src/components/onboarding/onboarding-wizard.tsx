@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { slugify } from "@/lib/workspace/helpers";
 
 interface OnboardingWizardProps {
   user: {
@@ -21,14 +22,6 @@ export function OnboardingWizard({ user }: OnboardingWizardProps) {
   const [emailInput, setEmailInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-
-  function slugify(name: string): string {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, "-")
-      .replace(/^-|-$/g, "")
-      .slice(0, 50);
-  }
 
   function addEmail() {
     const email = emailInput.trim().toLowerCase();

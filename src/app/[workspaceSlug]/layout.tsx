@@ -5,6 +5,8 @@ import { WorkspaceProvider } from "@/lib/workspace/context";
 import { ShellThemeProvider } from "@/components/shell/theme-provider";
 import { IconRail } from "@/components/shell/icon-rail";
 import { AppSidebar } from "@/components/shell/app-sidebar";
+import { AppRouteGuard } from "@/components/shell/app-route-guard";
+import { formatMember } from "@/lib/workspace/helpers";
 
 export default async function WorkspaceLayout({
   children,
@@ -67,15 +69,7 @@ export default async function WorkspaceLayout({
     `)
     .eq("workspace_id", workspace.id);
 
-  const members = (membersData || []).map((m) => ({
-    id: m.id,
-    userId: m.user_id,
-    fullName: (m.profiles as any)?.full_name || "",
-    email: (m.profiles as any)?.email || "",
-    avatarUrl: (m.profiles as any)?.avatar_url || null,
-    role: m.role as "owner" | "member",
-    joinedAt: m.joined_at,
-  }));
+  const members = (membersData || []).map(formatMember);
 
   const cookieStore = await cookies();
   cookieStore.set("active_workspace_id", workspace.id, {
@@ -107,7 +101,7 @@ export default async function WorkspaceLayout({
           <IconRail />
           <AppSidebar />
           <main className="flex-1 flex flex-col overflow-hidden">
-            {children}
+            <AppRouteGuard>{children}</AppRouteGuard>
           </main>
         </div>
       </ShellThemeProvider>

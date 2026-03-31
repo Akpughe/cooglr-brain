@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { WORKSPACE_SLUG_REGEX } from "@/lib/constants";
+import { formatMember } from "@/lib/workspace/helpers";
 
 // GET /api/workspaces/[id]
 export async function GET(
@@ -51,15 +52,7 @@ export async function GET(
     .filter(Boolean)
     .sort((a: any, b: any) => a.sort_order - b.sort_order);
 
-  const formattedMembers = (members || []).map((m) => ({
-    id: m.id,
-    userId: m.user_id,
-    fullName: (m.profiles as any)?.full_name || "",
-    email: (m.profiles as any)?.email || "",
-    avatarUrl: (m.profiles as any)?.avatar_url || null,
-    role: m.role,
-    joinedAt: m.joined_at,
-  }));
+  const formattedMembers = (members || []).map(formatMember);
 
   return NextResponse.json({
     workspace,
