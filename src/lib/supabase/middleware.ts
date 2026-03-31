@@ -63,7 +63,8 @@ export async function updateSession(request: NextRequest) {
         .single();
 
       if (membership?.workspaces) {
-        slug = (membership.workspaces as { slug: string }).slug;
+        const ws = membership.workspaces as unknown as { slug: string };
+        slug = ws.slug;
       }
     }
 
@@ -77,7 +78,8 @@ export async function updateSession(request: NextRequest) {
         .single();
 
       if (firstMembership?.workspaces) {
-        slug = (firstMembership.workspaces as { slug: string }).slug;
+        const ws = firstMembership.workspaces as unknown as { slug: string };
+        slug = ws.slug;
       }
     }
 
