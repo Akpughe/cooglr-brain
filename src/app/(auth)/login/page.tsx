@@ -24,14 +24,14 @@ export default function LoginPage() {
           </div>
           <div>
             <h1 className="text-[22px] font-semibold tracking-tight text-foreground">500Claw Platform</h1>
-            <p className="text-[13px] text-muted-foreground mt-1">Sign in to your workspace</p>
+            <p className="text-[13px] text-muted-foreground mt-1">Sign in or create an account</p>
           </div>
         </div>
 
         <LoginForm />
 
         <p className="text-[11px] text-muted-foreground/50 text-center">
-          Only pre-approved emails can access this platform
+          Create a workspace or join your team
         </p>
       </div>
     </div>
