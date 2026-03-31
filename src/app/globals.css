@@ -108,6 +108,19 @@
   --sidebar-ring: #c2410c33;
 }
 
+/* ---- Shell Theme Variables (defaults, overridden by workspace theme) ---- */
+:root {
+  --rail-bg: #f5f5f5;
+  --rail-icon: #888888;
+  --rail-icon-active: #1a1a1a;
+  --sidebar-bg: #ffffff;
+  --sidebar-text: #1a1a1a;
+  --sidebar-text-muted: #999999;
+  --sidebar-hover: #f0f0f0;
+  --sidebar-active: #f5f5f5;
+  --shell-accent: #1a1a1a;
+}
+
 /* ---- Dark Mode ---- */
 .dark {
   --background: #0f0e0d;
