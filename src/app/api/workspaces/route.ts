@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { WORKSPACE_SLUG_REGEX, WORKSPACE_NAME_MAX_LENGTH } from "@/lib/constants";
 import { slugify } from "@/lib/workspace/helpers";
@@ -33,6 +33,8 @@ export async function GET() {
 }
 
 // POST /api/workspaces — create workspace
+// Uses service client because the user has no membership yet,
+// so RLS SELECT policies (which require membership) would block reads.
 export async function POST(request: Request) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
@@ -50,7 +52,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Invalid slug format" }, { status: 400 });
   }
 
-  const { data: existing } = await supabase
+  // Use service client for workspace creation — bypasses RLS
+  // because the user has no membership yet (chicken-and-egg problem)
+  const serviceClient = await createServiceClient();
+
+  // Check slug uniqueness (needs service client to see all workspaces)
+  const { data: existing } = await serviceClient
     .from("workspaces")
     .select("id")
     .eq("slug", slug)
@@ -60,7 +67,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Slug already taken" }, { status: 409 });
   }
 
-  const { data: workspace, error: wsError } = await supabase
+  // Create workspace
+  const { data: workspace, error: wsError } = await serviceClient
     .from("workspaces")
     .insert({ name, slug, owner_id: user.id })
     .select()
@@ -68,13 +76,15 @@ export async function POST(request: Request) {
 
   if (wsError) return NextResponse.json({ error: wsError.message }, { status: 500 });
 
-  const { error: memberError } = await supabase
+  // Add creator as owner
+  const { error: memberError } = await serviceClient
     .from("workspace_members")
     .insert({ workspace_id: workspace.id, user_id: user.id, role: "owner" });
 
   if (memberError) return NextResponse.json({ error: memberError.message }, { status: 500 });
 
-  const { data: defaultApps } = await supabase
+  // Install default apps
+  const { data: defaultApps } = await serviceClient
     .from("app_registry")
     .select("id")
     .eq("default_installed", true);
@@ -86,7 +96,7 @@ export async function POST(request: Request) {
       installed_by: user.id,
     }));
 
-    await supabase.from("workspace_apps").insert(appInserts);
+    await serviceClient.from("workspace_apps").insert(appInserts);
   }
 
   return NextResponse.json({ workspace }, { status: 201 });

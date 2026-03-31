@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
 import { WORKSPACE_SLUG_REGEX } from "@/lib/constants";
 import { formatMember } from "@/lib/workspace/helpers";
@@ -91,7 +91,9 @@ export async function PATCH(
     if (!WORKSPACE_SLUG_REGEX.test(body.slug)) {
       return NextResponse.json({ error: "Invalid slug format" }, { status: 400 });
     }
-    const { data: existing } = await supabase
+    // Use service client for slug uniqueness — RLS scopes to user's workspaces only
+    const svc = await createServiceClient();
+    const { data: existing } = await svc
       .from("workspaces")
       .select("id")
       .eq("slug", body.slug)

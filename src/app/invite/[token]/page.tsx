@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 
 export default async function InvitePage({
@@ -7,10 +7,13 @@ export default async function InvitePage({
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
-  const supabase = await createClient();
+
+  // Use service client for invite lookup — this page is publicly accessible
+  // (unauthenticated users land here), so RLS would block the query
+  const serviceClient = await createServiceClient();
 
   // Verify token
-  const { data: invite } = await supabase
+  const { data: invite } = await serviceClient
     .from("workspace_invites")
     .select("*, workspaces(name, slug)")
     .eq("token", token)
@@ -30,7 +33,7 @@ export default async function InvitePage({
   }
 
   if (new Date(invite.expires_at) < new Date()) {
-    await supabase
+    await serviceClient
       .from("workspace_invites")
       .update({ status: "expired" })
       .eq("id", invite.id);
@@ -45,6 +48,8 @@ export default async function InvitePage({
     );
   }
 
+  // Now check auth with the regular client (has user's JWT)
+  const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
@@ -68,7 +73,9 @@ export default async function InvitePage({
 
   const workspaceId = invite.workspace_id;
 
-  const { data: existingMembership } = await supabase
+  // Use service client for membership operations — the user may not be
+  // a member yet, so RLS SELECT on workspace_members would return nothing
+  const { data: existingMembership } = await serviceClient
     .from("workspace_members")
     .select("id")
     .eq("workspace_id", workspaceId)
@@ -76,14 +83,14 @@ export default async function InvitePage({
     .single();
 
   if (!existingMembership) {
-    await supabase.from("workspace_members").insert({
+    await serviceClient.from("workspace_members").insert({
       workspace_id: workspaceId,
       user_id: user.id,
       role: invite.role || "member",
     });
   }
 
-  await supabase
+  await serviceClient
     .from("workspace_invites")
     .update({ status: "accepted" })
     .eq("id", invite.id);
