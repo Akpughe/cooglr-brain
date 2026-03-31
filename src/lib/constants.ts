@@ -7,18 +7,14 @@ export const GATEWAY = {
   },
 };
 
-export const ROLES = {
-  ADMIN: "admin",
+export const WORKSPACE_ROLES = {
+  OWNER: "owner",
   MEMBER: "member",
 } as const;
 
-export const DEPARTMENTS = [
-  "engineering",
-  "marketing",
-  "business",
-  "product",
-  "operations",
-] as const;
+export type WorkspaceRole = (typeof WORKSPACE_ROLES)[keyof typeof WORKSPACE_ROLES];
 
-export type Role = (typeof ROLES)[keyof typeof ROLES];
-export type Department = (typeof DEPARTMENTS)[number];
+export const WORKSPACE_SLUG_REGEX = /^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?$/;
+export const WORKSPACE_NAME_MAX_LENGTH = 50;
+export const WORKSPACE_SLUG_MAX_LENGTH = 50;
+export const INVITE_EXPIRY_DAYS = 7;
