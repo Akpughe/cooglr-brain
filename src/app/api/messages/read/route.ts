@@ -7,19 +7,54 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { channelId, conversationId, lastReadAt } = await request.json();
-  if (!channelId && !conversationId) return NextResponse.json({ error: "channelId or conversationId required" }, { status: 400 });
+  if (!channelId && !conversationId) {
+    return NextResponse.json({ error: "channelId or conversationId required" }, { status: 400 });
+  }
 
-  const target = channelId
-    ? { channel_id: channelId, conversation_id: null }
-    : { channel_id: null, conversation_id: conversationId };
+  const readAt = lastReadAt || new Date().toISOString();
 
-  const { error } = await supabase
-    .from("message_reads")
-    .upsert(
-      { user_id: user.id, ...target, last_read_at: lastReadAt || new Date().toISOString() },
-      { onConflict: channelId ? "user_id,channel_id" : "user_id,conversation_id" }
-    );
+  // Manual upsert — partial unique indexes don't work with Supabase's upsert onConflict
+  if (channelId) {
+    const { data: existing } = await supabase
+      .from("message_reads")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("channel_id", channelId)
+      .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    if (existing) {
+      const { error } = await supabase
+        .from("message_reads")
+        .update({ last_read_at: readAt })
+        .eq("id", existing.id);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      const { error } = await supabase
+        .from("message_reads")
+        .insert({ user_id: user.id, channel_id: channelId, last_read_at: readAt });
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  } else {
+    const { data: existing } = await supabase
+      .from("message_reads")
+      .select("id")
+      .eq("user_id", user.id)
+      .eq("conversation_id", conversationId)
+      .single();
+
+    if (existing) {
+      const { error } = await supabase
+        .from("message_reads")
+        .update({ last_read_at: readAt })
+        .eq("id", existing.id);
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    } else {
+      const { error } = await supabase
+        .from("message_reads")
+        .insert({ user_id: user.id, conversation_id: conversationId, last_read_at: readAt });
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+  }
+
   return NextResponse.json({ success: true });
 }
