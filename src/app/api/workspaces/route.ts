@@ -99,5 +99,16 @@ export async function POST(request: Request) {
     await serviceClient.from("workspace_apps").insert(appInserts);
   }
 
+  // Create default #general channel
+  await serviceClient
+    .from("channels")
+    .insert({
+      workspace_id: workspace.id,
+      name: "general",
+      description: "General discussion",
+      created_by: user.id,
+      is_default: true,
+    });
+
   return NextResponse.json({ workspace }, { status: 201 });
 }
