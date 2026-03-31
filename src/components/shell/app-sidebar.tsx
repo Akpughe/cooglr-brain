@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useWorkspace } from "@/lib/workspace/context";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { MessagesSidebarContent } from "@/components/messages/messages-sidebar-content";
 
 function SidebarSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -45,17 +46,7 @@ function SidebarItem({ label, active = false }: { label: string; active?: boolea
 function renderSidebarContent(appId: string) {
   switch (appId) {
     case "messages":
-      return (
-        <>
-          <SidebarSection label="Channels">
-            <SidebarItem label="# general" active />
-            <SidebarItem label="# random" />
-          </SidebarSection>
-          <SidebarSection label="Direct Messages">
-            <SidebarItem label="Alex Johnson" />
-          </SidebarSection>
-        </>
-      );
+      return <MessagesSidebarContent />;
     case "projects":
       return (
         <SidebarSection label="Projects">
