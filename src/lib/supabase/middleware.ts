@@ -1,5 +1,15 @@
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 import { NextResponse, type NextRequest } from "next/server";
+
+// Service client for workspace resolution — bypasses RLS
+// Used only for routing decisions in middleware, not for user data access
+function getServiceClient() {
+  return createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+}
 
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request });
@@ -37,49 +47,65 @@ export async function updateSession(request: NextRequest) {
     pathname.startsWith("/callback") ||
     pathname.startsWith("/invite");
 
+  // Not authenticated + not public → login
   if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
+  // Authenticated + on login/signup → go to root
   if (user && (pathname === "/login" || pathname === "/signup")) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
   }
 
+  // Authenticated + root "/" → resolve workspace
   if (user && pathname === "/") {
+    const svc = getServiceClient();
     const activeWorkspaceId = request.cookies.get("active_workspace_id")?.value;
 
     let slug: string | null = null;
 
     if (activeWorkspaceId) {
-      const { data: membership } = await supabase
+      // Verify the cookie's workspace still exists and user is still a member
+      const { data: membership } = await svc
         .from("workspace_members")
-        .select("workspace_id, workspaces(slug)")
+        .select("workspace_id")
         .eq("user_id", user.id)
         .eq("workspace_id", activeWorkspaceId)
         .single();
 
-      if (membership?.workspaces) {
-        const ws = membership.workspaces as unknown as { slug: string };
-        slug = ws.slug;
+      if (membership) {
+        const { data: ws } = await svc
+          .from("workspaces")
+          .select("slug")
+          .eq("id", activeWorkspaceId)
+          .single();
+
+        if (ws) slug = ws.slug;
       }
     }
 
     if (!slug) {
-      const { data: firstMembership } = await supabase
+      // Fall back to first workspace the user belongs to
+      const { data: firstMembership } = await svc
         .from("workspace_members")
-        .select("workspace_id, workspaces(slug)")
+        .select("workspace_id")
         .eq("user_id", user.id)
         .order("joined_at", { ascending: true })
         .limit(1)
         .single();
 
-      if (firstMembership?.workspaces) {
-        const ws = firstMembership.workspaces as unknown as { slug: string };
-        slug = ws.slug;
+      if (firstMembership) {
+        const { data: ws } = await svc
+          .from("workspaces")
+          .select("slug")
+          .eq("id", firstMembership.workspace_id)
+          .single();
+
+        if (ws) slug = ws.slug;
       }
     }
 
@@ -92,26 +118,39 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // Authenticated + on /onboarding but has workspaces → redirect to workspace
   if (user && pathname === "/onboarding") {
-    const { count } = await supabase
-      .from("workspace_members")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", user.id);
+    const svc = getServiceClient();
 
-    if (count && count > 0) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/";
-      return NextResponse.redirect(url);
+    const { data: firstMembership } = await svc
+      .from("workspace_members")
+      .select("workspace_id")
+      .eq("user_id", user.id)
+      .limit(1)
+      .single();
+
+    if (firstMembership) {
+      const { data: ws } = await svc
+        .from("workspaces")
+        .select("slug")
+        .eq("id", firstMembership.workspace_id)
+        .single();
+
+      if (ws) {
+        const url = request.nextUrl.clone();
+        url.pathname = `/${ws.slug}`;
+        return NextResponse.redirect(url);
+      }
     }
   }
 
   // Set active_workspace_id cookie when navigating to a workspace path
-  // This is done here because cookies can't be set in Server Component layouts
   if (user && !isPublicPath && pathname !== "/" && pathname !== "/onboarding") {
     const segments = pathname.split("/").filter(Boolean);
     const potentialSlug = segments[0];
     if (potentialSlug && !potentialSlug.startsWith("api")) {
-      const { data: ws } = await supabase
+      const svc = getServiceClient();
+      const { data: ws } = await svc
         .from("workspaces")
         .select("id")
         .eq("slug", potentialSlug)
