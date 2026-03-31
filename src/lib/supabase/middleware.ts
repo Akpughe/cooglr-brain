@@ -29,21 +29,78 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const isAuthPage =
-    request.nextUrl.pathname.startsWith("/login") ||
-    request.nextUrl.pathname.startsWith("/signup") ||
-    request.nextUrl.pathname.startsWith("/callback");
+  const { pathname } = request.nextUrl;
 
-  if (!user && !isAuthPage) {
+  const isPublicPath =
+    pathname.startsWith("/login") ||
+    pathname.startsWith("/signup") ||
+    pathname.startsWith("/callback") ||
+    pathname.startsWith("/invite");
+
+  if (!user && !isPublicPath) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
   }
 
-  if (user && isAuthPage) {
+  if (user && (pathname === "/login" || pathname === "/signup")) {
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
+  }
+
+  if (user && pathname === "/") {
+    const activeWorkspaceId = request.cookies.get("active_workspace_id")?.value;
+
+    let slug: string | null = null;
+
+    if (activeWorkspaceId) {
+      const { data: membership } = await supabase
+        .from("workspace_members")
+        .select("workspace_id, workspaces(slug)")
+        .eq("user_id", user.id)
+        .eq("workspace_id", activeWorkspaceId)
+        .single();
+
+      if (membership?.workspaces) {
+        slug = (membership.workspaces as { slug: string }).slug;
+      }
+    }
+
+    if (!slug) {
+      const { data: firstMembership } = await supabase
+        .from("workspace_members")
+        .select("workspace_id, workspaces(slug)")
+        .eq("user_id", user.id)
+        .order("joined_at", { ascending: true })
+        .limit(1)
+        .single();
+
+      if (firstMembership?.workspaces) {
+        slug = (firstMembership.workspaces as { slug: string }).slug;
+      }
+    }
+
+    const url = request.nextUrl.clone();
+    if (slug) {
+      url.pathname = `/${slug}`;
+    } else {
+      url.pathname = "/onboarding";
+    }
+    return NextResponse.redirect(url);
+  }
+
+  if (user && pathname === "/onboarding") {
+    const { count } = await supabase
+      .from("workspace_members")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id);
+
+    if (count && count > 0) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/";
+      return NextResponse.redirect(url);
+    }
   }
 
   return supabaseResponse;
