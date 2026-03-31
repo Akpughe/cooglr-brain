@@ -6,6 +6,7 @@ import { IconRail } from "@/components/shell/icon-rail";
 import { AppSidebar } from "@/components/shell/app-sidebar";
 import { AppRouteGuard } from "@/components/shell/app-route-guard";
 import { formatMember } from "@/lib/workspace/helpers";
+import { PresenceProvider } from "@/lib/messages/presence-context";
 
 export default async function WorkspaceLayout({
   children,
@@ -83,19 +84,22 @@ export default async function WorkspaceLayout({
     membership: { role: membership.role as "owner" | "member" },
     installedApps,
     members,
+    currentUserId: user.id,
   };
 
   return (
     <WorkspaceProvider value={contextValue}>
-      <ShellThemeProvider themeId={workspace.theme || "default"}>
-        <div className="flex h-screen bg-background">
-          <IconRail />
-          <AppSidebar />
-          <main className="flex-1 flex flex-col overflow-hidden">
-            <AppRouteGuard>{children}</AppRouteGuard>
-          </main>
-        </div>
-      </ShellThemeProvider>
+      <PresenceProvider>
+        <ShellThemeProvider themeId={workspace.theme || "default"}>
+          <div className="flex h-screen bg-background">
+            <IconRail />
+            <AppSidebar />
+            <main className="flex-1 flex flex-col overflow-hidden">
+              <AppRouteGuard>{children}</AppRouteGuard>
+            </main>
+          </div>
+        </ShellThemeProvider>
+      </PresenceProvider>
     </WorkspaceProvider>
   );
 }

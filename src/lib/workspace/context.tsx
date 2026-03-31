@@ -10,6 +10,7 @@ interface WorkspaceContextValue {
   };
   installedApps: InstalledApp[];
   members: WorkspaceMember[];
+  currentUserId: string;
 }
 
 const WorkspaceContext = createContext<WorkspaceContextValue | null>(null);
@@ -39,4 +40,9 @@ export function useWorkspace(): WorkspaceContextValue {
 export function useIsOwner(): boolean {
   const { membership } = useWorkspace();
   return membership.role === "owner";
+}
+
+export function useCurrentUserId(): string {
+  const { currentUserId } = useWorkspace();
+  return currentUserId;
 }
