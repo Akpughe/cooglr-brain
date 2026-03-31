@@ -105,5 +105,28 @@ export async function updateSession(request: NextRequest) {
     }
   }
 
+  // Set active_workspace_id cookie when navigating to a workspace path
+  // This is done here because cookies can't be set in Server Component layouts
+  if (user && !isPublicPath && pathname !== "/" && pathname !== "/onboarding") {
+    const segments = pathname.split("/").filter(Boolean);
+    const potentialSlug = segments[0];
+    if (potentialSlug && !potentialSlug.startsWith("api")) {
+      const { data: ws } = await supabase
+        .from("workspaces")
+        .select("id")
+        .eq("slug", potentialSlug)
+        .single();
+
+      if (ws) {
+        supabaseResponse.cookies.set("active_workspace_id", ws.id, {
+          path: "/",
+          httpOnly: true,
+          sameSite: "lax",
+          maxAge: 60 * 60 * 24 * 365,
+        });
+      }
+    }
+  }
+
   return supabaseResponse;
 }

@@ -1,6 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
-import { cookies } from "next/headers";
 import { WorkspaceProvider } from "@/lib/workspace/context";
 import { ShellThemeProvider } from "@/components/shell/theme-provider";
 import { IconRail } from "@/components/shell/icon-rail";
@@ -70,14 +69,6 @@ export default async function WorkspaceLayout({
     .eq("workspace_id", workspace.id);
 
   const members = (membersData || []).map(formatMember);
-
-  const cookieStore = await cookies();
-  cookieStore.set("active_workspace_id", workspace.id, {
-    path: "/",
-    httpOnly: true,
-    sameSite: "lax",
-    maxAge: 60 * 60 * 24 * 365,
-  });
 
   const contextValue = {
     workspace: {
