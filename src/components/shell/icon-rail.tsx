@@ -6,9 +6,22 @@ import { WorkspaceSwitcher } from "./workspace-switcher";
 import * as LucideIcons from "lucide-react";
 import { Plus, Settings, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { AppCatalogModal } from "./app-catalog-modal";
 import Link from "next/link";
+
+function Tooltip({ label, children }: { label: string; children: ReactNode }) {
+  return (
+    <div className="group/tooltip relative">
+      {children}
+      <div className="pointer-events-none absolute left-[calc(100%+8px)] top-1/2 -translate-y-1/2 z-50 opacity-0 scale-95 group-hover/tooltip:opacity-100 group-hover/tooltip:scale-100 transition-all duration-150 origin-left">
+        <div className="whitespace-nowrap rounded-lg bg-foreground text-background px-2.5 py-1 text-xs font-medium shadow-lg">
+          {label}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export function IconRail() {
   const pathname = usePathname();
@@ -40,97 +53,102 @@ export function IconRail() {
         </div>
 
         {/* AI Home */}
-        <div className="relative mt-2">
-          {isActive("") && (
-            <div
-              className="absolute left-[-7px] top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-full"
-              style={{ background: "var(--shell-accent)" }}
-            />
-          )}
-          <Link
-            href={workspaceBase}
-            title="AI Home"
-            className={cn(
-              "w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-all duration-150",
-              isActive("") ? "bg-black/[0.06] dark:bg-white/[0.08]" : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
-            )}
-            style={{
-              color: isActive("") ? "var(--rail-icon-active)" : "var(--rail-icon)",
-            }}
-          >
-            <Sparkles className="w-[18px] h-[18px]" />
-          </Link>
-        </div>
-
-        {/* Divider */}
-        <div className="w-5 h-px my-1" style={{ background: "var(--sidebar-hover)" }} />
-
-        {/* Installed apps */}
-        {installedApps.map((app) => (
-          <div key={app.id} className="relative">
-            {isActive(app.route) && (
+        <Tooltip label="AI Home">
+          <div className="relative mt-2">
+            {isActive("") && (
               <div
                 className="absolute left-[-7px] top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-full"
                 style={{ background: "var(--shell-accent)" }}
               />
             )}
             <Link
-              href={`${workspaceBase}${app.route}`}
-              title={app.name}
+              href={workspaceBase}
               className={cn(
                 "w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-all duration-150",
-                isActive(app.route) ? "bg-black/[0.06] dark:bg-white/[0.08]" : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                isActive("") ? "bg-black/[0.06] dark:bg-white/[0.08]" : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
               )}
               style={{
-                color: isActive(app.route) ? "var(--rail-icon-active)" : "var(--rail-icon)",
+                color: isActive("") ? "var(--rail-icon-active)" : "var(--rail-icon)",
               }}
             >
-              {getIcon(app.icon)}
+              <Sparkles className="w-[18px] h-[18px]" />
             </Link>
           </div>
+        </Tooltip>
+
+        {/* Divider */}
+        <div className="w-5 h-px my-1" style={{ background: "var(--sidebar-hover)" }} />
+
+        {/* Installed apps */}
+        {installedApps.map((app) => (
+          <Tooltip key={app.id} label={app.name}>
+            <div className="relative">
+              {isActive(app.route) && (
+                <div
+                  className="absolute left-[-7px] top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-full"
+                  style={{ background: "var(--shell-accent)" }}
+                />
+              )}
+              <Link
+                href={`${workspaceBase}${app.route}`}
+                className={cn(
+                  "w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-all duration-150",
+                  isActive(app.route) ? "bg-black/[0.06] dark:bg-white/[0.08]" : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+                )}
+                style={{
+                  color: isActive(app.route) ? "var(--rail-icon-active)" : "var(--rail-icon)",
+                }}
+              >
+                {getIcon(app.icon)}
+              </Link>
+            </div>
+          </Tooltip>
         ))}
 
         {/* Add app button */}
-        <button
-          onClick={() => setCatalogOpen(true)}
-          title="Add app"
-          className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center mt-1 transition-all duration-150 border border-transparent hover:border-dashed hover:border-current opacity-40 hover:opacity-70"
-          style={{ color: "var(--rail-icon)" }}
-        >
-          <Plus className="w-4 h-4" />
-        </button>
+        <Tooltip label="Add app">
+          <button
+            onClick={() => setCatalogOpen(true)}
+            className="w-[38px] h-[38px] rounded-[10px] flex items-center justify-center mt-1 transition-all duration-150 border border-transparent hover:border-dashed hover:border-current opacity-40 hover:opacity-70"
+            style={{ color: "var(--rail-icon)" }}
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+        </Tooltip>
 
         {/* Spacer */}
         <div className="flex-1" />
 
         {/* Settings */}
-        <div className="relative">
-          {isActive("/settings") && (
-            <div
-              className="absolute left-[-7px] top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-full"
-              style={{ background: "var(--shell-accent)" }}
-            />
-          )}
-          <Link
-            href={`${workspaceBase}/settings`}
-            title="Settings"
-            className={cn(
-              "w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-all duration-150",
-              isActive("/settings") ? "bg-black/[0.06] dark:bg-white/[0.08]" : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+        <Tooltip label="Settings">
+          <div className="relative">
+            {isActive("/settings") && (
+              <div
+                className="absolute left-[-7px] top-1/2 -translate-y-1/2 w-[3px] h-4 rounded-full"
+                style={{ background: "var(--shell-accent)" }}
+              />
             )}
-            style={{
-              color: isActive("/settings") ? "var(--rail-icon-active)" : "var(--rail-icon)",
-            }}
-          >
-            <Settings className="w-[18px] h-[18px]" />
-          </Link>
-        </div>
+            <Link
+              href={`${workspaceBase}/settings`}
+              className={cn(
+                "w-[38px] h-[38px] rounded-[10px] flex items-center justify-center transition-all duration-150",
+                isActive("/settings") ? "bg-black/[0.06] dark:bg-white/[0.08]" : "hover:bg-black/[0.04] dark:hover:bg-white/[0.06]"
+              )}
+              style={{
+                color: isActive("/settings") ? "var(--rail-icon-active)" : "var(--rail-icon)",
+              }}
+            >
+              <Settings className="w-[18px] h-[18px]" />
+            </Link>
+          </div>
+        </Tooltip>
 
         {/* User avatar */}
-        <div
-          className="w-[30px] h-[30px] rounded-full bg-foreground mt-2 cursor-pointer transition-transform duration-150 hover:scale-105 shadow-sm"
-          title="User settings"
-        />
+        <Tooltip label="User settings">
+          <div
+            className="w-[30px] h-[30px] rounded-full bg-foreground mt-2 cursor-pointer transition-transform duration-150 hover:scale-105 shadow-sm"
+          />
+        </Tooltip>
       </div>
 
       {catalogOpen && (
