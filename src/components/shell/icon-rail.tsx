@@ -4,10 +4,11 @@ import { usePathname } from "next/navigation";
 import { useWorkspace } from "@/lib/workspace/context";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 import * as LucideIcons from "lucide-react";
-import { Plus, Settings, Sparkles } from "lucide-react";
+import { Plus, Settings, Sparkles, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState, type ReactNode } from "react";
+import { useState, useRef, useEffect, type ReactNode } from "react";
 import { AppCatalogModal } from "./app-catalog-modal";
+import { UserMenu } from "./user-menu";
 import Link from "next/link";
 
 function Tooltip({ label, children }: { label: string; children: ReactNode }) {
@@ -143,12 +144,8 @@ export function IconRail() {
           </div>
         </Tooltip>
 
-        {/* User avatar */}
-        <Tooltip label="User settings">
-          <div
-            className="w-[30px] h-[30px] rounded-full bg-foreground mt-2 cursor-pointer transition-transform duration-150 hover:scale-105 shadow-sm"
-          />
-        </Tooltip>
+        {/* User menu */}
+        <UserMenu />
       </div>
 
       {catalogOpen && (
