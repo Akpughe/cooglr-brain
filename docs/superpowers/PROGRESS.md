@@ -45,9 +45,37 @@ Transform 500Claw from a single-user AI ops dashboard into a multi-workspace, te
 
 ---
 
-### Sub-Project 2: Messages (Slack-like)
-**Branch:** TBD
-**Status:** Starting brainstorm
+### Sub-Project 2: Messages (Slack-like) ✅
+**Branch:** `feat/workspaces-apps-collaboration` (continued)
+**Spec:** `docs/superpowers/specs/2026-03-31-messages-design.md`
+**Plan:** `docs/superpowers/plans/2026-03-31-messages.md`
+**Status:** Complete (10 commits)
+**Date:** 2026-03-31
+
+**What was built:**
+- Workspace-wide channels (#general auto-created per workspace)
+- 1:1 Direct Messages with create/find logic
+- Real-time message delivery (Supabase Postgres Changes)
+- Typing indicators (Supabase Broadcast, 3s timeout, 2s debounce)
+- Online presence with green dots (Supabase Presence, workspace-level)
+- Rich text composer (bold, italic, code, link toolbar)
+- File attachments (images inline, files as download cards, Supabase Storage)
+- Unread tracking (per-channel/DM read watermark)
+- Message edit/delete (own messages)
+- Create channel modal, new DM picker
+- Messages sidebar replacing placeholder (channels list + DMs with presence dots)
+- Markdown renderer (HTML-escaped then pattern-matched, safe)
+- Channel/DM pages with top bar, message list (infinite scroll), date separators
+
+**Database migration:** `014_messages.sql` — channels, direct_conversations, direct_conversation_members, messages, message_reads + Realtime publication
+
+**Key decisions:**
+- Unified messages table (channel_id XOR conversation_id)
+- Read watermark (not per-message reads) for efficiency
+- DM conversations as join table (future-proofs for group DMs)
+- Presence at workspace level (one channel per workspace, not per chat)
+- Service client for DM conversation creation (RLS bootstrap)
+- PresenceProvider added at workspace layout level
 
 ---
 
