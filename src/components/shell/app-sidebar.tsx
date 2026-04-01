@@ -5,6 +5,7 @@ import { useWorkspace } from "@/lib/workspace/context";
 import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MessagesSidebarContent } from "@/components/messages/messages-sidebar-content";
+import { ProjectsSidebarContent } from "@/components/projects/projects-sidebar-content";
 
 function SidebarSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -48,11 +49,7 @@ function renderSidebarContent(appId: string) {
     case "messages":
       return <MessagesSidebarContent />;
     case "projects":
-      return (
-        <SidebarSection label="Projects">
-          <SidebarItem label="Project #1" active />
-        </SidebarSection>
-      );
+      return <ProjectsSidebarContent />;
     case "files":
       return (
         <>
