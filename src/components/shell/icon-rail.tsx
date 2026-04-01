@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import { useWorkspace } from "@/lib/workspace/context";
 import { WorkspaceSwitcher } from "./workspace-switcher";
 import * as LucideIcons from "lucide-react";
-import { Plus, Settings, Sparkles, LogOut } from "lucide-react";
+import { Plus, Settings, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useState, useRef, useEffect, type ReactNode } from "react";
 import { AppCatalogModal } from "./app-catalog-modal";

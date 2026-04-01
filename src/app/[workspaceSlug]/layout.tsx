@@ -1,11 +1,10 @@
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import { WorkspaceProvider } from "@/lib/workspace/context";
 import { ShellThemeProvider } from "@/components/shell/theme-provider";
 import { IconRail } from "@/components/shell/icon-rail";
 import { AppSidebar } from "@/components/shell/app-sidebar";
 import { AppRouteGuard } from "@/components/shell/app-route-guard";
-import { formatMember } from "@/lib/workspace/helpers";
 import { PresenceProvider } from "@/lib/messages/presence-context";
 
 export default async function WorkspaceLayout({
@@ -61,15 +60,37 @@ export default async function WorkspaceLayout({
       category: a.category,
     }));
 
-  const { data: membersData } = await supabase
+  // Use service client for members — the profiles:user_id FK join doesn't work
+  // because workspace_members.user_id references auth.users, not profiles
+  const svc = await createServiceClient();
+
+  const { data: membersData } = await svc
     .from("workspace_members")
-    .select(`
-      id, user_id, role, joined_at,
-      profiles:user_id (full_name, email, avatar_url)
-    `)
+    .select("id, user_id, role, joined_at")
     .eq("workspace_id", workspace.id);
 
-  const members = (membersData || []).map(formatMember);
+  // Resolve profiles for all member user IDs
+  const memberUserIds = (membersData || []).map((m) => m.user_id);
+  const { data: profilesData } = memberUserIds.length > 0
+    ? await svc.from("profiles").select("id, full_name, email, avatar_url").in("id", memberUserIds)
+    : { data: [] };
+
+  const profilesMap = new Map(
+    (profilesData || []).map((p) => [p.id, p])
+  );
+
+  const members = (membersData || []).map((m) => {
+    const profile = profilesMap.get(m.user_id);
+    return {
+      id: m.id,
+      userId: m.user_id,
+      fullName: profile?.full_name || "",
+      email: profile?.email || "",
+      avatarUrl: profile?.avatar_url || null,
+      role: m.role as "owner" | "member",
+      joinedAt: m.joined_at,
+    };
+  });
 
   const contextValue = {
     workspace: {

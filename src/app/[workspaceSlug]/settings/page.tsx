@@ -19,6 +19,7 @@ export default function SettingsPage() {
   const [pendingInvites, setPendingInvites] = useState<WorkspaceInvite[]>([]);
   const [invitesLoading, setInvitesLoading] = useState(false);
   const [removingMember, setRemovingMember] = useState<string | null>(null);
+  const [memberSearch, setMemberSearch] = useState("");
 
   // --- Apps tab state ---
   const [removingApp, setRemovingApp] = useState<string | null>(null);
@@ -310,9 +311,26 @@ export default function SettingsPage() {
 
             {/* Current members */}
             <div>
-              <h3 className="text-sm font-medium mb-3">Current members</h3>
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-sm font-medium">Current members ({members.length})</h3>
+              </div>
+              {members.length > 3 && (
+                <input
+                  type="text"
+                  value={memberSearch}
+                  onChange={(e) => setMemberSearch(e.target.value)}
+                  placeholder="Search members..."
+                  className="w-full h-9 px-3 mb-3 border border-border rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                />
+              )}
               <div className="space-y-2">
-                {members.map((member) => (
+                {members
+                  .filter((m) => {
+                    if (!memberSearch) return true;
+                    const q = memberSearch.toLowerCase();
+                    return m.fullName.toLowerCase().includes(q) || m.email.toLowerCase().includes(q);
+                  })
+                  .map((member) => (
                   <div
                     key={member.id}
                     className="flex items-center gap-3 p-3 border border-border rounded-xl"
