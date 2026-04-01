@@ -79,8 +79,36 @@ Transform 500Claw from a single-user AI ops dashboard into a multi-workspace, te
 
 ---
 
-### Sub-Project 3: Projects (Linear-like)
-**Status:** Not started
+### Sub-Project 3: Projects (Linear-like) ✅
+**Branch:** `feat/workspaces-apps-collaboration` (continued)
+**Spec:** `docs/superpowers/specs/2026-04-01-projects-design.md`
+**Plan:** `docs/superpowers/plans/2026-04-01-projects.md`
+**Status:** Complete
+**Date:** 2026-04-01
+
+**What was built:**
+- Multiple projects per workspace with sidebar navigation
+- Kanban board view with drag-and-drop (HTML5 API)
+- List view with sortable columns
+- Task cards with type icons, priority dots, assignee avatars, labels, due dates
+- Auto-incrementing task IDs (PROJ-1, PROJ-2)
+- Default columns on project creation (To Do, In Progress, Done)
+- Add/rename/delete columns
+- Task detail slide-over panel with inline editing and auto-save
+- Filter bar (assignee, priority, type, active-only toggle)
+- Create project modal with name + identifier
+- Inline task creation at bottom of each column
+- Placeholder AI chat panel
+- Projects sidebar replacing placeholder
+
+**Database migration:** `015_projects.sql` — projects, project_columns, tasks
+
+**Key decisions:**
+- HTML5 drag-and-drop (no library), optimistic UI + batch reorder endpoint
+- Labels as jsonb (no separate table)
+- Position as integer (reassign on reorder)
+- Task counter atomic increment via service client
+- Task detail as side panel (no task-level routing)
 
 ---
 
