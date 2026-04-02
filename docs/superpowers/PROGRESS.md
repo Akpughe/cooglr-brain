@@ -112,8 +112,33 @@ Transform 500Claw from a single-user AI ops dashboard into a multi-workspace, te
 
 ---
 
-### Sub-Project 4: Files (Notion-like)
-**Status:** Not started
+### Sub-Project 4: Files (Notion-like) ✅
+**Branch:** `feat/workspaces-apps-collaboration` (continued)
+**Spec:** `docs/superpowers/specs/2026-04-02-files-design.md`
+**Plan:** `docs/superpowers/plans/2026-04-02-files.md`
+**Status:** Complete
+**Date:** 2026-04-02
+
+**What was built:**
+- Unified node tree (pages, folders, uploaded files in one table)
+- TipTap rich-text editor with formatting toolbar, headings, lists, tables, images, file attachments
+- Nested sidebar file tree with collapse/expand, search, context menu, recently edited
+- Folder view with contents list
+- File preview (images, PDFs, video, audio inline; download for others)
+- Auto-save (1s debounce)
+- Emoji icons and cover images for pages
+- Privacy toggle (public/private) with share modal
+- File upload to Supabase Storage (50MB files, 10MB images)
+- Realtime sidebar updates via Postgres Changes
+
+**Database migration:** `016_files.sql` — files, file_shares + RLS policies + updated_at trigger
+
+**Key decisions:**
+- Unified node table with type discriminator (no separate tables for pages/folders/files)
+- TipTap JSON stored in content column (pages only)
+- Single dynamic route [fileId] renders page editor, folder view, or file preview based on type
+- No real-time collaborative editing (lightweight presence awareness only)
+- Client-side tree building from flat API response
 
 ---
 
