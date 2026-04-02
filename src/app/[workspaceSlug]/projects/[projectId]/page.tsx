@@ -1,15 +1,16 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useWorkspace } from "@/lib/workspace/context";
 import { BoardView } from "@/components/projects/board-view";
 import { ListView } from "@/components/projects/list-view";
 import { TaskDetailPanel } from "@/components/projects/task-detail-panel";
+import { TaskExpandedView } from "@/components/projects/task-expanded-view";
 import { FilterBar } from "@/components/projects/filter-bar";
 import { AiChatPanel } from "@/components/projects/ai-chat-panel";
 import { Plus, Filter, Sparkles, LayoutGrid, List } from "lucide-react";
-import type { Project, ProjectColumn, Task } from "@/lib/projects/types";
+import type { Project, ProjectColumn, Task, TaskType, Priority, TaskLabel } from "@/lib/projects/types";
 import { cn } from "@/lib/utils";
 
 type ViewMode = "board" | "list";
@@ -24,7 +25,8 @@ interface Filters {
 export default function ProjectPage() {
   const params = useParams<{ projectId: string }>();
   const projectId = params.projectId;
-  const { workspace } = useWorkspace();
+  const router = useRouter();
+  const { workspace, members } = useWorkspace();
 
   const [project, setProject] = useState<Project | null>(null);
   const [columns, setColumns] = useState<ProjectColumn[]>([]);
@@ -34,7 +36,21 @@ export default function ProjectPage() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [showAiChat, setShowAiChat] = useState(false);
+  const [taskExpanded, setTaskExpanded] = useState(false);
   const [filters, setFilters] = useState<Filters>({ assignee: null, priority: null, taskType: null, activeOnly: false });
+
+  // Sync selected task to URL query param
+  function selectTask(task: Task | null) {
+    setSelectedTask(task);
+    if (!task) setTaskExpanded(false);
+    const url = new URL(window.location.href);
+    if (task) {
+      url.searchParams.set("task", task.id);
+    } else {
+      url.searchParams.delete("task");
+    }
+    router.replace(url.pathname + url.search, { scroll: false });
+  }
 
   // Load project data
   const loadData = useCallback(async () => {
@@ -51,8 +67,17 @@ export default function ProjectPage() {
     const proj = (projData.projects || []).find((p: any) => p.id === projectId);
     setProject(proj || null);
     setColumns(colData.columns || []);
-    setTasks(taskData.tasks || []);
+
+    const loadedTasks: Task[] = taskData.tasks || [];
+    setTasks(loadedTasks);
     setLoading(false);
+
+    // Open task from URL if present
+    const taskIdFromUrl = new URLSearchParams(window.location.search).get("task");
+    if (taskIdFromUrl) {
+      const match = loadedTasks.find((t) => t.id === taskIdFromUrl);
+      if (match) setSelectedTask(match);
+    }
   }, [projectId, workspace.id]);
 
   useEffect(() => {
@@ -72,14 +97,30 @@ export default function ProjectPage() {
   });
 
   // Create task
-  async function handleCreateTask(columnId: string, title: string) {
+  async function handleCreateTask(taskData: {
+    columnId: string;
+    title: string;
+    description?: string;
+    taskType?: TaskType;
+    priority?: Priority;
+    assigneeId?: string;
+    dueDate?: string;
+    labels?: TaskLabel[];
+  }) {
     const res = await fetch(`/api/projects/${projectId}/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, columnId, workspaceId: workspace.id }),
+      body: JSON.stringify({ ...taskData, workspaceId: workspace.id }),
     });
     const data = await res.json();
     if (data.task) {
+      // Resolve assignee name from members if available
+      if (taskData.assigneeId) {
+        const member = members.find((m) => m.userId === taskData.assigneeId);
+        if (member) {
+          data.task.assigneeName = member.fullName || member.email;
+        }
+      }
       setTasks((prev) => [...prev, data.task]);
     }
   }
@@ -171,6 +212,22 @@ export default function ProjectPage() {
     );
   }
 
+  // Expanded task view takes over the entire content area
+  if (selectedTask && taskExpanded) {
+    return (
+      <div className="flex-1 flex flex-col h-full">
+        <TaskExpandedView
+          task={selectedTask}
+          columns={columns}
+          projectName={project?.name || "Project"}
+          onClose={() => selectTask(null)}
+          onCollapse={() => setTaskExpanded(false)}
+          onUpdate={handleUpdateTask}
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="flex-1 flex flex-col h-full">
       {/* Top bar */}
@@ -248,22 +305,23 @@ export default function ProjectPage() {
             onUpdateColumn={handleUpdateColumn}
             onDeleteColumn={handleDeleteColumn}
             onReorderTasks={handleReorderTasks}
-            onSelectTask={setSelectedTask}
+            onSelectTask={selectTask}
           />
         ) : (
           <ListView
             columns={columns}
             tasks={filteredTasks}
-            onSelectTask={setSelectedTask}
+            onSelectTask={selectTask}
           />
         )}
 
-        {/* Task detail panel */}
+        {/* Task detail panel (sidebar) */}
         {selectedTask && (
           <TaskDetailPanel
             task={selectedTask}
             columns={columns}
-            onClose={() => setSelectedTask(null)}
+            onClose={() => selectTask(null)}
+            onExpand={() => setTaskExpanded(true)}
             onUpdate={handleUpdateTask}
           />
         )}

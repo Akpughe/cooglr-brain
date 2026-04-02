@@ -1,22 +1,39 @@
 "use client";
 
 import { useState } from "react";
-import { Circle, Star, CheckSquare, ArrowUp } from "lucide-react";
+import {
+  Circle,
+  CircleDot,
+  CheckCircle2,
+  Clock,
+  Star,
+  CheckSquare,
+  ArrowUp,
+  CalendarDays,
+  ArrowDownAZ,
+  ArrowUpAZ,
+} from "lucide-react";
 import type { Task, ProjectColumn } from "@/lib/projects/types";
 
-const TYPE_ICONS: Record<string, typeof Circle> = {
-  bug: Circle,
-  feature: Star,
-  task: CheckSquare,
-  improvement: ArrowUp,
+const TYPE_ICONS: Record<string, { icon: typeof Circle; color: string }> = {
+  bug: { icon: Circle, color: "text-red-400" },
+  feature: { icon: Star, color: "text-amber-400" },
+  task: { icon: CheckSquare, color: "text-muted-foreground" },
+  improvement: { icon: ArrowUp, color: "text-emerald-400" },
 };
 
-const PRIORITY_COLORS: Record<string, string> = {
-  urgent: "text-red-500",
-  high: "text-orange-500",
-  medium: "text-yellow-600",
-  low: "text-blue-400",
-};
+function getColumnStatusIcon(name: string) {
+  const lower = name.toLowerCase().trim();
+  if (lower === "to do" || lower === "todo" || lower === "backlog")
+    return { icon: Circle, color: "text-muted-foreground" };
+  if (lower === "in progress" || lower === "in-progress" || lower === "doing")
+    return { icon: CircleDot, color: "text-amber-500" };
+  if (lower === "done" || lower === "completed")
+    return { icon: CheckCircle2, color: "text-emerald-500" };
+  if (lower === "review" || lower === "in review" || lower === "pending")
+    return { icon: Clock, color: "text-blue-400" };
+  return { icon: Circle, color: "text-muted-foreground" };
+}
 
 interface ListViewProps {
   columns: ProjectColumn[];
@@ -25,7 +42,6 @@ interface ListViewProps {
 }
 
 type SortField = "taskNumber" | "title" | "priority" | "assigneeName" | "dueDate" | "taskType";
-
 const PRIORITY_ORDER: Record<string, number> = { urgent: 0, high: 1, medium: 2, low: 3 };
 
 export function ListView({ columns, tasks, onSelectTask }: ListViewProps) {
@@ -57,12 +73,16 @@ export function ListView({ columns, tasks, onSelectTask }: ListViewProps) {
   });
 
   function SortHeader({ field, label, className }: { field: SortField; label: string; className?: string }) {
+    const active = sortField === field;
     return (
       <th
-        className={`text-left text-xs font-medium text-muted-foreground py-2 px-3 cursor-pointer hover:text-foreground select-none ${className || ""}`}
+        className={`text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wider py-2 px-3 cursor-pointer select-none hover:text-foreground transition-colors ${className || ""}`}
         onClick={() => handleSort(field)}
       >
-        {label} {sortField === field ? (sortAsc ? "↑" : "↓") : ""}
+        <span className="inline-flex items-center gap-1">
+          {label}
+          {active && (sortAsc ? <ArrowDownAZ className="w-3 h-3" /> : <ArrowUpAZ className="w-3 h-3" />)}
+        </span>
       </th>
     );
   }
@@ -76,60 +96,98 @@ export function ListView({ columns, tasks, onSelectTask }: ListViewProps) {
   }
 
   return (
-    <div className="flex-1 overflow-auto p-4">
+    <div className="flex-1 overflow-auto">
       <table className="w-full">
-        <thead>
+        <thead className="sticky top-0 bg-background z-10">
           <tr className="border-b border-border">
-            <SortHeader field="taskNumber" label="ID" className="w-20" />
+            <SortHeader field="taskNumber" label="ID" className="w-20 pl-4" />
+            <SortHeader field="priority" label="Priority" className="w-20" />
             <SortHeader field="title" label="Title" />
-            <th className="text-left text-xs font-medium text-muted-foreground py-2 px-3 w-28">Status</th>
-            <SortHeader field="priority" label="Priority" className="w-24" />
+            <th className="text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wider py-2 px-3 w-28">Status</th>
             <SortHeader field="assigneeName" label="Assignee" className="w-32" />
-            <SortHeader field="taskType" label="Type" className="w-24" />
-            <SortHeader field="dueDate" label="Due" className="w-28" />
+            <SortHeader field="dueDate" label="Due" className="w-28 pr-4" />
           </tr>
         </thead>
         <tbody>
           {sorted.map((task) => {
-            const TypeIcon = TYPE_ICONS[task.taskType] || CheckSquare;
+            const typeConf = TYPE_ICONS[task.taskType] || TYPE_ICONS.task;
+            const TypeIcon = typeConf.icon;
             const col = task.columnId ? columnsMap.get(task.columnId) : null;
+            const statusConf = col ? getColumnStatusIcon(col.name) : null;
+            const StatusIcon = statusConf?.icon || Circle;
+            const overdue = task.dueDate ? new Date(task.dueDate) < new Date(new Date().toDateString()) : false;
+
             return (
               <tr
                 key={task.id}
                 onClick={() => onSelectTask(task)}
-                className="border-b border-border/50 hover:bg-muted/50 cursor-pointer transition-colors"
+                className="border-b border-border/40 hover:bg-muted/40 cursor-pointer transition-colors group"
               >
-                <td className="py-2.5 px-3 text-xs text-muted-foreground">{task.displayId}</td>
-                <td className="py-2.5 px-3 text-sm font-medium">{task.title}</td>
+                {/* ID */}
+                <td className="py-2.5 px-3 pl-4">
+                  <span className="text-[11px] text-muted-foreground font-mono">{task.displayId}</span>
+                </td>
+
+                {/* Priority bars */}
+                <td className="py-2.5 px-3">
+                  <div className="flex items-end gap-[2px]" title={task.priority}>
+                    {[0, 1, 2].map((i) => {
+                      const filled = task.priority === "urgent" ? 3 : task.priority === "high" ? 2 : task.priority === "medium" ? 1 : 1;
+                      const colorMap: Record<string, string> = { urgent: "bg-red-500", high: "bg-orange-500", medium: "bg-yellow-500", low: "bg-blue-400" };
+                      const color = colorMap[task.priority] || "bg-muted-foreground";
+                      return (
+                        <div
+                          key={i}
+                          className={`w-[3px] rounded-sm ${i < filled ? color : `${color}/25`}`}
+                          style={{ height: `${6 + i * 2}px` }}
+                        />
+                      );
+                    })}
+                  </div>
+                </td>
+
+                {/* Title with type icon */}
+                <td className="py-2.5 px-3">
+                  <div className="flex items-center gap-2">
+                    <TypeIcon className={`w-4 h-4 shrink-0 ${typeConf.color}`} />
+                    <span className="text-sm">{task.title}</span>
+                  </div>
+                </td>
+
+                {/* Status with icon */}
                 <td className="py-2.5 px-3">
                   {col && (
-                    <span className="text-xs px-2 py-0.5 rounded-full bg-muted">
+                    <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <StatusIcon className={`w-3.5 h-3.5 ${statusConf?.color || ""}`} />
                       {col.name}
                     </span>
                   )}
                 </td>
-                <td className="py-2.5 px-3">
-                  <span className={`text-xs font-medium capitalize ${PRIORITY_COLORS[task.priority]}`}>
-                    {task.priority}
-                  </span>
-                </td>
+
+                {/* Assignee */}
                 <td className="py-2.5 px-3">
                   {task.assigneeName ? (
                     <div className="flex items-center gap-1.5">
-                      <div className="w-5 h-5 rounded-full bg-foreground text-background flex items-center justify-center text-[9px] font-bold">
+                      <div className="w-5 h-5 rounded-full bg-foreground/10 flex items-center justify-center text-[9px] font-semibold text-foreground/60">
                         {task.assigneeName[0]?.toUpperCase()}
                       </div>
                       <span className="text-xs truncate">{task.assigneeName}</span>
                     </div>
                   ) : (
-                    <span className="text-xs text-muted-foreground">—</span>
+                    <span className="text-xs text-muted-foreground/40">No assignee</span>
                   )}
                 </td>
-                <td className="py-2.5 px-3">
-                  <TypeIcon className="w-4 h-4 text-muted-foreground" />
-                </td>
-                <td className="py-2.5 px-3 text-xs text-muted-foreground">
-                  {task.dueDate ? new Date(task.dueDate).toLocaleDateString(undefined, { month: "short", day: "numeric" }) : "—"}
+
+                {/* Due date */}
+                <td className="py-2.5 px-3 pr-4">
+                  {task.dueDate ? (
+                    <span className={`inline-flex items-center gap-1 text-xs ${overdue ? "text-red-400" : "text-muted-foreground"}`}>
+                      <CalendarDays className="w-3 h-3" />
+                      {new Date(task.dueDate).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
+                    </span>
+                  ) : (
+                    <span className="text-xs text-muted-foreground/30">—</span>
+                  )}
                 </td>
               </tr>
             );

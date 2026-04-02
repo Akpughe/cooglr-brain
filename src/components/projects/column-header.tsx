@@ -1,30 +1,51 @@
 "use client";
 
 import { useState } from "react";
-import { MoreHorizontal, Pencil, Trash2 } from "lucide-react";
+import { MoreHorizontal, Pencil, Trash2, Plus, Circle, CircleDot, CheckCircle2, XCircle, Clock, Archive } from "lucide-react";
 import type { ProjectColumn } from "@/lib/projects/types";
 
-const COLOR_DOT: Record<string, string> = {
-  red: "bg-red-500",
-  blue: "bg-blue-500",
-  green: "bg-green-500",
-  yellow: "bg-yellow-500",
-  purple: "bg-purple-500",
-  orange: "bg-orange-500",
-  gray: "bg-gray-400",
-};
+/**
+ * Maps column name to a semantic status icon + color.
+ * Falls back to a generic circle if the name doesn't match.
+ */
+function getStatusIcon(name: string, color: string) {
+  const lower = name.toLowerCase().trim();
+
+  if (lower === "to do" || lower === "todo" || lower === "backlog")
+    return { icon: Circle, color: "text-muted-foreground" };
+  if (lower === "in progress" || lower === "in-progress" || lower === "doing" || lower === "active")
+    return { icon: CircleDot, color: "text-amber-500" };
+  if (lower === "done" || lower === "completed" || lower === "complete")
+    return { icon: CheckCircle2, color: "text-emerald-500" };
+  if (lower === "cancelled" || lower === "canceled" || lower === "archived")
+    return { icon: XCircle, color: "text-muted-foreground" };
+  if (lower === "review" || lower === "in review" || lower === "pending")
+    return { icon: Clock, color: "text-blue-400" };
+
+  // Fallback to colored circle
+  const colorMap: Record<string, string> = {
+    red: "text-red-500", blue: "text-blue-500", green: "text-emerald-500",
+    yellow: "text-amber-500", purple: "text-purple-500", orange: "text-orange-500",
+    gray: "text-muted-foreground",
+  };
+  return { icon: Circle, color: colorMap[color] || "text-muted-foreground" };
+}
 
 interface ColumnHeaderProps {
   column: ProjectColumn;
   taskCount: number;
   onRename: (name: string) => void;
   onDelete: () => void;
+  onAddTask: () => void;
 }
 
-export function ColumnHeader({ column, taskCount, onRename, onDelete }: ColumnHeaderProps) {
+export function ColumnHeader({ column, taskCount, onRename, onDelete, onAddTask }: ColumnHeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [editing, setEditing] = useState(false);
   const [editName, setEditName] = useState(column.name);
+
+  const status = getStatusIcon(column.name, column.color);
+  const StatusIcon = status.icon;
 
   function handleSave() {
     if (editName.trim() && editName !== column.name) {
@@ -34,35 +55,43 @@ export function ColumnHeader({ column, taskCount, onRename, onDelete }: ColumnHe
   }
 
   return (
-    <div className="flex items-center justify-between px-1 pb-3">
-      <div className="flex items-center gap-2">
-        <div className={`w-2.5 h-2.5 rounded-full ${COLOR_DOT[column.color] || "bg-gray-400"}`} />
+    <div className="flex items-center justify-between px-2 pb-3">
+      <div className="flex items-center gap-2 min-w-0">
+        <StatusIcon className={`w-4 h-4 shrink-0 ${status.color}`} />
         {editing ? (
           <input
             value={editName}
             onChange={(e) => setEditName(e.target.value)}
             onBlur={handleSave}
             onKeyDown={(e) => { if (e.key === "Enter") handleSave(); if (e.key === "Escape") setEditing(false); }}
-            className="text-sm font-semibold bg-transparent border-b border-border focus:outline-none w-24"
+            className="text-sm font-medium bg-transparent border-b border-border focus:outline-none w-24"
             autoFocus
           />
         ) : (
-          <span className="text-sm font-semibold">{column.name}</span>
+          <span className="text-sm font-medium truncate">{column.name}</span>
         )}
-        <span className="text-xs text-muted-foreground">{taskCount}</span>
+        <span className="text-xs text-muted-foreground tabular-nums shrink-0">{taskCount}</span>
       </div>
 
-      <div className="relative">
+      <div className="flex items-center gap-0.5 shrink-0">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors opacity-0 group-hover/col:opacity-100"
+          className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-muted transition-colors"
         >
-          <MoreHorizontal className="w-4 h-4" />
+          <MoreHorizontal className="w-3.5 h-3.5" />
         </button>
+        <button
+          onClick={onAddTask}
+          className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-muted transition-colors"
+          title="Add task"
+        >
+          <Plus className="w-3.5 h-3.5" />
+        </button>
+
         {menuOpen && (
           <>
             <div className="fixed inset-0 z-40" onClick={() => setMenuOpen(false)} />
-            <div className="absolute right-0 top-7 z-50 w-36 bg-popover border border-border rounded-lg shadow-lg py-1">
+            <div className="absolute right-2 top-8 z-50 w-36 bg-popover border border-border rounded-lg shadow-lg py-1">
               <button
                 onClick={() => { setMenuOpen(false); setEditing(true); setEditName(column.name); }}
                 className="w-full flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-muted transition-colors"
