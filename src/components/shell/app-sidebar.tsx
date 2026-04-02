@@ -6,6 +6,7 @@ import { Plus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { MessagesSidebarContent } from "@/components/messages/messages-sidebar-content";
 import { ProjectsSidebarContent } from "@/components/projects/projects-sidebar-content";
+import { FilesSidebarContent } from "@/components/files/files-sidebar-content";
 
 function SidebarSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -51,16 +52,7 @@ function renderSidebarContent(appId: string) {
     case "projects":
       return <ProjectsSidebarContent />;
     case "files":
-      return (
-        <>
-          <SidebarSection label="My Files">
-            <SidebarItem label="All files" active />
-          </SidebarSection>
-          <SidebarSection label="Shared with me">
-            <SidebarItem label="Recent" />
-          </SidebarSection>
-        </>
-      );
+      return <FilesSidebarContent />;
     default:
       return (
         <div className="px-4 py-6">
