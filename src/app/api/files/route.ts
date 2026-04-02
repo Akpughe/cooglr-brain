@@ -47,6 +47,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "type must be page, folder, or file" }, { status: 400 });
   }
 
+  // Verify workspace membership
+  const { data: membership } = await supabase
+    .from("workspace_members")
+    .select("id")
+    .eq("workspace_id", workspaceId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (!membership) return NextResponse.json({ error: "Not a workspace member" }, { status: 403 });
+
   // Get next position within parent
   const svc = await createServiceClient();
   const { data: siblings } = await svc

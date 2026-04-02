@@ -20,6 +20,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "File too large (max 50MB)" }, { status: 400 });
   }
 
+  // Verify workspace membership
+  const { data: membership } = await supabase
+    .from("workspace_members")
+    .select("id")
+    .eq("workspace_id", workspaceId)
+    .eq("user_id", user.id)
+    .single();
+
+  if (!membership) return NextResponse.json({ error: "Not a workspace member" }, { status: 403 });
+
   const ext = file.name.split(".").pop() || "bin";
   const fileId = crypto.randomUUID();
   const storagePath = `${workspaceId}/${fileId}/${crypto.randomUUID()}.${ext}`;

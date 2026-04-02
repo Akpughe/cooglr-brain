@@ -7,7 +7,7 @@
 create table public.files (
   id uuid default gen_random_uuid() primary key,
   workspace_id uuid references public.workspaces(id) on delete cascade not null,
-  parent_id uuid references public.files(id) on delete set null,
+  parent_id uuid references public.files(id) on delete cascade,
   type text not null check (type in ('page', 'folder', 'file')),
   title text not null default 'Untitled',
   content jsonb,

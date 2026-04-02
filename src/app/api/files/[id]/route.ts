@@ -106,31 +106,23 @@ export async function DELETE(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  // Check if it's a file with storage — delete from storage first
-  const { data: file } = await supabase
-    .from("files")
-    .select("type, storage_path")
-    .eq("id", id)
-    .single();
-
-  if (file?.type === "file" && file.storage_path) {
-    await supabase.storage.from("file-uploads").remove([file.storage_path]);
-  }
-
-  // Also delete storage for any child files
+  // Collect all storage paths in the subtree before cascade delete removes them
   const svc = await createServiceClient();
-  const { data: childFiles } = await svc
-    .from("files")
-    .select("storage_path")
-    .eq("parent_id", id)
-    .eq("type", "file")
-    .not("storage_path", "is", null);
+  const { data: subtreeFiles, error: rpcError } = await svc.rpc("get_file_subtree_storage", { root_id: id });
 
-  if (childFiles && childFiles.length > 0) {
-    const paths = childFiles.map((f: { storage_path: string }) => f.storage_path);
-    await supabase.storage.from("file-uploads").remove(paths);
+  const storagePaths: string[] = [];
+  if (!rpcError && subtreeFiles) {
+    for (const f of subtreeFiles as { storage_path: string }[]) {
+      storagePaths.push(f.storage_path);
+    }
   }
 
+  // Clean up storage objects
+  if (storagePaths.length > 0) {
+    await supabase.storage.from("file-uploads").remove(storagePaths);
+  }
+
+  // CASCADE delete handles children in DB
   const { error } = await supabase.from("files").delete().eq("id", id);
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
