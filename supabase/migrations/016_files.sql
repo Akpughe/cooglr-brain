@@ -2,7 +2,8 @@
 -- Migration 016: Files — pages, folders, uploaded files + sharing
 -- ============================================================
 
--- 1. Unified files table
+-- 1. Create tables first (files SELECT policy references file_shares)
+
 create table public.files (
   id uuid default gen_random_uuid() primary key,
   workspace_id uuid references public.workspaces(id) on delete cascade not null,
@@ -22,9 +23,20 @@ create table public.files (
   created_at timestamptz not null default now()
 );
 
-alter table public.files enable row level security;
+create table public.file_shares (
+  id uuid default gen_random_uuid() primary key,
+  file_id uuid references public.files(id) on delete cascade not null,
+  shared_with uuid references auth.users(id) not null,
+  permission text not null check (permission in ('view', 'edit')),
+  created_at timestamptz not null default now(),
+  unique(file_id, shared_with)
+);
 
--- SELECT: workspace member AND (public OR creator OR shared with)
+-- 2. RLS policies (both tables exist now)
+
+alter table public.files enable row level security;
+alter table public.file_shares enable row level security;
+
 create policy "Members can view accessible files"
   on public.files for select to authenticated
   using (
@@ -40,7 +52,6 @@ create policy "Members can create files"
   on public.files for insert to authenticated
   with check (workspace_id in (select public.get_user_workspace_ids()));
 
--- UPDATE: public files → any member; private files → creator or edit-shared
 create policy "Members can update accessible files"
   on public.files for update to authenticated
   using (
@@ -55,23 +66,6 @@ create policy "Members can update accessible files"
 create policy "Creator can delete files"
   on public.files for delete to authenticated
   using (created_by = auth.uid());
-
-create index idx_files_workspace_parent on public.files(workspace_id, parent_id);
-create index idx_files_workspace_type on public.files(workspace_id, type);
-create index idx_files_created_by on public.files(created_by);
-create index idx_files_workspace_updated on public.files(workspace_id, updated_at desc);
-
--- 2. File shares table
-create table public.file_shares (
-  id uuid default gen_random_uuid() primary key,
-  file_id uuid references public.files(id) on delete cascade not null,
-  shared_with uuid references auth.users(id) not null,
-  permission text not null check (permission in ('view', 'edit')),
-  created_at timestamptz not null default now(),
-  unique(file_id, shared_with)
-);
-
-alter table public.file_shares enable row level security;
 
 create policy "Users can view their shares or shares they created"
   on public.file_shares for select to authenticated
@@ -92,7 +86,13 @@ create policy "File creator can revoke shares"
     file_id in (select id from public.files where created_by = auth.uid())
   );
 
--- 3. updated_at trigger
+-- 3. Indexes
+create index idx_files_workspace_parent on public.files(workspace_id, parent_id);
+create index idx_files_workspace_type on public.files(workspace_id, type);
+create index idx_files_created_by on public.files(created_by);
+create index idx_files_workspace_updated on public.files(workspace_id, updated_at desc);
+
+-- 4. updated_at trigger
 create or replace function public.set_updated_at()
 returns trigger as $$
 begin
@@ -106,5 +106,5 @@ create trigger set_files_updated_at
   for each row
   execute function public.set_updated_at();
 
--- 4. Realtime
+-- 5. Realtime
 alter publication supabase_realtime add table public.files;
