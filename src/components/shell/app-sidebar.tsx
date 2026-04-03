@@ -7,6 +7,8 @@ import { cn } from "@/lib/utils";
 import { MessagesSidebarContent } from "@/components/messages/messages-sidebar-content";
 import { ProjectsSidebarContent } from "@/components/projects/projects-sidebar-content";
 import { FilesSidebarContent } from "@/components/files/files-sidebar-content";
+import { ReportsSidebarContent } from "@/components/reports/reports-sidebar-content";
+import { EmailSidebarContent } from "@/components/emails/email-sidebar-content";
 
 function SidebarSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -53,6 +55,10 @@ function renderSidebarContent(appId: string) {
       return <ProjectsSidebarContent />;
     case "files":
       return <FilesSidebarContent />;
+    case "reports":
+      return <ReportsSidebarContent />;
+    case "email-marketing":
+      return <EmailSidebarContent />;
     default:
       return (
         <div className="px-4 py-6">
