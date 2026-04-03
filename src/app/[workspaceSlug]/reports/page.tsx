@@ -11,7 +11,7 @@ export default function ReportsPage() {
   const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
   function checkConnections() {
-    fetch("/api/db/connections")
+    fetch(`/api/db/connections?workspaceId=${workspace.id}`)
       .then((r) => r.json())
       .then((data) => {
         // API returns a plain array

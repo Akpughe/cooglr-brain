@@ -3,18 +3,27 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { encrypt } from "@/lib/crypto";
 import { createDbAdapter } from "@/lib/db-adapter";
 
-// GET — list user's database connections
-export async function GET() {
+// GET — list database connections (workspace-scoped if workspaceId provided)
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data } = await supabase
+  const { searchParams } = new URL(request.url);
+  const workspaceId = searchParams.get("workspaceId");
+
+  const query = supabase
     .from("database_connections")
     .select("id, name, db_type, is_active, created_at, selected_database")
-    .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 
+  if (workspaceId) {
+    query.eq("workspace_id", workspaceId);
+  } else {
+    query.eq("user_id", user.id);
+  }
+
+  const { data } = await query;
   return NextResponse.json(data || []);
 }
 
@@ -24,7 +33,7 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { name, connectionString, dbType, selectedDatabase } = await request.json();
+  const { name, connectionString, dbType, selectedDatabase, workspaceId } = await request.json();
   if (!name || !connectionString) {
     return NextResponse.json({ error: "Name and connection string required" }, { status: 400 });
   }
@@ -46,6 +55,7 @@ export async function POST(request: NextRequest) {
     .from("database_connections")
     .insert({
       user_id: user.id,
+      workspace_id: workspaceId || null,
       name,
       encrypted_connection_string: encrypt(connectionString),
       db_type: type,

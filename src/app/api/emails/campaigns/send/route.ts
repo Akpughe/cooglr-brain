@@ -158,8 +158,13 @@ export async function POST(request: NextRequest) {
   const suppressQuery = supabase
     .from("email_unsubscribes")
     .select("email")
-    .eq("user_id", user.id)
     .in("email", emails);
+
+  if (workspaceId) {
+    suppressQuery.eq("workspace_id", workspaceId);
+  } else {
+    suppressQuery.eq("user_id", user.id);
+  }
 
   const { data: suppressed } = await suppressQuery;
 

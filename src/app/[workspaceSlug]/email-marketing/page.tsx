@@ -16,7 +16,7 @@ export default function EmailMarketingPage() {
     fetch(`/api/emails/providers?workspaceId=${workspace.id}`)
       .then((r) => r.json())
       .then((data) => {
-        const providers = data.providers || [];
+        const providers = Array.isArray(data) ? data : (data.providers || []);
         if (providers.length === 0) {
           setNeedsOnboarding(true);
         } else {

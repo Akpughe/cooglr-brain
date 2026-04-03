@@ -51,6 +51,7 @@ export function ReportsOnboarding({ workspaceId, onComplete }: Props) {
           name: connName,
           connectionString,
           dbType: dbType === "clickhouse" ? "clickhouse" : "postgres",
+          workspaceId,
         }),
       });
       if (res.ok) {
