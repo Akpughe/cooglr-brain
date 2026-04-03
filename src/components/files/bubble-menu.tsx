@@ -1,22 +1,23 @@
 "use client";
 
-import { BubbleMenu, type Editor } from "@tiptap/react";
+import { useEffect, useState, useRef, type RefObject } from "react";
+import type { Editor } from "@tiptap/react";
 import {
   Bold, Italic, Underline, Strikethrough, Code,
   Heading1, Heading2, Heading3,
   Link, Quote,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
 
 interface Props {
   editor: Editor;
+  containerRef: RefObject<HTMLDivElement | null>;
 }
 
 function BubbleButton({ active, onClick, children, title }: { active?: boolean; onClick: () => void; children: React.ReactNode; title: string }) {
   return (
     <button
-      onClick={onClick}
+      onMouseDown={(e) => { e.preventDefault(); onClick(); }}
       title={title}
       className={cn(
         "p-1.5 rounded transition-colors",
@@ -28,9 +29,57 @@ function BubbleButton({ active, onClick, children, title }: { active?: boolean; 
   );
 }
 
-export function EditorBubbleMenu({ editor }: Props) {
+export function EditorBubbleMenu({ editor, containerRef }: Props) {
+  const [show, setShow] = useState(false);
+  const [pos, setPos] = useState({ top: 0, left: 0 });
   const [showLinkInput, setShowLinkInput] = useState(false);
   const [linkUrl, setLinkUrl] = useState("");
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleSelectionUpdate() {
+      const { from, to } = editor.state.selection;
+      const hasSelection = from !== to;
+      const text = editor.state.doc.textBetween(from, to, " ");
+
+      if (!hasSelection || !text.trim()) {
+        setShow(false);
+        setShowLinkInput(false);
+        return;
+      }
+
+      // Get position from DOM selection
+      const domSelection = window.getSelection();
+      if (!domSelection || domSelection.rangeCount === 0) { setShow(false); return; }
+
+      const range = domSelection.getRangeAt(0);
+      const rect = range.getBoundingClientRect();
+      const containerRect = containerRef.current?.getBoundingClientRect();
+
+      if (!containerRect || rect.width === 0) { setShow(false); return; }
+
+      setPos({
+        top: rect.top - containerRect.top - 48,
+        left: rect.left - containerRect.left + rect.width / 2,
+      });
+      setShow(true);
+    }
+
+    editor.on("selectionUpdate", handleSelectionUpdate);
+    editor.on("blur", () => {
+      // Delay to allow button clicks to register
+      setTimeout(() => {
+        if (!menuRef.current?.contains(document.activeElement)) {
+          setShow(false);
+          setShowLinkInput(false);
+        }
+      }, 150);
+    });
+
+    return () => {
+      editor.off("selectionUpdate", handleSelectionUpdate);
+    };
+  }, [editor, containerRef]);
 
   function handleSetLink() {
     if (linkUrl) {
@@ -48,15 +97,17 @@ export function EditorBubbleMenu({ editor }: Props) {
     }
   }
 
+  if (!show) return null;
+
   return (
-    <BubbleMenu
-      editor={editor}
-      tippyOptions={{
-        duration: 150,
-        placement: "top",
-        animation: "shift-toward-subtle",
+    <div
+      ref={menuRef}
+      className="absolute z-50 flex items-center gap-0.5 bg-[#1e1e2e] border border-white/10 rounded-lg px-1.5 py-1 shadow-2xl"
+      style={{
+        top: pos.top,
+        left: pos.left,
+        transform: "translateX(-50%)",
       }}
-      className="flex items-center gap-0.5 bg-[#1e1e2e] border border-white/10 rounded-lg px-1.5 py-1 shadow-2xl"
     >
       {showLinkInput ? (
         <div className="flex items-center gap-1 px-1">
@@ -69,16 +120,15 @@ export function EditorBubbleMenu({ editor }: Props) {
             className="bg-transparent text-sm outline-none w-48 text-white placeholder:text-white/30"
             autoFocus
           />
-          <button onClick={handleSetLink} className="text-xs text-indigo-400 hover:text-indigo-300 px-1.5 py-0.5 rounded bg-white/5">
+          <button onMouseDown={(e) => { e.preventDefault(); handleSetLink(); }} className="text-xs text-indigo-400 hover:text-indigo-300 px-1.5 py-0.5 rounded bg-white/5">
             Add
           </button>
-          <button onClick={() => { setShowLinkInput(false); setLinkUrl(""); }} className="text-xs text-white/40 hover:text-white/60 px-1">
-            ×
+          <button onMouseDown={(e) => { e.preventDefault(); setShowLinkInput(false); setLinkUrl(""); }} className="text-xs text-white/40 hover:text-white/60 px-1">
+            &times;
           </button>
         </div>
       ) : (
         <>
-          {/* Text formatting */}
           <BubbleButton active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()} title="Bold">
             <Bold className="w-3.5 h-3.5" />
           </BubbleButton>
@@ -97,7 +147,6 @@ export function EditorBubbleMenu({ editor }: Props) {
 
           <div className="w-px h-4 bg-white/10 mx-0.5" />
 
-          {/* Headings */}
           <BubbleButton active={editor.isActive("heading", { level: 1 })} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} title="Heading 1">
             <Heading1 className="w-3.5 h-3.5" />
           </BubbleButton>
@@ -110,7 +159,6 @@ export function EditorBubbleMenu({ editor }: Props) {
 
           <div className="w-px h-4 bg-white/10 mx-0.5" />
 
-          {/* Link & quote */}
           <BubbleButton active={editor.isActive("link")} onClick={handleLinkClick} title={editor.isActive("link") ? "Remove link" : "Add link"}>
             <Link className="w-3.5 h-3.5" />
           </BubbleButton>
@@ -119,6 +167,6 @@ export function EditorBubbleMenu({ editor }: Props) {
           </BubbleButton>
         </>
       )}
-    </BubbleMenu>
+    </div>
   );
 }

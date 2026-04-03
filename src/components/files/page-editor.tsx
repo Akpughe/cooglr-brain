@@ -13,7 +13,6 @@ import TableHeader from "@tiptap/extension-table-header";
 import TaskList from "@tiptap/extension-task-list";
 import TaskItem from "@tiptap/extension-task-item";
 import Placeholder from "@tiptap/extension-placeholder";
-import BubbleMenuExtension from "@tiptap/extension-bubble-menu";
 import { EditorToolbar } from "./editor-toolbar";
 import { EditorBubbleMenu } from "./bubble-menu";
 import { EmojiPicker } from "./emoji-picker";
@@ -30,6 +29,7 @@ export function PageEditor({ file, onUpdate }: Props) {
   const { workspace } = useWorkspace();
   const [title, setTitle] = useState(file.title);
   const [localCoverUrl, setLocalCoverUrl] = useState<string | null>(null);
+  const editorContainerRef = useRef<HTMLDivElement>(null);
   const saveTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const titleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -49,7 +49,6 @@ export function PageEditor({ file, onUpdate }: Props) {
       TaskList,
       TaskItem.configure({ nested: true }),
       Placeholder.configure({ placeholder: "Start writing..." }),
-      BubbleMenuExtension,
     ],
     content: file.content || undefined,
     onUpdate: ({ editor }) => {
@@ -215,11 +214,11 @@ export function PageEditor({ file, onUpdate }: Props) {
         {/* Static toolbar for block-level actions */}
         <EditorToolbar editor={editor} onImageUpload={handleImageUpload} onFileAttach={handleFileAttach} />
 
-        {/* Bubble menu for inline formatting on text selection */}
-        {editor && <EditorBubbleMenu editor={editor} />}
-
-        {/* Editor content */}
-        <EditorContent editor={editor} className="pb-20" />
+        {/* Editor area with bubble menu */}
+        <div ref={editorContainerRef} className="relative">
+          {editor && <EditorBubbleMenu editor={editor} containerRef={editorContainerRef} />}
+          <EditorContent editor={editor} className="pb-20" />
+        </div>
       </div>
     </div>
   );
