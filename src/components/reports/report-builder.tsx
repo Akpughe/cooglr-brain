@@ -28,7 +28,7 @@ interface SavedReport {
   query_text: string;
 }
 
-export function ReportBuilder() {
+export function ReportBuilder({ workspaceId }: { workspaceId: string }) {
   const [connections, setConnections] = useState<DbConnection[]>([]);
   const [activeConnection, setActiveConnection] = useState<DbConnection | null>(null);
   const [schemaLoaded, setSchemaLoaded] = useState(false);
@@ -44,12 +44,12 @@ export function ReportBuilder() {
   const [showSQL, setShowSQL] = useState(false);
 
   useEffect(() => {
-    fetch("/api/db/connections").then((r) => r.json()).then((data) => {
+    fetch(`/api/db/connections?workspaceId=${workspaceId}`).then((r) => r.json()).then((data) => {
       setConnections(data);
       if (data.length === 1) selectConnection(data[0]);
     });
-    fetch("/api/reports").then((r) => r.json()).then(setSaved);
-  }, []);
+    fetch(`/api/reports?workspaceId=${workspaceId}`).then((r) => r.json()).then(setSaved);
+  }, [workspaceId]);
 
   const selectConnection = useCallback(async (conn: DbConnection) => {
     setActiveConnection(conn);
@@ -79,6 +79,7 @@ export function ReportBuilder() {
           prompt: prompt.trim(),
           connectionId: activeConnection.id,
           dbType: activeConnection.db_type,
+          workspaceId,
         }),
       });
 
@@ -139,6 +140,7 @@ export function ReportBuilder() {
         description: prompt,
         connectionId: activeConnection.id,
         queryText: generatedSQL,
+        workspaceId,
       }),
     });
     if (res.ok) {
@@ -170,7 +172,7 @@ export function ReportBuilder() {
     await fetch("/api/reports", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify({ id, workspaceId }),
     });
     setSaved((prev) => prev.filter((r) => r.id !== id));
   }

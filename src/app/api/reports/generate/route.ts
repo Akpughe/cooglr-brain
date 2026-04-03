@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { prompt, connectionId, conversationHistory } = await request.json();
+  const { prompt, connectionId, conversationHistory, workspaceId } = await request.json();
   if (!prompt || !connectionId) {
     return NextResponse.json({ error: "Prompt and connectionId required" }, { status: 400 });
   }
@@ -19,12 +19,18 @@ export async function POST(request: NextRequest) {
     )
     .join("\n");
 
-  const { data: connection } = await supabase
+  const connectionQuery = supabase
     .from("database_connections")
     .select("encrypted_connection_string, db_type, selected_database")
-    .eq("id", connectionId)
-    .eq("user_id", user.id)
-    .single();
+    .eq("id", connectionId);
+
+  if (workspaceId) {
+    connectionQuery.eq("workspace_id", workspaceId);
+  } else {
+    connectionQuery.eq("user_id", user.id);
+  }
+
+  const { data: connection } = await connectionQuery.single();
 
   if (!connection) return NextResponse.json({ error: "Connection not found" }, { status: 404 });
 
