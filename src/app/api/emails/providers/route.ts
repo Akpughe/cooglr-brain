@@ -2,16 +2,26 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { encrypt, decrypt } from "@/lib/crypto";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data } = await supabase
+  const { searchParams } = new URL(request.url);
+  const workspaceId = searchParams.get("workspaceId");
+
+  const query = supabase
     .from("email_providers")
     .select("id, name, display_name, from_email, from_name, reply_to_email, is_default, status, created_at")
-    .eq("user_id", user.id)
     .order("created_at", { ascending: false });
+
+  if (workspaceId) {
+    query.eq("workspace_id", workspaceId);
+  } else {
+    query.eq("user_id", user.id);
+  }
+
+  const { data } = await query;
 
   return NextResponse.json(data || []);
 }
@@ -21,7 +31,7 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { name, apiKey, fromEmail, fromName, replyToEmail, displayName } = await request.json();
+  const { name, apiKey, fromEmail, fromName, replyToEmail, displayName, workspaceId } = await request.json();
   if (!name || !apiKey || !fromEmail) {
     return NextResponse.json({ error: "Provider name, API key, and from email are required" }, { status: 400 });
   }
@@ -39,17 +49,24 @@ export async function POST(request: NextRequest) {
   }
 
   // If this is first provider, make it default
-  const { count } = await supabase
+  const countQuery = supabase
     .from("email_providers")
-    .select("id", { count: "exact", head: true })
-    .eq("user_id", user.id);
+    .select("id", { count: "exact", head: true });
 
+  if (workspaceId) {
+    countQuery.eq("workspace_id", workspaceId);
+  } else {
+    countQuery.eq("user_id", user.id);
+  }
+
+  const { count } = await countQuery;
   const isDefault = (count || 0) === 0;
 
   const { data, error } = await supabase
     .from("email_providers")
     .insert({
       user_id: user.id,
+      ...(workspaceId ? { workspace_id: workspaceId } : {}),
       name,
       display_name: displayName || name,
       encrypted_api_key: encrypt(apiKey),
@@ -71,7 +88,7 @@ export async function PATCH(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id, apiKey, fromEmail, fromName, displayName, replyToEmail } = await request.json();
+  const { id, apiKey, fromEmail, fromName, displayName, replyToEmail, workspaceId } = await request.json();
   if (!id) return NextResponse.json({ error: "Provider ID required" }, { status: 400 });
 
   const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
@@ -93,11 +110,18 @@ export async function PATCH(request: NextRequest) {
   if (displayName !== undefined) updateData.display_name = displayName;
   if (replyToEmail !== undefined) updateData.reply_to_email = replyToEmail || null;
 
-  const { error } = await supabase
+  const updateQuery = supabase
     .from("email_providers")
     .update(updateData)
-    .eq("id", id)
-    .eq("user_id", user.id);
+    .eq("id", id);
+
+  if (workspaceId) {
+    updateQuery.eq("workspace_id", workspaceId);
+  } else {
+    updateQuery.eq("user_id", user.id);
+  }
+
+  const { error } = await updateQuery;
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
@@ -116,25 +140,37 @@ export async function DELETE(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id } = await request.json();
+  const { id, workspaceId } = await request.json();
   if (!id) return NextResponse.json({ error: "Provider ID required" }, { status: 400 });
 
-  await supabase
+  const deleteQuery = supabase
     .from("email_providers")
     .delete()
-    .eq("id", id)
-    .eq("user_id", user.id);
+    .eq("id", id);
+
+  if (workspaceId) {
+    deleteQuery.eq("workspace_id", workspaceId);
+  } else {
+    deleteQuery.eq("user_id", user.id);
+  }
+
+  await deleteQuery;
 
   return NextResponse.json({ ok: true });
 }
 
 // Helper to get decrypted provider for internal use
-export async function getProvider(supabase: Awaited<ReturnType<typeof createClient>>, userId: string, providerId?: string) {
+export async function getProvider(supabase: Awaited<ReturnType<typeof createClient>>, userId: string, providerId?: string, workspaceId?: string) {
   const query = supabase
     .from("email_providers")
     .select("*")
-    .eq("user_id", userId)
     .eq("status", "active");
+
+  if (workspaceId) {
+    query.eq("workspace_id", workspaceId);
+  } else {
+    query.eq("user_id", userId);
+  }
 
   if (providerId) {
     query.eq("id", providerId);

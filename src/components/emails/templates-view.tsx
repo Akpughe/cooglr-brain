@@ -17,13 +17,13 @@ interface Template {
 
 const INPUT = "w-full h-9 px-3 rounded-lg border border-border bg-background text-[13px] focus:outline-none focus:border-primary/30 transition-colors placeholder:text-muted-foreground/40";
 
-export function TemplatesView() {
+export function TemplatesView({ workspaceId }: { workspaceId: string }) {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
 
   const loadTemplates = useCallback(() => {
-    fetch("/api/emails/templates")
+    fetch(`/api/emails/templates?workspaceId=${workspaceId}`)
       .then((r) => r.json())
       .then((data) => { setTemplates(Array.isArray(data) ? data : []); setLoading(false); })
       .catch(() => setLoading(false));
@@ -32,14 +32,14 @@ export function TemplatesView() {
   useEffect(() => { loadTemplates(); }, [loadTemplates]);
 
   if (showCreate) {
-    return <TemplateCreateFlow onClose={() => { setShowCreate(false); loadTemplates(); }} />;
+    return <TemplateCreateFlow workspaceId={workspaceId} onClose={() => { setShowCreate(false); loadTemplates(); }} />;
   }
 
   async function deleteTemplate(id: string) {
     await fetch("/api/emails/templates", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify({ id, workspaceId }),
     });
     setTemplates((prev) => prev.filter((t) => t.id !== id));
   }
@@ -108,7 +108,7 @@ export function TemplatesView() {
 const TONES = ["Professional", "Friendly", "Minimal", "Bold", "Playful", "Corporate"];
 const PRESETS = ["Welcome email", "Monthly newsletter", "Product launch", "Promotional offer", "Event invitation", "Re-engagement", "Thank you"];
 
-function TemplateCreateFlow({ onClose }: { onClose: () => void }) {
+function TemplateCreateFlow({ workspaceId, onClose }: { workspaceId: string; onClose: () => void }) {
   // Brand state
   const [brandName, setBrandName] = useState("");
   const [logoUrl, setLogoUrl] = useState("");
@@ -137,6 +137,7 @@ function TemplateCreateFlow({ onClose }: { onClose: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "generate",
+          workspaceId,
           prompt: prompt.trim(),
           templateName: templateName.trim() || "AI Generated Template",
           brandConfig: {
@@ -262,7 +263,7 @@ function TemplateCreateFlow({ onClose }: { onClose: () => void }) {
                   await fetch("/api/emails/templates", {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ id: generatedId, htmlContent: generatedHtml }),
+                    body: JSON.stringify({ id: generatedId, htmlContent: generatedHtml, workspaceId }),
                   });
                 }
                 onClose();

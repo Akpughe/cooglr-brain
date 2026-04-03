@@ -8,18 +8,24 @@ export async function POST(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { campaignId } = await request.json();
+  const { campaignId, workspaceId } = await request.json();
   if (!campaignId) return NextResponse.json({ error: "Campaign ID required" }, { status: 400 });
 
   console.log("[send] Starting campaign send:", campaignId);
 
   // Load campaign with relations
-  const { data: campaign, error: loadErr } = await supabase
+  const campaignQuery = supabase
     .from("email_campaigns")
     .select("*, provider:email_providers(*), audience:email_audiences(id, name)")
-    .eq("id", campaignId)
-    .eq("user_id", user.id)
-    .single();
+    .eq("id", campaignId);
+
+  if (workspaceId) {
+    campaignQuery.eq("workspace_id", workspaceId);
+  } else {
+    campaignQuery.eq("user_id", user.id);
+  }
+
+  const { data: campaign, error: loadErr } = await campaignQuery.single();
 
   if (!campaign) {
     console.log("[send] Campaign not found:", loadErr?.message);
@@ -57,14 +63,20 @@ export async function POST(request: NextRequest) {
   let provider = campaign.provider;
   if (!provider) {
     console.log("[send] Campaign provider missing, falling back to default provider");
-    const { data: defaultProvider } = await supabase
+    const providerQuery = supabase
       .from("email_providers")
       .select("*")
-      .eq("user_id", user.id)
       .eq("status", "active")
       .order("is_default", { ascending: false })
-      .limit(1)
-      .single();
+      .limit(1);
+
+    if (workspaceId) {
+      providerQuery.eq("workspace_id", workspaceId);
+    } else {
+      providerQuery.eq("user_id", user.id);
+    }
+
+    const { data: defaultProvider } = await providerQuery.single();
 
     provider = defaultProvider;
 
@@ -143,11 +155,13 @@ export async function POST(request: NextRequest) {
 
   // Check global suppression list
   const emails = recipients.map((r) => r.email);
-  const { data: suppressed } = await supabase
+  const suppressQuery = supabase
     .from("email_unsubscribes")
     .select("email")
     .eq("user_id", user.id)
     .in("email", emails);
+
+  const { data: suppressed } = await suppressQuery;
 
   const suppressedSet = new Set((suppressed || []).map((s) => s.email));
   const suppressedCount = recipients.filter((r) => suppressedSet.has(r.email)).length;

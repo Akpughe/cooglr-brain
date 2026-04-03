@@ -1,17 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data } = await supabase
+  const { searchParams } = new URL(request.url);
+  const workspaceId = searchParams.get("workspaceId");
+
+  const query = supabase
     .from("email_templates")
     .select("id, name, subject, category, brand_config, variables, is_ai_generated, status, created_at, updated_at")
-    .eq("user_id", user.id)
     .neq("status", "archived")
     .order("updated_at", { ascending: false });
+
+  if (workspaceId) {
+    query.eq("workspace_id", workspaceId);
+  } else {
+    query.eq("user_id", user.id);
+  }
+
+  const { data } = await query;
 
   return NextResponse.json(data || []);
 }
@@ -22,10 +32,11 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
+  const { workspaceId } = body;
 
   // AI generation mode
   if (body.action === "generate") {
-    return generateTemplate(body, user.id);
+    return generateTemplate(body, user.id, workspaceId);
   }
 
   // Manual create/save
@@ -36,6 +47,7 @@ export async function POST(request: NextRequest) {
     .from("email_templates")
     .insert({
       user_id: user.id,
+      ...(workspaceId ? { workspace_id: workspaceId } : {}),
       name,
       subject: subject || "",
       html_content: htmlContent || "",
@@ -56,7 +68,7 @@ export async function PATCH(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id, ...updates } = await request.json();
+  const { id, workspaceId, ...updates } = await request.json();
   if (!id) return NextResponse.json({ error: "Template ID required" }, { status: 400 });
 
   const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
@@ -66,11 +78,18 @@ export async function PATCH(request: NextRequest) {
   if (updates.status !== undefined) updateData.status = updates.status;
   if (updates.brandConfig !== undefined) updateData.brand_config = updates.brandConfig;
 
-  const { error } = await supabase
+  const patchQuery = supabase
     .from("email_templates")
     .update(updateData)
-    .eq("id", id)
-    .eq("user_id", user.id);
+    .eq("id", id);
+
+  if (workspaceId) {
+    patchQuery.eq("workspace_id", workspaceId);
+  } else {
+    patchQuery.eq("user_id", user.id);
+  }
+
+  const { error } = await patchQuery;
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
@@ -81,12 +100,18 @@ export async function DELETE(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id } = await request.json();
-  await supabase.from("email_templates").delete().eq("id", id).eq("user_id", user.id);
+  const { id, workspaceId } = await request.json();
+  const deleteQuery = supabase.from("email_templates").delete().eq("id", id);
+  if (workspaceId) {
+    deleteQuery.eq("workspace_id", workspaceId);
+  } else {
+    deleteQuery.eq("user_id", user.id);
+  }
+  await deleteQuery;
   return NextResponse.json({ ok: true });
 }
 
-async function generateTemplate(body: { prompt: string; brandConfig?: Record<string, unknown>; templateName?: string }, userId: string) {
+async function generateTemplate(body: { prompt: string; brandConfig?: Record<string, unknown>; templateName?: string }, userId: string, workspaceId?: string) {
   const geminiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
   if (!geminiKey) return NextResponse.json({ error: "AI API key not configured" }, { status: 500 });
 
@@ -160,6 +185,7 @@ Output ONLY the complete HTML — no markdown, no explanation, no code fences.`;
       .from("email_templates")
       .insert({
         user_id: userId,
+        ...(workspaceId ? { workspace_id: workspaceId } : {}),
         name: templateName || "AI Generated Template",
         subject,
         html_content: html,

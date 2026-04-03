@@ -1,12 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data } = await supabase
+  const { searchParams } = new URL(request.url);
+  const workspaceId = searchParams.get("workspaceId");
+
+  const query = supabase
     .from("email_campaigns")
     .select(`
       id, name, subject, status, campaign_type, is_test,
@@ -16,8 +19,15 @@ export async function GET() {
       audience:email_audiences(id, name, contact_count),
       provider:email_providers(id, name, display_name)
     `)
-    .eq("user_id", user.id)
     .order("created_at", { ascending: false });
+
+  if (workspaceId) {
+    query.eq("workspace_id", workspaceId);
+  } else {
+    query.eq("user_id", user.id);
+  }
+
+  const { data } = await query;
 
   return NextResponse.json(data || []);
 }
@@ -32,6 +42,7 @@ export async function POST(request: NextRequest) {
     name, subject, templateId, audienceId, providerId,
     htmlContent, fromEmail, fromName, replyTo,
     isTest, testRecipients, scheduledAt, scheduledTimezone,
+    workspaceId,
   } = body;
 
   if (!name || !subject) {
@@ -41,12 +52,16 @@ export async function POST(request: NextRequest) {
   // If template specified, snapshot its HTML
   let html = htmlContent || "";
   if (templateId && !html) {
-    const { data: tpl } = await supabase
+    const tplQuery = supabase
       .from("email_templates")
       .select("html_content")
-      .eq("id", templateId)
-      .eq("user_id", user.id)
-      .single();
+      .eq("id", templateId);
+    if (workspaceId) {
+      tplQuery.eq("workspace_id", workspaceId);
+    } else {
+      tplQuery.eq("user_id", user.id);
+    }
+    const { data: tpl } = await tplQuery.single();
     if (tpl) html = tpl.html_content;
   }
 
@@ -54,12 +69,16 @@ export async function POST(request: NextRequest) {
   let resolvedFromEmail = fromEmail || "";
   let resolvedFromName = fromName || "";
   if (!resolvedFromEmail && providerId) {
-    const { data: prov } = await supabase
+    const provQuery = supabase
       .from("email_providers")
       .select("from_email, from_name")
-      .eq("id", providerId)
-      .eq("user_id", user.id)
-      .single();
+      .eq("id", providerId);
+    if (workspaceId) {
+      provQuery.eq("workspace_id", workspaceId);
+    } else {
+      provQuery.eq("user_id", user.id);
+    }
+    const { data: prov } = await provQuery.single();
     if (prov) {
       resolvedFromEmail = prov.from_email;
       resolvedFromName = prov.from_name || "";
@@ -72,6 +91,7 @@ export async function POST(request: NextRequest) {
     .from("email_campaigns")
     .insert({
       user_id: user.id,
+      ...(workspaceId ? { workspace_id: workspaceId } : {}),
       name,
       subject,
       template_id: templateId || null,
@@ -99,7 +119,7 @@ export async function PATCH(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id, ...updates } = await request.json();
+  const { id, workspaceId, ...updates } = await request.json();
   if (!id) return NextResponse.json({ error: "Campaign ID required" }, { status: 400 });
 
   const updateData: Record<string, unknown> = { updated_at: new Date().toISOString() };
@@ -122,20 +142,31 @@ export async function PATCH(request: NextRequest) {
 
   // If editing a sent test campaign, also snapshot new template content
   if (updates.templateId && !updates.htmlContent) {
-    const { data: tpl } = await supabase
+    const tplQuery = supabase
       .from("email_templates")
       .select("html_content")
-      .eq("id", updates.templateId)
-      .eq("user_id", user.id)
-      .single();
+      .eq("id", updates.templateId);
+    if (workspaceId) {
+      tplQuery.eq("workspace_id", workspaceId);
+    } else {
+      tplQuery.eq("user_id", user.id);
+    }
+    const { data: tpl } = await tplQuery.single();
     if (tpl) updateData.html_content = tpl.html_content;
   }
 
-  const { error } = await supabase
+  const patchQuery = supabase
     .from("email_campaigns")
     .update(updateData)
-    .eq("id", id)
-    .eq("user_id", user.id);
+    .eq("id", id);
+
+  if (workspaceId) {
+    patchQuery.eq("workspace_id", workspaceId);
+  } else {
+    patchQuery.eq("user_id", user.id);
+  }
+
+  const { error } = await patchQuery;
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
   return NextResponse.json({ ok: true });
@@ -146,7 +177,13 @@ export async function DELETE(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id } = await request.json();
-  await supabase.from("email_campaigns").delete().eq("id", id).eq("user_id", user.id);
+  const { id, workspaceId } = await request.json();
+  const deleteQuery = supabase.from("email_campaigns").delete().eq("id", id);
+  if (workspaceId) {
+    deleteQuery.eq("workspace_id", workspaceId);
+  } else {
+    deleteQuery.eq("user_id", user.id);
+  }
+  await deleteQuery;
   return NextResponse.json({ ok: true });
 }

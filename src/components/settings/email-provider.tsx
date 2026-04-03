@@ -21,7 +21,7 @@ const PROVIDERS = [
   { value: "resend", label: "Resend", description: "Modern email API with React Email support" },
 ];
 
-export function EmailProviderSettings() {
+export function EmailProviderSettings({ workspaceId }: { workspaceId: string }) {
   const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAdd, setShowAdd] = useState(false);
@@ -44,7 +44,7 @@ export function EmailProviderSettings() {
   const [editError, setEditError] = useState<string | null>(null);
 
   useEffect(() => {
-    fetch("/api/emails/providers")
+    fetch(`/api/emails/providers?workspaceId=${workspaceId}`)
       .then((r) => r.json())
       .then((data) => { setProviders(Array.isArray(data) ? data : []); setLoading(false); });
   }, []);
@@ -71,7 +71,7 @@ export function EmailProviderSettings() {
     const res = await fetch("/api/emails/providers", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: providerName, apiKey, fromEmail, fromName }),
+      body: JSON.stringify({ name: providerName, apiKey, fromEmail, fromName, workspaceId }),
     });
 
     const data = await res.json();
@@ -93,6 +93,7 @@ export function EmailProviderSettings() {
 
     const body: Record<string, string> = {
       id,
+      workspaceId,
       fromEmail: editFromEmail,
       fromName: editFromName,
       displayName: editDisplayName,
@@ -120,7 +121,7 @@ export function EmailProviderSettings() {
     await fetch("/api/emails/providers", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify({ id, workspaceId }),
     });
     setProviders((prev) => prev.filter((p) => p.id !== id));
   }

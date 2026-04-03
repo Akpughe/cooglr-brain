@@ -21,14 +21,14 @@ const SOURCE_META: Record<string, { label: string }> = {
 
 const INPUT = "w-full h-9 px-3 rounded-lg border border-border bg-background text-[13px] focus:outline-none focus:border-primary/30 transition-colors placeholder:text-muted-foreground/40";
 
-export function AudiencesView() {
+export function AudiencesView({ workspaceId }: { workspaceId: string }) {
   const [audiences, setAudiences] = useState<Audience[]>([]);
   const [loading, setLoading] = useState(true);
   const [showImport, setShowImport] = useState(false);
   const [showCreate, setShowCreate] = useState(false);
 
   const loadAudiences = useCallback(() => {
-    fetch("/api/emails/audiences")
+    fetch(`/api/emails/audiences?workspaceId=${workspaceId}`)
       .then((r) => r.json())
       .then((data) => { setAudiences(Array.isArray(data) ? data : []); setLoading(false); })
       .catch(() => setLoading(false));
@@ -40,19 +40,19 @@ export function AudiencesView() {
     await fetch("/api/emails/audiences", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id }),
+      body: JSON.stringify({ id, workspaceId }),
     });
     setAudiences((prev) => prev.filter((a) => a.id !== id));
   }
 
   // CSV import
   if (showImport) {
-    return <CsvImportFlow onClose={() => { setShowImport(false); loadAudiences(); }} />;
+    return <CsvImportFlow workspaceId={workspaceId} onClose={() => { setShowImport(false); loadAudiences(); }} />;
   }
 
   // Manual create
   if (showCreate) {
-    return <ManualCreateFlow onClose={() => { setShowCreate(false); loadAudiences(); }} />;
+    return <ManualCreateFlow workspaceId={workspaceId} onClose={() => { setShowCreate(false); loadAudiences(); }} />;
   }
 
   return (
@@ -123,7 +123,7 @@ export function AudiencesView() {
 
 /* ======== CSV Import Flow ======== */
 
-function CsvImportFlow({ onClose }: { onClose: () => void }) {
+function CsvImportFlow({ workspaceId, onClose }: { workspaceId: string; onClose: () => void }) {
   const [name, setName] = useState("");
   const [csvText, setCsvText] = useState("");
   const [parsed, setParsed] = useState<Record<string, string>[]>([]);
@@ -172,6 +172,7 @@ function CsvImportFlow({ onClose }: { onClose: () => void }) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "import_csv",
+          workspaceId,
           name: name.trim(),
           contacts: parsed,
         }),
@@ -243,7 +244,7 @@ function CsvImportFlow({ onClose }: { onClose: () => void }) {
 
 /* ======== Manual Create ======== */
 
-function ManualCreateFlow({ onClose }: { onClose: () => void }) {
+function ManualCreateFlow({ workspaceId, onClose }: { workspaceId: string; onClose: () => void }) {
   const [name, setName] = useState("");
   const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -254,7 +255,7 @@ function ManualCreateFlow({ onClose }: { onClose: () => void }) {
     const res = await fetch("/api/emails/audiences", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: name.trim() }),
+      body: JSON.stringify({ name: name.trim(), workspaceId }),
     });
     if (!res.ok) { const d = await res.json(); setError(d.error); setCreating(false); return; }
     onClose();

@@ -37,7 +37,7 @@ const STATUS_META: Record<string, { label: string; dot: string; bg: string }> = 
 
 const FILTER_TABS = ["All", "Drafts", "Scheduled", "Sent"];
 
-export function CampaignsView() {
+export function CampaignsView({ workspaceId }: { workspaceId: string }) {
   const [filter, setFilter] = useState("All");
   const [showCreateFlow, setShowCreateFlow] = useState(false);
   const [editingCampaign, setEditingCampaign] = useState<Campaign | null>(null);
@@ -47,7 +47,7 @@ export function CampaignsView() {
   const [sendingId, setSendingId] = useState<string | null>(null);
 
   const loadCampaigns = useCallback(() => {
-    fetch("/api/emails/campaigns")
+    fetch(`/api/emails/campaigns?workspaceId=${workspaceId}`)
       .then((r) => r.json())
       .then((data) => { setCampaigns(Array.isArray(data) ? data : []); setLoading(false); })
       .catch(() => setLoading(false));
@@ -60,7 +60,7 @@ export function CampaignsView() {
     const res = await fetch("/api/emails/campaigns/send", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ campaignId: id }),
+      body: JSON.stringify({ campaignId: id, workspaceId }),
     });
     const data = await res.json();
     setSendingId(null);
@@ -78,6 +78,7 @@ export function CampaignsView() {
   if (showCreateFlow || editingCampaign) {
     return (
       <CampaignCreateFlow
+        workspaceId={workspaceId}
         editCampaign={editingCampaign}
         onClose={() => { setShowCreateFlow(false); setEditingCampaign(null); loadCampaigns(); }}
       />
@@ -229,7 +230,7 @@ export function CampaignsView() {
                           await fetch("/api/emails/campaigns", {
                             method: "DELETE",
                             headers: { "Content-Type": "application/json" },
-                            body: JSON.stringify({ id: c.id }),
+                            body: JSON.stringify({ id: c.id, workspaceId }),
                           });
                           setExpandedId(null);
                           loadCampaigns();
@@ -265,7 +266,7 @@ export function CampaignsView() {
 const STEPS = ["Setup", "Template", "Audience", "Review"];
 const INPUT = "w-full h-9 px-3 rounded-lg border border-border bg-background text-[13px] focus:outline-none focus:border-primary/30 transition-colors placeholder:text-muted-foreground/40";
 
-function CampaignCreateFlow({ editCampaign, onClose }: { editCampaign?: Campaign | null; onClose: () => void }) {
+function CampaignCreateFlow({ workspaceId, editCampaign, onClose }: { workspaceId: string; editCampaign?: Campaign | null; onClose: () => void }) {
   const isEditing = !!editCampaign;
   const [step, setStep] = useState(0);
   const [sending, setSending] = useState(false);
@@ -307,9 +308,9 @@ function CampaignCreateFlow({ editCampaign, onClose }: { editCampaign?: Campaign
 
   // Fetch data on mount
   useEffect(() => {
-    fetch("/api/emails/templates").then((r) => r.json()).then((d) => setTemplates(Array.isArray(d) ? d : [])).catch(() => {});
-    fetch("/api/emails/audiences").then((r) => r.json()).then((d) => setAudiences(Array.isArray(d) ? d : [])).catch(() => {});
-    fetch("/api/emails/providers").then((r) => r.json()).then((d) => {
+    fetch(`/api/emails/templates?workspaceId=${workspaceId}`).then((r) => r.json()).then((d) => setTemplates(Array.isArray(d) ? d : [])).catch(() => {});
+    fetch(`/api/emails/audiences?workspaceId=${workspaceId}`).then((r) => r.json()).then((d) => setAudiences(Array.isArray(d) ? d : [])).catch(() => {});
+    fetch(`/api/emails/providers?workspaceId=${workspaceId}`).then((r) => r.json()).then((d) => {
       const list = Array.isArray(d) ? d : [];
       setProviders(list);
       if (!isEditing && list[0]) {
@@ -359,7 +360,7 @@ function CampaignCreateFlow({ editCampaign, onClose }: { editCampaign?: Campaign
         const updateRes = await fetch("/api/emails/campaigns", {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ id: editCampaign.id, ...payload, status: scheduledAt ? "scheduled" : "draft" }),
+          body: JSON.stringify({ id: editCampaign.id, workspaceId, ...payload, status: scheduledAt ? "scheduled" : "draft" }),
         });
         const updateData = await updateRes.json();
         if (!updateRes.ok) { setError(updateData.error); setSending(false); return; }
@@ -369,7 +370,7 @@ function CampaignCreateFlow({ editCampaign, onClose }: { editCampaign?: Campaign
         const createRes = await fetch("/api/emails/campaigns", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
+          body: JSON.stringify({ ...payload, workspaceId }),
         });
         const createData = await createRes.json();
         if (!createRes.ok) { setError(createData.error); setSending(false); return; }
@@ -381,7 +382,7 @@ function CampaignCreateFlow({ editCampaign, onClose }: { editCampaign?: Campaign
         const sendRes = await fetch("/api/emails/campaigns/send", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ campaignId }),
+          body: JSON.stringify({ campaignId, workspaceId }),
         });
         const sendData = await sendRes.json();
         if (!sendRes.ok) { setError(sendData.error); setSending(false); return; }

@@ -11,12 +11,12 @@ interface CampaignRow {
   stats: Record<string, number>;
 }
 
-export function AnalyticsView() {
+export function AnalyticsView({ workspaceId }: { workspaceId: string }) {
   const [campaigns, setCampaigns] = useState<CampaignRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/emails/campaigns")
+    fetch(`/api/emails/campaigns?workspaceId=${workspaceId}`)
       .then((r) => r.json())
       .then((data) => {
         setCampaigns((Array.isArray(data) ? data : []).filter((c: CampaignRow) => c.status === "sent"));

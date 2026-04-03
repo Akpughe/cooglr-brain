@@ -1,17 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { data } = await supabase
+  const { searchParams } = new URL(request.url);
+  const workspaceId = searchParams.get("workspaceId");
+
+  const query = supabase
     .from("email_audiences")
     .select("id, name, description, source_type, contact_count, tags, status, last_synced_at, created_at")
-    .eq("user_id", user.id)
     .eq("status", "active")
     .order("created_at", { ascending: false });
+
+  if (workspaceId) {
+    query.eq("workspace_id", workspaceId);
+  } else {
+    query.eq("user_id", user.id);
+  }
+
+  const { data } = await query;
 
   return NextResponse.json(data || []);
 }
@@ -22,10 +32,11 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
+  const { workspaceId } = body;
 
   // CSV import mode
   if (body.action === "import_csv") {
-    return importCsv(supabase, user.id, body);
+    return importCsv(supabase, user.id, body, workspaceId);
   }
 
   // Database query mode
@@ -41,6 +52,7 @@ export async function POST(request: NextRequest) {
     .from("email_audiences")
     .insert({
       user_id: user.id,
+      ...(workspaceId ? { workspace_id: workspaceId } : {}),
       name,
       description: description || null,
       source_type: "manual",
@@ -58,18 +70,25 @@ export async function DELETE(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-  const { id } = await request.json();
+  const { id, workspaceId } = await request.json();
   if (!id) return NextResponse.json({ error: "Audience ID required" }, { status: 400 });
 
   // Delete audience (cascade deletes junction records)
-  await supabase.from("email_audiences").delete().eq("id", id).eq("user_id", user.id);
+  const deleteQuery = supabase.from("email_audiences").delete().eq("id", id);
+  if (workspaceId) {
+    deleteQuery.eq("workspace_id", workspaceId);
+  } else {
+    deleteQuery.eq("user_id", user.id);
+  }
+  await deleteQuery;
   return NextResponse.json({ ok: true });
 }
 
 async function importCsv(
   supabase: Awaited<ReturnType<typeof createClient>>,
   userId: string,
-  body: { name: string; contacts: { email: string; first_name?: string; last_name?: string; [key: string]: unknown }[] }
+  body: { name: string; contacts: { email: string; first_name?: string; last_name?: string; [key: string]: unknown }[] },
+  workspaceId?: string
 ) {
   const { name, contacts } = body;
   if (!name || !contacts?.length) {
@@ -81,6 +100,7 @@ async function importCsv(
     .from("email_audiences")
     .insert({
       user_id: userId,
+      ...(workspaceId ? { workspace_id: workspaceId } : {}),
       name,
       source_type: "csv_import",
       contact_count: contacts.length,
