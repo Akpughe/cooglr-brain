@@ -29,6 +29,7 @@ export function PageEditor({ file, onUpdate }: Props) {
   const titleTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
