@@ -67,23 +67,29 @@ create policy "Creator can delete files"
   on public.files for delete to authenticated
   using (created_by = auth.uid());
 
+-- Security definer function to break RLS recursion (files SELECT → file_shares SELECT → files)
+create or replace function public.get_files_created_by_user()
+returns setof uuid as $$
+  select id from public.files where created_by = auth.uid();
+$$ language sql security definer stable;
+
 create policy "Users can view their shares or shares they created"
   on public.file_shares for select to authenticated
   using (
     shared_with = auth.uid()
-    or file_id in (select id from public.files where created_by = auth.uid())
+    or file_id in (select public.get_files_created_by_user())
   );
 
 create policy "File creator can share"
   on public.file_shares for insert to authenticated
   with check (
-    file_id in (select id from public.files where created_by = auth.uid())
+    file_id in (select public.get_files_created_by_user())
   );
 
 create policy "File creator can revoke shares"
   on public.file_shares for delete to authenticated
   using (
-    file_id in (select id from public.files where created_by = auth.uid())
+    file_id in (select public.get_files_created_by_user())
   );
 
 -- 3. Indexes
