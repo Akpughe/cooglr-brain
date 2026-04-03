@@ -8,6 +8,7 @@ import { FileTree } from "./file-tree";
 import { createClient } from "@/lib/supabase/client";
 import type { FileTreeNode } from "@/lib/files/types";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 export function FilesSidebarContent() {
   const pathname = usePathname();
@@ -55,15 +56,57 @@ export function FilesSidebarContent() {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
+  // Optimistic page creation — instant UI, API in background
   async function handleCreatePage(parentId?: string) {
-    const res = await fetch("/api/files", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ workspaceId: workspace.id, type: "page", title: "Untitled", parentId: parentId || null }),
-    });
-    const data = await res.json();
-    if (data.file) {
-      router.push(`/${workspace.slug}/files/${data.file.id}`);
+    const tempId = `temp-${crypto.randomUUID()}`;
+    const optimisticNode: FileTreeNode = {
+      id: tempId,
+      parentId: parentId || null,
+      type: "page",
+      title: "Untitled",
+      icon: null,
+      isPrivate: false,
+      position: nodes.length,
+      createdBy: "",
+      updatedAt: new Date().toISOString(),
+    };
+
+    // Instantly add to tree and navigate
+    setNodes((prev) => [...prev, optimisticNode]);
+    router.push(`/${workspace.slug}/files/${tempId}`);
+
+    try {
+      const res = await fetch("/api/files", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ workspaceId: workspace.id, type: "page", title: "Untitled", parentId: parentId || null }),
+      });
+      const data = await res.json();
+
+      if (!res.ok || !data.file) {
+        // Remove optimistic node on failure
+        setNodes((prev) => prev.filter((n) => n.id !== tempId));
+        toast.error("Failed to create page");
+        router.push(`/${workspace.slug}/files`);
+        return;
+      }
+
+      // Swap temp ID for real ID
+      setNodes((prev) =>
+        prev.map((n) =>
+          n.id === tempId
+            ? { ...n, id: data.file.id, position: data.file.position, createdBy: data.file.createdBy }
+            : n
+        )
+      );
+
+      // Navigate to real ID
+      router.replace(`/${workspace.slug}/files/${data.file.id}`);
+      toast.success("Page created");
+    } catch {
+      setNodes((prev) => prev.filter((n) => n.id !== tempId));
+      toast.error("Failed to create page — check your connection");
+      router.push(`/${workspace.slug}/files`);
     }
   }
 
@@ -73,11 +116,26 @@ export function FilesSidebarContent() {
     input.multiple = true;
     input.onchange = async () => {
       if (!input.files) return;
+      const fileCount = input.files.length;
+      toast.loading(`Uploading ${fileCount} file${fileCount > 1 ? "s" : ""}...`, { id: "upload" });
+
+      let successCount = 0;
       for (const file of Array.from(input.files)) {
         const formData = new FormData();
         formData.append("file", file);
         formData.append("workspaceId", workspace.id);
-        await fetch("/api/files/upload", { method: "POST", body: formData });
+        try {
+          const res = await fetch("/api/files/upload", { method: "POST", body: formData });
+          if (res.ok) successCount++;
+        } catch { /* continue with remaining files */ }
+      }
+
+      if (successCount === fileCount) {
+        toast.success(`${successCount} file${successCount > 1 ? "s" : ""} uploaded`, { id: "upload" });
+      } else if (successCount > 0) {
+        toast.warning(`${successCount} of ${fileCount} files uploaded`, { id: "upload" });
+      } else {
+        toast.error("Upload failed", { id: "upload" });
       }
     };
     input.click();
@@ -95,30 +153,76 @@ export function FilesSidebarContent() {
 
   async function handleRename(node: FileTreeNode) {
     const newTitle = prompt("Rename:", node.title);
-    if (newTitle && newTitle !== node.title) {
-      await fetch(`/api/files/${node.id}`, {
+    if (!newTitle || newTitle === node.title) { setContextMenu(null); return; }
+
+    // Optimistic
+    setNodes((prev) => prev.map((n) => n.id === node.id ? { ...n, title: newTitle } : n));
+    setContextMenu(null);
+
+    try {
+      const res = await fetch(`/api/files/${node.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ title: newTitle }),
       });
+      if (!res.ok) {
+        setNodes((prev) => prev.map((n) => n.id === node.id ? { ...n, title: node.title } : n));
+        toast.error("Failed to rename");
+      } else {
+        toast.success("Renamed");
+      }
+    } catch {
+      setNodes((prev) => prev.map((n) => n.id === node.id ? { ...n, title: node.title } : n));
+      toast.error("Failed to rename");
     }
-    setContextMenu(null);
   }
 
   async function handleDelete(node: FileTreeNode) {
     if (!confirm(`Delete "${node.title}"? This will also delete all children.`)) return;
-    await fetch(`/api/files/${node.id}`, { method: "DELETE" });
+
+    // Optimistic — remove from tree
+    const previousNodes = nodes;
+    setNodes((prev) => prev.filter((n) => n.id !== node.id && n.parentId !== node.id));
     setContextMenu(null);
     if (activeFileId === node.id) router.push(`/${workspace.slug}/files`);
+
+    try {
+      const res = await fetch(`/api/files/${node.id}`, { method: "DELETE" });
+      if (!res.ok) {
+        setNodes(previousNodes);
+        toast.error("Failed to delete");
+      } else {
+        toast.success("Deleted");
+      }
+    } catch {
+      setNodes(previousNodes);
+      toast.error("Failed to delete");
+    }
   }
 
   async function handleTogglePrivate(node: FileTreeNode) {
-    await fetch(`/api/files/${node.id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ isPrivate: !node.isPrivate }),
-    });
+    const newPrivate = !node.isPrivate;
+
+    // Optimistic
+    setNodes((prev) => prev.map((n) => n.id === node.id ? { ...n, isPrivate: newPrivate } : n));
     setContextMenu(null);
+
+    try {
+      const res = await fetch(`/api/files/${node.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ isPrivate: newPrivate }),
+      });
+      if (!res.ok) {
+        setNodes((prev) => prev.map((n) => n.id === node.id ? { ...n, isPrivate: !newPrivate } : n));
+        toast.error("Failed to update privacy");
+      } else {
+        toast.success(newPrivate ? "Made private" : "Made public");
+      }
+    } catch {
+      setNodes((prev) => prev.map((n) => n.id === node.id ? { ...n, isPrivate: !newPrivate } : n));
+      toast.error("Failed to update privacy");
+    }
   }
 
   const filteredNodes = search

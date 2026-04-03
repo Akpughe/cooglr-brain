@@ -1,13 +1,14 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useParams } from "next/navigation";
 import { useWorkspace } from "@/lib/workspace/context";
 import { PageEditor } from "@/components/files/page-editor";
 import { FolderView } from "@/components/files/folder-view";
 import { FilePreview } from "@/components/files/file-preview";
-import { Lock, Globe } from "lucide-react";
+import { Lock, Globe, Check } from "lucide-react";
 import type { FileNode } from "@/lib/files/types";
+import { toast } from "sonner";
 
 export default function FileDetailPage() {
   const params = useParams<{ fileId: string }>();
@@ -15,13 +16,46 @@ export default function FileDetailPage() {
   const [file, setFile] = useState<FileNode | null>(null);
   const [children, setChildren] = useState<FileNode[]>([]);
   const [loading, setLoading] = useState(true);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const savedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Skip loading for temp (optimistic) IDs — editor will show blank until real ID arrives
+  const isTemp = params.fileId.startsWith("temp-");
 
   const loadFile = useCallback(async () => {
-    const res = await fetch(`/api/files/${params.fileId}`);
-    const data = await res.json();
-    if (data.file) setFile(data.file);
+    if (isTemp) {
+      // Optimistic page — show empty editor immediately
+      setFile({
+        id: params.fileId,
+        workspaceId: workspace.id,
+        parentId: null,
+        type: "page",
+        title: "Untitled",
+        content: null,
+        icon: null,
+        coverUrl: null,
+        storagePath: null,
+        mimeType: null,
+        fileSize: null,
+        isPrivate: false,
+        position: 0,
+        createdBy: "",
+        updatedAt: new Date().toISOString(),
+        createdAt: new Date().toISOString(),
+      });
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/files/${params.fileId}`);
+      const data = await res.json();
+      if (data.file) setFile(data.file);
+    } catch {
+      toast.error("Failed to load file");
+    }
     setLoading(false);
-  }, [params.fileId]);
+  }, [params.fileId, isTemp, workspace.id]);
 
   const loadChildren = useCallback(async () => {
     if (!file || file.type !== "folder") return;
@@ -35,24 +69,48 @@ export default function FileDetailPage() {
   useEffect(() => { loadChildren(); }, [loadChildren]);
 
   async function handleUpdate(updates: Partial<FileNode>) {
-    setFile((prev) => prev ? { ...prev, ...updates } : prev);
+    if (isTemp) return; // Don't save temp pages
 
-    await fetch(`/api/files/${params.fileId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(updates),
-    });
+    // Optimistic update
+    setFile((prev) => prev ? { ...prev, ...updates } : prev);
+    setSaveStatus("saving");
+
+    try {
+      const res = await fetch(`/api/files/${params.fileId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(updates),
+      });
+
+      if (!res.ok) {
+        toast.error("Failed to save");
+        setSaveStatus("idle");
+        return;
+      }
+
+      setSaveStatus("saved");
+      if (savedTimerRef.current) clearTimeout(savedTimerRef.current);
+      savedTimerRef.current = setTimeout(() => setSaveStatus("idle"), 2000);
+    } catch {
+      toast.error("Failed to save — check your connection");
+      setSaveStatus("idle");
+    }
   }
 
   async function handleCreatePage(parentId: string) {
-    const res = await fetch("/api/files", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ workspaceId: workspace.id, type: "page", title: "Untitled", parentId }),
-    });
-    const data = await res.json();
-    if (data.file) {
-      loadChildren();
+    try {
+      const res = await fetch("/api/files", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ workspaceId: workspace.id, type: "page", title: "Untitled", parentId }),
+      });
+      const data = await res.json();
+      if (data.file) {
+        loadChildren();
+        toast.success("Page created");
+      }
+    } catch {
+      toast.error("Failed to create page");
     }
   }
 
@@ -62,17 +120,29 @@ export default function FileDetailPage() {
     input.multiple = true;
     input.onchange = async () => {
       if (!input.files) return;
+      toast.loading("Uploading...", { id: "folder-upload" });
+      let ok = true;
       for (const f of Array.from(input.files)) {
         const formData = new FormData();
         formData.append("file", f);
         formData.append("workspaceId", workspace.id);
         formData.append("parentId", parentId);
-        await fetch("/api/files/upload", { method: "POST", body: formData });
+        try {
+          const res = await fetch("/api/files/upload", { method: "POST", body: formData });
+          if (!res.ok) ok = false;
+        } catch { ok = false; }
       }
       loadChildren();
+      if (ok) toast.success("Uploaded", { id: "folder-upload" });
+      else toast.error("Some uploads failed", { id: "folder-upload" });
     };
     input.click();
   }
+
+  // Cleanup
+  useEffect(() => {
+    return () => { if (savedTimerRef.current) clearTimeout(savedTimerRef.current); };
+  }, []);
 
   if (loading) {
     return (
@@ -90,7 +160,7 @@ export default function FileDetailPage() {
     );
   }
 
-  const creatorName = members.find((m) => m.userId === file.createdBy)?.fullName || "Unknown";
+  const creatorName = members.find((m) => m.userId === file.createdBy)?.fullName || "You";
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
@@ -99,6 +169,21 @@ export default function FileDetailPage() {
         <span>Created by <strong className="text-muted-foreground/80">{creatorName}</strong></span>
         <span>·</span>
         <span>Edited {timeAgo(file.updatedAt)}</span>
+
+        {/* Save status indicator */}
+        {saveStatus === "saving" && (
+          <span className="text-muted-foreground/40 flex items-center gap-1">
+            <span className="w-1.5 h-1.5 rounded-full bg-yellow-400/60 animate-pulse" />
+            Saving...
+          </span>
+        )}
+        {saveStatus === "saved" && (
+          <span className="text-green-400/60 flex items-center gap-1">
+            <Check className="w-3 h-3" />
+            Saved
+          </span>
+        )}
+
         <div className="ml-auto flex items-center gap-2">
           <button
             onClick={() => handleUpdate({ isPrivate: !file.isPrivate })}
@@ -110,8 +195,8 @@ export default function FileDetailPage() {
         </div>
       </div>
 
-      {/* Render based on type */}
-      {file.type === "page" && <PageEditor file={file} onUpdate={handleUpdate} />}
+      {/* Render based on type — key forces re-mount on navigation */}
+      {file.type === "page" && <PageEditor key={file.id} file={file} onUpdate={handleUpdate} />}
       {file.type === "folder" && (
         <FolderView
           folder={file}
