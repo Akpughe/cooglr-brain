@@ -58,12 +58,22 @@ export function FilesSidebarContent() {
 
   // Optimistic page creation — instant UI, API in background
   async function handleCreatePage(parentId?: string) {
+    // Generate smart name
+    const baseName = "New page";
+    const existingTitles = new Set(nodes.map((n) => n.title.toLowerCase()));
+    let newTitle = baseName;
+    if (existingTitles.has(newTitle.toLowerCase())) {
+      let i = 2;
+      while (existingTitles.has(`${baseName.toLowerCase()} ${i}`)) i++;
+      newTitle = `${baseName} ${i}`;
+    }
+
     const tempId = `temp-${crypto.randomUUID()}`;
     const optimisticNode: FileTreeNode = {
       id: tempId,
       parentId: parentId || null,
       type: "page",
-      title: "Untitled",
+      title: newTitle,
       icon: null,
       isPrivate: false,
       position: nodes.length,
@@ -79,7 +89,7 @@ export function FilesSidebarContent() {
       const res = await fetch("/api/files", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ workspaceId: workspace.id, type: "page", title: "Untitled", parentId: parentId || null }),
+        body: JSON.stringify({ workspaceId: workspace.id, type: "page", title: newTitle, parentId: parentId || null }),
       });
       const data = await res.json();
 
