@@ -1,26 +1,52 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useWorkspace } from "@/lib/workspace/context";
-import { Mail } from "lucide-react";
+import { EmailOnboarding } from "@/components/emails/email-onboarding";
 
 export default function EmailMarketingPage() {
+  const router = useRouter();
   const { workspace } = useWorkspace();
+  const [loading, setLoading] = useState(true);
+  const [needsOnboarding, setNeedsOnboarding] = useState(false);
 
-  return (
-    <div className="flex-1 overflow-y-auto">
-      <div className="max-w-5xl mx-auto px-8 py-6">
-        <div className="flex items-center gap-3 mb-6">
-          <div className="w-10 h-10 rounded-lg bg-indigo-500/10 flex items-center justify-center">
-            <Mail className="w-5 h-5 text-indigo-400" />
-          </div>
-          <div>
-            <h1 className="text-xl font-semibold">Email Marketing</h1>
-            <p className="text-sm text-muted-foreground">Campaigns, templates, and audience management</p>
-          </div>
-        </div>
+  useEffect(() => {
+    // Check if provider exists
+    fetch(`/api/emails/providers?workspaceId=${workspace.id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        const providers = data.providers || [];
+        if (providers.length === 0) {
+          setNeedsOnboarding(true);
+        } else {
+          // Provider exists — go straight to campaigns
+          router.replace(`/${workspace.slug}/email-marketing/campaigns`);
+        }
+        setLoading(false);
+      })
+      .catch(() => {
+        setNeedsOnboarding(true);
+        setLoading(false);
+      });
+  }, [workspace.id, workspace.slug, router]);
 
-        <p className="text-muted-foreground">Select a section from the sidebar to get started.</p>
+  if (loading) {
+    return (
+      <div className="flex-1 flex items-center justify-center">
+        <div className="w-6 h-6 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
       </div>
-    </div>
-  );
+    );
+  }
+
+  if (needsOnboarding) {
+    return (
+      <EmailOnboarding
+        workspaceId={workspace.id}
+        onComplete={() => router.push(`/${workspace.slug}/email-marketing/campaigns`)}
+      />
+    );
+  }
+
+  return null;
 }
