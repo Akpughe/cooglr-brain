@@ -86,7 +86,7 @@ export async function POST(
   return NextResponse.json({ success: true }, { status: 201 });
 }
 
-// DELETE /api/workspaces/[id]/apps — uninstall app
+// DELETE /api/workspaces/[id]/apps — uninstall app (installer or owner)
 export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -96,6 +96,22 @@ export async function DELETE(
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
+  const { appId } = await request.json();
+
+  // Check if user is the installer or workspace owner
+  const { data: installedApp } = await supabase
+    .from("workspace_apps")
+    .select("installed_by")
+    .eq("workspace_id", id)
+    .eq("app_id", appId)
+    .single();
+
+  if (!installedApp) {
+    return NextResponse.json({ error: "App not installed" }, { status: 404 });
+  }
+
+  const isInstaller = installedApp.installed_by === user.id;
+
   const { data: membership } = await supabase
     .from("workspace_members")
     .select("role")
@@ -103,11 +119,11 @@ export async function DELETE(
     .eq("user_id", user.id)
     .single();
 
-  if (membership?.role !== "owner") {
-    return NextResponse.json({ error: "Only owners can uninstall apps" }, { status: 403 });
-  }
+  const isOwner = membership?.role === "owner";
 
-  const { appId } = await request.json();
+  if (!isInstaller && !isOwner) {
+    return NextResponse.json({ error: "Only the installer or workspace owner can uninstall apps" }, { status: 403 });
+  }
 
   const { error } = await supabase
     .from("workspace_apps")
