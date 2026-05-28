@@ -65,6 +65,9 @@ export async function ingestGmail(
   const result = await getComposio().tools.execute("GMAIL_FETCH_EMAILS", {
     userId,
     arguments: { max_results: max },
+    // Use the latest deployed toolkit version (Composio requires an explicit
+    // version for manual execution otherwise). Pin via toolkitVersions later.
+    dangerouslySkipVersionCheck: true,
   });
   const docs = gmailMessagesToDocs(result);
   if (docs.length === 0) return { messages: 0, chunks: 0 };
