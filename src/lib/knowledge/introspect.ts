@@ -20,10 +20,12 @@ export interface RawTable {
 }
 
 // Infer join paths: declared foreign keys first, then a name heuristic where a
-// column `<base>_id` joins to a table named like `<base>` (or its plural) on its
-// primary key. Heuristic joins are flagged declared:false (lower confidence).
+// column `<base>_id` (snake_case) or `<base>Id` (camelCase, Prisma-style) joins
+// to a table named like `<base>` (or its plural) on its primary key. Table
+// matching is case-insensitive so `userId` finds the PascalCase `User` table.
+// Heuristic joins are flagged declared:false (lower confidence).
 export function inferJoins(tables: RawTable[]): JoinPath[] {
-  const byName = new Map(tables.map((t) => [t.name, t]));
+  const byLower = new Map(tables.map((t) => [t.name.toLowerCase(), t]));
   const out: JoinPath[] = [];
 
   for (const t of tables) {
@@ -40,17 +42,18 @@ export function inferJoins(tables: RawTable[]): JoinPath[] {
     const declaredCols = new Set(t.foreignKeys.map((f) => f.column));
     for (const c of t.columns) {
       if (declaredCols.has(c.name)) continue;
-      const m = c.name.match(/^(.*)_id$/);
+      // snake_case `_id` or camelCase `Id` suffix (not bare "id"/"uuid").
+      const m = c.name.match(/^(.+?)(?:_id|Id)$/);
       if (!m) continue;
-      const base = m[1];
+      const base = m[1].toLowerCase();
       const candidates = [base, `${base}s`, `${base}es`];
       const target = candidates
-        .map((n) => byName.get(n))
+        .map((n) => byLower.get(n))
         .find((x): x is RawTable => Boolean(x));
       if (!target) continue;
       const pk =
         target.columns.find((x) => x.isPrimaryKey) ??
-        target.columns.find((x) => x.name === "id");
+        target.columns.find((x) => x.name.toLowerCase() === "id");
       if (!pk) continue;
       out.push({
         fromTable: t.name,

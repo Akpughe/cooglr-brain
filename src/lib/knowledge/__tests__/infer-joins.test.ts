@@ -29,6 +29,31 @@ describe("inferJoins", () => {
     });
   });
 
+  it("infers camelCase userId -> PascalCase User table (Prisma-style)", () => {
+    const prisma: RawTable[] = [
+      { name: "User", columns: [{ name: "id", type: "uuid", nullable: false, isPrimaryKey: true }], foreignKeys: [] },
+      { name: "Order", columns: [
+          { name: "id", type: "uuid", nullable: false, isPrimaryKey: true },
+          { name: "userId", type: "uuid", nullable: false, isPrimaryKey: false },
+        ], foreignKeys: [] },
+    ];
+    const joins = inferJoins(prisma);
+    expect(joins).toContainEqual({
+      fromTable: "Order", fromColumn: "userId",
+      toTable: "User", toColumn: "id", declared: false,
+    });
+  });
+
+  it("does not treat bare id / uuid columns as foreign keys", () => {
+    const t: RawTable[] = [
+      { name: "Thing", columns: [
+          { name: "id", type: "uuid", nullable: false, isPrimaryKey: true },
+          { name: "uuid", type: "text", nullable: true, isPrimaryKey: false },
+        ], foreignKeys: [] },
+    ];
+    expect(inferJoins(t)).toEqual([]);
+  });
+
   it("prefers a declared FK over a heuristic", () => {
     const withFk: RawTable[] = [
       tables[0],

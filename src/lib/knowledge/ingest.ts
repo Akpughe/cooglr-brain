@@ -190,7 +190,8 @@ export async function persistPages(
   operation: "ingest" | "refresh",
   userId: string,
 ): Promise<void> {
-  for (const p of pages) {
+  // Persist pages concurrently (bounded) — large schemas produce many pages.
+  await mapWithConcurrency(pages, 8, async (p) => {
     const { data } = await supabase
       .from("knowledge_pages")
       .upsert(
@@ -212,7 +213,7 @@ export async function persistPages(
       .select("id")
       .single();
 
-    if (!data?.id) continue;
+    if (!data?.id) return;
 
     await supabase.from("knowledge_page_revisions").insert({
       page_id: data.id,
@@ -234,5 +235,5 @@ export async function persistPages(
       },
       { onConflict: "page_id" },
     );
-  }
+  });
 }
