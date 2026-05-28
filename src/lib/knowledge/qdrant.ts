@@ -2,7 +2,7 @@ import { QdrantClient } from "@qdrant/js-client-rest";
 import { createHash } from "node:crypto";
 import { EMBED_DIMS } from "./embeddings";
 
-export const COLLECTION = "knowledge_content";
+export const COLLECTION = process.env.QDRANT_COLLECTION || "500Claw";
 
 export interface ChunkPoint {
   workspaceId: string;
