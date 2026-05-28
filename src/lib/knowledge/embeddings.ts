@@ -4,8 +4,11 @@
 // retrieval).
 
 const VOYAGE_URL = "https://api.voyageai.com/v1/embeddings";
-export const EMBED_MODEL = process.env.KNOWLEDGE_EMBED_MODEL || "voyage-3.5";
-export const EMBED_DIMS = Number(process.env.KNOWLEDGE_EMBED_DIMS || 1024);
+export const EMBED_MODEL =
+  process.env.VOYAGE_EMBED_MODEL || process.env.KNOWLEDGE_EMBED_MODEL || "voyage-3.5";
+export const EMBED_DIMS = Number(
+  process.env.VOYAGE_EMBED_DIM || process.env.KNOWLEDGE_EMBED_DIMS || 1024,
+);
 
 // Voyage caps inputs per request; batch to stay well under limits.
 const BATCH = 100;
@@ -16,7 +19,9 @@ async function embedBatch(input: string[], inputType: "document" | "query"): Pro
   const res = await fetch(VOYAGE_URL, {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ input, model: EMBED_MODEL, input_type: inputType }),
+    // Pin output_dimension so vectors match the Qdrant collection size exactly,
+    // regardless of the model's native default.
+    body: JSON.stringify({ input, model: EMBED_MODEL, input_type: inputType, output_dimension: EMBED_DIMS }),
   });
   if (!res.ok) throw new Error(`Voyage error ${res.status}: ${(await res.text()).slice(0, 200)}`);
   const data = (await res.json()) as { data: { embedding: number[]; index: number }[] };

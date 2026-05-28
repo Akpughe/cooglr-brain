@@ -22,9 +22,19 @@ export interface ChunkHit {
 let client: QdrantClient | null = null;
 function getClient(): QdrantClient {
   if (client) return client;
-  const url = process.env.QDRANT_URL;
-  if (!url) throw new Error("QDRANT_URL not configured");
-  client = new QdrantClient({ url, apiKey: process.env.QDRANT_API_KEY });
+  const raw = process.env.QDRANT_URL;
+  if (!raw) throw new Error("QDRANT_URL not configured");
+  // Parse explicitly — the client otherwise defaults to port 6333 and ignores a
+  // :443 in the URL, so hosted instances behind HTTPS time out.
+  const u = new URL(raw);
+  const https = u.protocol === "https:";
+  client = new QdrantClient({
+    host: u.hostname,
+    https,
+    port: u.port ? Number(u.port) : https ? 443 : 6333,
+    apiKey: process.env.QDRANT_API_KEY,
+    checkCompatibility: false,
+  });
   return client;
 }
 
