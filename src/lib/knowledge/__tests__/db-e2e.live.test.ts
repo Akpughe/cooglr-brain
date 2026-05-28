@@ -6,7 +6,7 @@
 //   KNOWLEDGE_TEST_DB_URL=postgres://... npx vitest run db-e2e.live
 import { describe, it, expect } from "vitest";
 import { createPostgresAdapter } from "../../db-adapter";
-import { buildPages } from "../ingest";
+import { buildPages, enrichSchema } from "../ingest";
 import { planQuery, synthesizeAnswer } from "../query";
 import { guardReadOnlySql } from "../sql-guard";
 import { sqlDigTool } from "../dig/sql-dig";
@@ -58,5 +58,18 @@ describe.skipIf(!url || !hasKey)("knowledge layer — live DB + Fireworks e2e", 
     expect(answer.answerMd.length).toBeGreaterThan(0);
 
     await adapter.close();
+  });
+
+  it("batch-enriches many real tables with the bulk model", { timeout: 180000 }, async () => {
+    const adapter = await createPostgresAdapter(url!);
+    const intro = await adapter.introspect();
+    await adapter.close();
+
+    // ~40 tables → 2 batches, exercising the batching path.
+    const subset = intro.tables.slice(0, 40);
+    const enrichment = await enrichSchema(subset);
+    console.log(`ENRICHED ${enrichment.tables.length}/${subset.length} tables, ${enrichment.metrics.length} metrics`);
+    console.log("SAMPLE METRIC:", JSON.stringify(enrichment.metrics[0] ?? null));
+    expect(enrichment.tables.length).toBeGreaterThan(0);
   });
 });

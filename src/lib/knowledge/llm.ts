@@ -15,16 +15,24 @@
 import { generateText } from "ai";
 import { fireworks } from "@ai-sdk/fireworks";
 
+// Reasoning model (planning, synthesis) — quality first.
 const DEFAULT_MODEL = "accounts/fireworks/models/kimi-k2p5";
+// Bulk model (schema enrichment over many tables) — fast, non-thinking.
+// gpt-oss-120b on Fireworks: ~1.3s/call vs Kimi's 20-50s, clean JSON.
+export const BULK_MODEL =
+  process.env.KNOWLEDGE_MODEL_BULK || "accounts/fireworks/models/gpt-oss-120b";
 
-function resolveModel() {
-  const id = process.env.KNOWLEDGE_MODEL || DEFAULT_MODEL;
+function resolveModel(modelId?: string) {
+  const id = modelId || process.env.KNOWLEDGE_MODEL || DEFAULT_MODEL;
+  // Fireworks account paths use the Fireworks provider (FIREWORKS_API_KEY);
+  // any other "provider/model" string routes through the Vercel AI Gateway.
   return id.startsWith("accounts/fireworks/") ? fireworks(id) : id;
 }
 
-export async function complete(system: string, user: string): Promise<string> {
+// `model` overrides the model for this call (e.g. BULK_MODEL for enrichment).
+export async function complete(system: string, user: string, model?: string): Promise<string> {
   const { text } = await generateText({
-    model: resolveModel(),
+    model: resolveModel(model),
     system,
     prompt: user,
   });

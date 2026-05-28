@@ -5,8 +5,14 @@ import {
   type RawTable,
 } from "./introspect";
 import { DEFAULT_AGENTS_MD } from "./agents-md";
-import { complete, extractJson } from "./llm";
+import { complete, extractJson, BULK_MODEL } from "./llm";
+import { chunkArray, mapWithConcurrency } from "./chunk";
 import { guardReadOnlySql, GuardError } from "./sql-guard";
+
+// Enrich tables in batches so large schemas (hundreds of tables) don't blow the
+// prompt or run serially. Each batch + the metrics pass use the fast BULK_MODEL.
+const ENRICH_BATCH_SIZE = 20;
+const ENRICH_CONCURRENCY = 5;
 
 // LLM-produced enrichment over the raw schema.
 export interface TableEnrichment {
@@ -132,18 +138,44 @@ export function buildPages(
   return pages;
 }
 
-// Ask the LLM to enrich the raw schema. Glue (needs an AI key).
-export async function enrichSchema(raw: RawTable[]): Promise<Enrichment> {
-  const schema = raw
+// Enrich one batch of tables (descriptions, grain, tenant column).
+async function enrichTableBatch(tables: RawTable[]): Promise<TableEnrichment[]> {
+  const schema = tables
     .map((t) => `${t.name}(${t.columns.map((c) => `${c.name} ${c.type}`).join(", ")})`)
     .join("\n");
-  const user = `Schema:\n${schema}\n\nReturn JSON: {"tables":[{"table","description","grain","tenantColumn"}],"metrics":[{"name","description","sql"}]}. Metrics' sql must be a single read-only SELECT. Use only real table/column names above.`;
-  const text = await complete(DEFAULT_AGENTS_MD, user);
+  const user = `Tables:\n${schema}\n\nFor EACH table above, return JSON {"tables":[{"table","description","grain","tenantColumn"}]}. Use ONLY the real table/column names shown. "grain" = what one row represents. "tenantColumn" = the workspace/account scoping column if one is obvious, else omit.`;
   try {
-    return extractJson<Enrichment>(text);
+    const text = await complete(DEFAULT_AGENTS_MD, user, BULK_MODEL);
+    return extractJson<{ tables: TableEnrichment[] }>(text).tables ?? [];
   } catch {
-    return { tables: [], metrics: [] };
+    return [];
   }
+}
+
+// One bounded pass for cross-table metrics over a compact schema summary.
+async function enrichMetrics(raw: RawTable[]): Promise<MetricEnrichment[]> {
+  const summary = raw
+    .map((t) => `${t.name}(${t.columns.slice(0, 10).map((c) => c.name).join(", ")})`)
+    .join("\n");
+  const user = `Schema summary:\n${summary}\n\nPropose up to 8 useful business metrics as JSON {"metrics":[{"name","description","sql"}]}. Each "sql" must be a single read-only SELECT using ONLY real table/column names above, double-quoting identifiers exactly (they are case-sensitive).`;
+  try {
+    const text = await complete(DEFAULT_AGENTS_MD, user, BULK_MODEL);
+    return extractJson<{ metrics: MetricEnrichment[] }>(text).metrics ?? [];
+  } catch {
+    return [];
+  }
+}
+
+// Enrich the raw schema. Batches tables (fast BULK_MODEL, bounded concurrency)
+// so it scales to hundreds of tables; resilient to individual batch failures.
+export async function enrichSchema(raw: RawTable[]): Promise<Enrichment> {
+  const batches = chunkArray(raw, ENRICH_BATCH_SIZE);
+  const tableBatches = await mapWithConcurrency(batches, ENRICH_CONCURRENCY, (b) =>
+    enrichTableBatch(b),
+  );
+  const tables = tableBatches.flat();
+  const metrics = await enrichMetrics(raw);
+  return { tables, metrics };
 }
 
 // Use the real Supabase server client type (type-only import — erased at runtime,
