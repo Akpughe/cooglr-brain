@@ -1,10 +1,11 @@
 import type { QueryPlan } from "../types";
 import type { DigTool } from "./types";
 import { sqlDigTool } from "./sql-dig";
+import { vectorDigTool } from "./vector-dig";
 
-// v1 registers only the SQL dig tool. Later sub-projects push vector / keyword /
-// API tools here; the planner and loop stay unchanged.
-const TOOLS: DigTool[] = [sqlDigTool];
+// Registered dig tools. The planner picks per query: SQL for DB questions,
+// vector for content questions. Keyword/API tools slot in here later.
+const TOOLS: DigTool[] = [sqlDigTool, vectorDigTool];
 
 export function pickDigTool(plan: QueryPlan): DigTool {
   const tool = TOOLS.find((t) => t.canHandle(plan));

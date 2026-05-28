@@ -12,6 +12,7 @@ export const sqlDigTool: DigTool = {
   },
 
   async run(plan: QueryPlan, ctx: DigContext): Promise<DigResult> {
+    if (!ctx.query) throw new Error("sql dig tool requires ctx.query");
     const guarded = guardReadOnlySql(plan.sql, { maxRows: ctx.maxRows });
     const res = await ctx.query(guarded);
     return {
