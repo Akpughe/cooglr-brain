@@ -19,6 +19,9 @@ not a data store. It never holds rows; it describes how to reach them.
 2. Every metric's SQL must be a single read-only SELECT/WITH.
 3. Mark inferred (non-FK) joins as confidence: medium.
 4. Structural changes refresh pages; data changes never do.
+5. Identifiers are case-sensitive. Always double-quote table and column names
+   exactly as written (e.g. "Activity", "userId") — Postgres lowercases
+   unquoted identifiers, which breaks mixed-case (Prisma-style) schemas.
 
 ## Query workflow: Plan -> Dig -> Synthesize
 1. Plan: read the index + relevant pages; produce tables, join path, and grounded SQL.

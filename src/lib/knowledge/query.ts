@@ -48,7 +48,7 @@ export async function planQuery(
   indexLines: string,
   pageSpecs: string,
 ): Promise<QueryPlan> {
-  const user = `Question: ${question}\n\nIndex:\n${indexLines}\n\nRelevant page access specs (JSON):\n${pageSpecs}\n\nReturn JSON: {"pagePaths":[],"tables":[],"sql":"<single read-only SELECT using ONLY real table/column names>","wantsChart":bool,"chartHint":"bar|line|pie"}`;
+  const user = `Question: ${question}\n\nIndex:\n${indexLines}\n\nRelevant page access specs (JSON):\n${pageSpecs}\n\nReturn JSON: {"pagePaths":[],"tables":[],"sql":"<single read-only SELECT>","wantsChart":bool,"chartHint":"bar|line|pie"}\n\nSQL rules:\n- Use ONLY real table/column names from the access specs.\n- Identifiers are CASE-SENSITIVE: wrap every table and column name in double quotes EXACTLY as written in the specs, e.g. SELECT count(*) FROM "Activity". Never lowercase or unquote a mixed-case name.`;
   const text = await complete(DEFAULT_AGENTS_MD, user);
   const parsed = extractJson<Partial<QueryPlan>>(text);
   return {
