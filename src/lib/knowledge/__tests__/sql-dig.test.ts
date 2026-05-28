@@ -15,11 +15,9 @@ function ctx(query: DigContext["query"]): DigContext {
 
 describe("sqlDigTool", () => {
   it("guards then runs the query, returning rows", async () => {
-    const query = vi.fn(async (_sql: string) => ({
-      columns: ["n"],
-      rows: [{ n: 7 }],
-      rowCount: 1,
-    }));
+    const query = vi.fn<(sql: string) => Promise<{ columns: string[]; rows: Record<string, unknown>[]; rowCount: number }>>(
+      async () => ({ columns: ["n"], rows: [{ n: 7 }], rowCount: 1 }),
+    );
     const res = await sqlDigTool.run(plan("SELECT count(*) n FROM users"), ctx(query));
     expect(query).toHaveBeenCalledOnce();
     // The guard wrapped/limited the SQL before it reached the query fn.

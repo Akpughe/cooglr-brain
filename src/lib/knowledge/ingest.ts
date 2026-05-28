@@ -136,18 +136,14 @@ export async function enrichSchema(raw: RawTable[]): Promise<Enrichment> {
   }
 }
 
-// Minimal supabase surface we need, kept local to avoid a hard type dependency.
-interface SupabaseLike {
-  from(table: string): {
-    upsert: (v: unknown, o?: unknown) => { select: (c?: string) => { single: () => Promise<{ data: { id: string } | null }> } };
-    insert: (v: unknown) => Promise<{ error: unknown }>;
-    update: (v: unknown) => { eq: (c: string, val: unknown) => Promise<{ error: unknown }> };
-  };
-}
+// Use the real Supabase server client type (type-only import — erased at runtime,
+// so test bundles that import buildPages never pull in server-only code).
+import type { createClient } from "@/lib/supabase/server";
+type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
 
 // Persist pages + revisions + index entries. Uses the caller's RLS-scoped client.
 export async function persistPages(
-  supabase: SupabaseLike,
+  supabase: SupabaseServerClient,
   pages: KnowledgePage[],
   operation: "ingest" | "refresh",
   userId: string,
