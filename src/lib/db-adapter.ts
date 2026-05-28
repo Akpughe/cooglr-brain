@@ -14,10 +14,21 @@ export interface SchemaTable {
   columns: string;
 }
 
+// Rich, structured introspection used to build the knowledge map.
+export interface RawIntrospection {
+  tables: {
+    name: string;
+    columns: { name: string; type: string; nullable: boolean; isPrimaryKey: boolean }[];
+    foreignKeys: { column: string; refTable: string; refColumn: string }[];
+    rowCount: number;
+  }[];
+}
+
 export interface DbAdapter {
   testConnection(): Promise<void>;
   listDatabases(): Promise<string[]>;
   getSchema(): Promise<SchemaTable[]>;
+  introspect(): Promise<RawIntrospection>;
   query(sql: string): Promise<QueryResult>;
   close(): Promise<void>;
 }
@@ -70,6 +81,60 @@ export async function createPostgresAdapter(connectionString: string): Promise<D
         ORDER BY t.table_name
       `);
       return result.rows;
+    },
+
+    async introspect(): Promise<RawIntrospection> {
+      const cols = await client!.query(`
+        SELECT c.table_name, c.column_name, c.data_type, c.is_nullable,
+          (pk.column_name IS NOT NULL) AS is_pk
+        FROM information_schema.columns c
+        LEFT JOIN (
+          SELECT kcu.table_name, kcu.column_name
+          FROM information_schema.table_constraints tc
+          JOIN information_schema.key_column_usage kcu ON tc.constraint_name = kcu.constraint_name
+          WHERE tc.constraint_type = 'PRIMARY KEY' AND tc.table_schema = 'public'
+        ) pk ON pk.table_name = c.table_name AND pk.column_name = c.column_name
+        WHERE c.table_schema = 'public'
+        ORDER BY c.table_name, c.ordinal_position
+      `);
+      const fks = await client!.query(`
+        SELECT tc.table_name, kcu.column_name,
+          ccu.table_name AS ref_table, ccu.column_name AS ref_column
+        FROM information_schema.table_constraints tc
+        JOIN information_schema.key_column_usage kcu ON tc.constraint_name = kcu.constraint_name
+        JOIN information_schema.constraint_column_usage ccu ON ccu.constraint_name = tc.constraint_name
+        WHERE tc.constraint_type = 'FOREIGN KEY' AND tc.table_schema = 'public'
+      `);
+      const counts = await client!.query(`
+        SELECT relname AS table_name, reltuples::bigint AS approx
+        FROM pg_class WHERE relkind = 'r'
+      `);
+
+      type Table = RawIntrospection["tables"][number];
+      const tableMap = new Map<string, Table>();
+      for (const r of cols.rows) {
+        if (!tableMap.has(r.table_name)) {
+          tableMap.set(r.table_name, { name: r.table_name, columns: [], foreignKeys: [], rowCount: 0 });
+        }
+        tableMap.get(r.table_name)!.columns.push({
+          name: r.column_name,
+          type: r.data_type,
+          nullable: r.is_nullable === "YES",
+          isPrimaryKey: r.is_pk,
+        });
+      }
+      for (const r of fks.rows) {
+        tableMap.get(r.table_name)?.foreignKeys.push({
+          column: r.column_name,
+          refTable: r.ref_table,
+          refColumn: r.ref_column,
+        });
+      }
+      for (const r of counts.rows) {
+        const t = tableMap.get(r.table_name);
+        if (t) t.rowCount = Number(r.approx);
+      }
+      return { tables: [...tableMap.values()] };
     },
 
     async query(sql: string) {
@@ -182,6 +247,12 @@ export async function createClickHouseAdapter(connectionString: string, selected
         table_name: r.table_name,
         columns: r.column_list.join(", "),
       }));
+    },
+
+    async introspect(): Promise<RawIntrospection> {
+      // ClickHouse structural mapping is out of scope for v1 (Postgres is the
+      // target). Return an empty map so the adapter still satisfies the interface.
+      return { tables: [] };
     },
 
     async query(sql: string) {
