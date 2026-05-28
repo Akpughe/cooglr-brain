@@ -72,12 +72,14 @@ export async function ingestFile(
     {
       workspace_id: workspaceId,
       file_id: file.id,
+      source: "file",
+      source_ref: file.id,
       title: file.title,
       status: "done",
       chunk_count: chunks.length,
       updated_at: new Date().toISOString(),
     },
-    { onConflict: "workspace_id,file_id" },
+    { onConflict: "workspace_id,source,source_ref" },
   );
 
   return { fileId: file.id, title: file.title, chunks: chunks.length };
