@@ -168,13 +168,33 @@ async function enrichMetrics(raw: RawTable[]): Promise<MetricEnrichment[]> {
 
 // Enrich the raw schema. Batches tables (fast BULK_MODEL, bounded concurrency)
 // so it scales to hundreds of tables; resilient to individual batch failures.
+// A second pass retries tables the first pass skipped (the model sometimes
+// omits some), in smaller batches, to lift coverage.
 export async function enrichSchema(raw: RawTable[]): Promise<Enrichment> {
-  const batches = chunkArray(raw, ENRICH_BATCH_SIZE);
-  const tableBatches = await mapWithConcurrency(batches, ENRICH_CONCURRENCY, (b) =>
-    enrichTableBatch(b),
-  );
-  const tables = tableBatches.flat();
+  const first = (
+    await mapWithConcurrency(chunkArray(raw, ENRICH_BATCH_SIZE), ENRICH_CONCURRENCY, (b) =>
+      enrichTableBatch(b),
+    )
+  ).flat();
+
+  const got = new Set(first.map((t) => t.table));
+  const missing = raw.filter((t) => !got.has(t.name));
+  const retried =
+    missing.length > 0
+      ? (
+          await mapWithConcurrency(chunkArray(missing, 10), ENRICH_CONCURRENCY, (b) =>
+            enrichTableBatch(b),
+          )
+        ).flat()
+      : [];
+
   const metrics = await enrichMetrics(raw);
+
+  // De-dupe by table name (first pass wins).
+  const seen = new Set<string>();
+  const tables = [...first, ...retried].filter((t) =>
+    seen.has(t.table) ? false : (seen.add(t.table), true),
+  );
   return { tables, metrics };
 }
 
