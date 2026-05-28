@@ -39,14 +39,23 @@ export async function extractViaNuton(
   const form = new FormData();
   for (const f of files) form.append("files", f.blob, f.name);
 
-  const res = await fetch("https://api.nuton.app/v2/documents/extract", {
+  const res = await fetch("https://api.nuton.app/api/v2/documents/extract", {
     method: "POST",
     headers: { "X-API-Key": key, "X-External-User-Id": userId },
     body: form,
   });
   if (!res.ok) throw new Error(`Nuton error ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  const data: unknown = await res.json();
-  return nutonText(data);
+  const data = (await res.json()) as {
+    documents?: { markdown?: string; status?: string; error_message?: string }[];
+  };
+  const docs = data.documents ?? [];
+  const ready = docs.filter((d) => d.status === "ready" && d.markdown);
+  if (ready.length === 0) {
+    // Surface the real reason (e.g. free-tier page limit) instead of empty text.
+    const reason = docs.find((d) => d.error_message)?.error_message;
+    throw new Error(reason || "Nuton returned no extractable text");
+  }
+  return ready.map((d) => d.markdown).join("\n\n").trim();
 }
 
 // Defensive parse of Nuton's response into a single text blob. The API shape may
