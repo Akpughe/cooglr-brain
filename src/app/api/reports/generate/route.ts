@@ -23,7 +23,8 @@ export async function POST(request: NextRequest) {
   const { data: pages } = await supabase
     .from("knowledge_pages")
     .select("path, type, title, access_spec")
-    .eq("connection_id", connectionId);
+    .eq("connection_id", connectionId)
+    .eq("stale", false);
 
   if (!pages || pages.length === 0) {
     return NextResponse.json(

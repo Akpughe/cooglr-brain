@@ -190,6 +190,10 @@ export async function persistPages(
   operation: "ingest" | "refresh",
   userId: string,
 ): Promise<void> {
+  // Timestamp before any write; every page we persist gets updated_at > this,
+  // so anything older is an orphan from a prior ingest (see prune below).
+  const ingestStart = new Date().toISOString();
+
   // Persist pages concurrently (bounded) — large schemas produce many pages.
   await mapWithConcurrency(pages, 8, async (p) => {
     const { data } = await supabase
@@ -236,4 +240,16 @@ export async function persistPages(
       { onConflict: "page_id" },
     );
   });
+
+  // Stale-prune: any page for this connection not written this run is an orphan
+  // (e.g. a metric the model renamed). Mark it stale rather than delete — keeps
+  // the revision history intact, and the planner ignores stale pages.
+  const connectionId = pages[0]?.connectionId;
+  if (connectionId) {
+    await supabase
+      .from("knowledge_pages")
+      .update({ stale: true })
+      .eq("connection_id", connectionId)
+      .lt("updated_at", ingestStart);
+  }
 }

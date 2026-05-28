@@ -23,7 +23,8 @@ export async function POST(request: NextRequest) {
     .from("knowledge_pages")
     .select("path, type, title, access_spec")
     .eq("workspace_id", workspaceId)
-    .eq("connection_id", connectionId);
+    .eq("connection_id", connectionId)
+    .eq("stale", false);
 
   if (!pages || pages.length === 0) {
     return NextResponse.json({ error: "No knowledge map for this connection yet. Build it first." }, { status: 409 });
