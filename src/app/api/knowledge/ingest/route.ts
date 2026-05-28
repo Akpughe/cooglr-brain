@@ -34,6 +34,7 @@ export async function POST(request: NextRequest) {
     .from("database_connections")
     .select("encrypted_connection_string, db_type, selected_database")
     .eq("id", connectionId)
+    .eq("workspace_id", workspaceId)
     .single();
   if (!connection) return fail("Connection not found", 404);
 

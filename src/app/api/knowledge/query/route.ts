@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
     .from("database_connections")
     .select("encrypted_connection_string, db_type, selected_database")
     .eq("id", connectionId)
+    .eq("workspace_id", workspaceId)
     .single();
   if (!connection) return NextResponse.json({ error: "Connection not found" }, { status: 404 });
 
@@ -56,7 +57,7 @@ export async function POST(request: NextRequest) {
         sqlDigTool.run(plan, {
           connectionId,
           maxRows: MAX_ROWS,
-          query: (sql) => adapter.query(sql),
+          query: (sql) => adapter.runReadOnly(sql),
         }),
       synthesize: (q, plan, dig) => synthesizeAnswer(q, plan, dig),
     });

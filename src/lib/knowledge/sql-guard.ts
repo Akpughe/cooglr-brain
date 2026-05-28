@@ -14,6 +14,11 @@ const FORBIDDEN = [
   "grant", "revoke", "comment", "merge", "call", "do", "copy",
   "vacuum", "analyze", "reindex", "set", "reset", "lock", "begin",
   "commit", "rollback", "savepoint", "listen", "notify", "explain",
+  // `SELECT ... INTO` creates a table — a write disguised as a SELECT.
+  "into",
+  // Server-side functions that read the filesystem or reach other systems.
+  "pg_read_file", "pg_read_binary_file", "pg_ls_dir", "lo_import",
+  "lo_export", "dblink",
 ];
 
 // Remove block and line comments before keyword scanning so writes cannot be

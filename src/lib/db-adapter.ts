@@ -30,6 +30,10 @@ export interface DbAdapter {
   getSchema(): Promise<SchemaTable[]>;
   introspect(): Promise<RawIntrospection>;
   query(sql: string): Promise<QueryResult>;
+  // Execute SQL that has ALREADY been processed by the read-only guard, without
+  // re-wrapping it. Runs inside a read-only transaction (Postgres) and rolls back
+  // on error. Used by the knowledge-layer dig step.
+  runReadOnly(sql: string): Promise<QueryResult>;
   close(): Promise<void>;
 }
 
@@ -151,6 +155,24 @@ export async function createPostgresAdapter(connectionString: string): Promise<D
       };
     },
 
+    async runReadOnly(sql: string) {
+      // sql is already guard-processed (read-only, single statement, LIMITed) —
+      // do NOT re-wrap. Just run it inside a read-only transaction.
+      await client!.query("BEGIN READ ONLY");
+      try {
+        const result = await client!.query(sql);
+        await client!.query("COMMIT");
+        return {
+          columns: result.fields.map((f: { name: string }) => f.name),
+          rows: result.rows,
+          rowCount: result.rowCount ?? result.rows.length,
+        };
+      } catch (err) {
+        await client!.query("ROLLBACK").catch(() => {});
+        throw err;
+      }
+    },
+
     async close() {
       await client!.end().catch(() => {});
     },
@@ -268,6 +290,14 @@ export async function createClickHouseAdapter(connectionString: string, selected
       const rows = await result.json<Record<string, unknown>>();
       const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
 
+      return { columns, rows, rowCount: rows.length };
+    },
+
+    async runReadOnly(sql: string) {
+      // sql is already guard-processed; ClickHouse has no transactions, run as-is.
+      const result = await client.query({ query: sql, format: "JSONEachRow" });
+      const rows = await result.json<Record<string, unknown>>();
+      const columns = rows.length > 0 ? Object.keys(rows[0]) : [];
       return { columns, rows, rowCount: rows.length };
     },
 

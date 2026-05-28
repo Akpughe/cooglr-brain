@@ -51,4 +51,13 @@ describe("guardReadOnlySql", () => {
   it("rejects an empty statement", () => {
     expect(() => guardReadOnlySql("   ", { maxRows: 10 })).toThrow(GuardError);
   });
+  it("rejects SELECT INTO (DDL write disguised as a SELECT)", () => {
+    expect(() => guardReadOnlySql("SELECT * INTO exfil FROM users", { maxRows: 10 })).toThrow(GuardError);
+  });
+  it("rejects pg_read_file (server filesystem read)", () => {
+    expect(() => guardReadOnlySql("SELECT pg_read_file('/etc/passwd')", { maxRows: 10 })).toThrow(GuardError);
+  });
+  it("rejects dblink (reach another system)", () => {
+    expect(() => guardReadOnlySql("SELECT * FROM dblink('host=x','SELECT 1') AS t(a int)", { maxRows: 10 })).toThrow(GuardError);
+  });
 });

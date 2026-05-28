@@ -60,4 +60,17 @@ describe("buildPages", () => {
   it("scopes every page to the workspace and connection", () => {
     expect(pages.every((p) => p.workspaceId === "ws-1" && p.connectionId === "conn-1")).toBe(true);
   });
+
+  it("drops a metric whose SQL is not a safe read-only query", () => {
+    const poisoned = buildPages("ws-1", "conn-1", raw, {
+      tables: [],
+      metrics: [
+        { name: "Good", sql: "SELECT count(*) FROM users" },
+        { name: "Evil", sql: "DELETE FROM users" },
+      ],
+    });
+    const metricTitles = poisoned.filter((p) => p.type === "metric").map((p) => p.title);
+    expect(metricTitles).toContain("Metric: Good");
+    expect(metricTitles).not.toContain("Metric: Evil");
+  });
 });

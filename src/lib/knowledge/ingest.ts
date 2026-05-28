@@ -6,6 +6,7 @@ import {
 } from "./introspect";
 import { DEFAULT_AGENTS_MD } from "./agents-md";
 import { complete, extractJson } from "./llm";
+import { guardReadOnlySql, GuardError } from "./sql-guard";
 
 // LLM-produced enrichment over the raw schema.
 export interface TableEnrichment {
@@ -103,8 +104,17 @@ export function buildPages(
     });
   }
 
-  // 4. Metric pages with vetted SQL.
+  // 4. Metric pages with vetted SQL. Validate the LLM-proposed SQL through the
+  // read-only guard at ingest; drop any metric whose SQL is not a safe read.
+  // (The stored SQL is later fed into the query-time prompt, so an unsafe value
+  // would be a prompt-injection surface.)
   for (const m of enrichment.metrics) {
+    try {
+      guardReadOnlySql(m.sql, { maxRows: 1 });
+    } catch (err) {
+      if (err instanceof GuardError) continue;
+      throw err;
+    }
     pages.push({
       workspaceId,
       connectionId,
