@@ -37,6 +37,8 @@ export function ReportBuilder({ workspaceId }: { workspaceId: string }) {
   const [generatedSQL, setGeneratedSQL] = useState<string | null>(null);
   const [result, setResult] = useState<QueryResult | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [needsMap, setNeedsMap] = useState(false);
+  const [building, setBuilding] = useState(false);
   const [loading, setLoading] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [saved, setSaved] = useState<SavedReport[]>([]);
@@ -68,6 +70,7 @@ export function ReportBuilder({ workspaceId }: { workspaceId: string }) {
     if (!activeConnection || !prompt.trim()) return;
     setLoading(true);
     setError(null);
+    setNeedsMap(false);
     setResult(null);
     setGeneratedSQL(null);
 
@@ -85,6 +88,8 @@ export function ReportBuilder({ workspaceId }: { workspaceId: string }) {
 
       if (!aiRes.ok) {
         const err = await aiRes.json();
+        // 409 = this connection has no knowledge map yet; offer to build it.
+        if (aiRes.status === 409) setNeedsMap(true);
         setError(err.error || "Failed to generate query");
         setLoading(false);
         return;
@@ -106,6 +111,29 @@ export function ReportBuilder({ workspaceId }: { workspaceId: string }) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     }
     setLoading(false);
+  }
+
+  async function buildMap() {
+    if (!activeConnection) return;
+    setBuilding(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/knowledge/ingest", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ workspaceId, connectionId: activeConnection.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setError(data.error || "Failed to build the knowledge map");
+      } else {
+        setNeedsMap(false);
+        await generateAndRun(); // retry the question now that a map exists
+      }
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Failed to build the knowledge map");
+    }
+    setBuilding(false);
   }
 
   async function runSavedReport(report: SavedReport) {
@@ -226,7 +254,7 @@ export function ReportBuilder({ workspaceId }: { workspaceId: string }) {
                     : "bg-[#f5f2ed] hover:bg-[#ede8e1] border-[#e7e0d5] text-foreground"
                 }`}
               >
-                <span className="w-2 h-2 rounded-full bg-green-500" />
+                <span className="size-2 rounded-full bg-success" />
                 {conn.name}
               </button>
             ))}
@@ -258,7 +286,16 @@ export function ReportBuilder({ workspaceId }: { workspaceId: string }) {
 
           {error && (
             <div className="p-3 rounded-xl bg-destructive/5 border border-destructive/20 text-sm text-destructive">
-              {error}
+              <div>{error}</div>
+              {needsMap && (
+                <button
+                  onClick={buildMap}
+                  disabled={building}
+                  className="mt-2 inline-flex items-center rounded-md bg-indigo-600 px-3 py-1.5 text-xs font-medium text-white disabled:opacity-50"
+                >
+                  {building ? "Building knowledge map…" : "Build knowledge map"}
+                </button>
+              )}
             </div>
           )}
         </CardContent>
