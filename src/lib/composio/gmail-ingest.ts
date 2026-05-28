@@ -2,6 +2,7 @@ import { getComposio } from "./client";
 import { chunkText } from "@/lib/knowledge/chunk";
 import { embedDocuments } from "@/lib/knowledge/embeddings";
 import { ensureCollection, upsertChunks, deleteFileChunks } from "@/lib/knowledge/qdrant";
+import { synthesizeDocument, persistUnderstanding } from "@/lib/knowledge/content-understanding";
 import type { createClient } from "@/lib/supabase/server";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
@@ -97,6 +98,11 @@ export async function ingestGmail(
       },
       { onConflict: "workspace_id,source,source_ref" },
     );
+
+    // Understand it: categorize + extract entities + summarize into the content map.
+    const synthesis = await synthesizeDocument(doc.text, doc.subject);
+    await persistUnderstanding(supabase, { workspaceId, source: "gmail", sourceRef: doc.id, synthesis });
+
     totalChunks += chunks.length;
   }
 

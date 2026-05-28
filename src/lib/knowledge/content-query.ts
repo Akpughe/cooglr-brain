@@ -13,8 +13,9 @@ export interface ContentAnswer {
 export async function runContentQuery(
   workspaceId: string,
   question: string,
-  topK = 8,
+  opts: { topK?: number; mapOverview?: string } = {},
 ): Promise<ContentAnswer> {
+  const topK = opts.topK ?? 8;
   const plan: QueryPlan = {
     question,
     pagePaths: [],
@@ -35,7 +36,7 @@ export async function runContentQuery(
 
   const answerMd = await complete(
     "You answer using ONLY the provided document excerpts. Cite excerpts inline as [#n]. If the answer is not in them, say you don't have it — never invent.",
-    `Question: ${question}\n\nExcerpts:\n${excerpts}`,
+    `${opts.mapOverview ? `Workspace context: ${opts.mapOverview}\n\n` : ""}Question: ${question}\n\nExcerpts:\n${excerpts}`,
   );
 
   const citations = dig.rows.map((r) => ({

@@ -2,6 +2,7 @@ import { chunkText } from "./chunk";
 import { tiptapToText, extractViaNuton } from "./extract";
 import { embedDocuments } from "./embeddings";
 import { ensureCollection, upsertChunks, deleteFileChunks, type ChunkPoint } from "./qdrant";
+import { synthesizeDocument, persistUnderstanding } from "./content-understanding";
 
 import type { createClient } from "@/lib/supabase/server";
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
@@ -81,6 +82,10 @@ export async function ingestFile(
     },
     { onConflict: "workspace_id,source,source_ref" },
   );
+
+  // Understand it: categorize + extract entities + summarize into the content map.
+  const synthesis = await synthesizeDocument(text, file.title);
+  await persistUnderstanding(supabase, { workspaceId, source: "file", sourceRef: file.id, synthesis });
 
   return { fileId: file.id, title: file.title, chunks: chunks.length };
 }

@@ -1,6 +1,7 @@
 import { complete } from "./llm";
 import { runDbQuery } from "./db-query";
 import { runContentQuery } from "./content-query";
+import { getContentMap, contentMapOverview } from "./content-understanding";
 import type { createClient } from "@/lib/supabase/server";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
@@ -78,6 +79,7 @@ export async function runUnifiedQuery(
     };
   }
 
-  const c = await runContentQuery(workspaceId, question);
+  const map = await getContentMap(supabase, workspaceId);
+  const c = await runContentQuery(workspaceId, question, { mapOverview: contentMapOverview(map) });
   return { source: "content", answerMd: c.answerMd, citations: c.citations };
 }

@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { runContentQuery } from "@/lib/knowledge/content-query";
+import { getContentMap, contentMapOverview } from "@/lib/knowledge/content-understanding";
 
 // POST /api/knowledge/content/query — ask a question over the workspace's
 // document corpus (RAG: embed -> Qdrant search -> grounded answer).
@@ -25,7 +26,8 @@ export async function POST(request: NextRequest) {
   if (!member) return NextResponse.json({ error: "Forbidden" }, { status: 403 });
 
   try {
-    const answer = await runContentQuery(workspaceId, question);
+    const map = await getContentMap(supabase, workspaceId);
+    const answer = await runContentQuery(workspaceId, question, { mapOverview: contentMapOverview(map) });
     return NextResponse.json(answer);
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "Query failed" }, { status: 500 });
