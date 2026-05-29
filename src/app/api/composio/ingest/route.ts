@@ -10,8 +10,10 @@ export async function POST(request: NextRequest) {
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const { workspaceId, toolkit, max } = await request.json();
-  if (!workspaceId || toolkit !== "gmail") {
-    return NextResponse.json({ error: "workspaceId and toolkit='gmail' required" }, { status: 400 });
+  if (!workspaceId) return NextResponse.json({ error: "workspaceId required" }, { status: 400 });
+  if (toolkit !== "gmail") {
+    // OAuth connect works for all toolkits; ingest adapters beyond Gmail are next.
+    return NextResponse.json({ error: `Ingest for '${toolkit}' isn't available yet — only Gmail. You can still connect it.` }, { status: 400 });
   }
 
   // Membership check (RLS-backed).

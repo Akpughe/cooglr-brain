@@ -4,14 +4,17 @@ import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useWorkspace, useIsOwner } from "@/lib/workspace/context";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 import { THEMES } from "@/lib/workspace/themes";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
+import { IntegrationsTab } from "@/components/settings/integrations-tab";
 import type { WorkspaceInvite } from "@/lib/apps/types";
 
 export default function SettingsPage() {
   const router = useRouter();
   const { workspace, members, installedApps } = useWorkspace();
   const isOwner = useIsOwner();
-  const [activeTab, setActiveTab] = useState<"members" | "apps" | "workspace">("members");
+  const [activeTab, setActiveTab] = useState<"members" | "apps" | "integrations" | "workspace">("members");
 
   // --- Members tab state ---
   const [inviteEmail, setInviteEmail] = useState("");
@@ -31,6 +34,7 @@ export default function SettingsPage() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleting, setDeleting] = useState(false);
+  const deleteTrapRef = useFocusTrap<HTMLDivElement>(deleteDialogOpen);
 
   // Fetch pending invites when Members tab is active
   const fetchInvites = useCallback(async () => {
@@ -228,16 +232,16 @@ export default function SettingsPage() {
 
   return (
     <div className="flex-1 overflow-y-auto">
-      <div className="max-w-2xl mx-auto px-8 py-10">
-        <h1 className="text-xl font-semibold mb-6">Workspace Settings</h1>
+      <div className="mx-auto max-w-2xl px-8 py-10">
+        <h1 className="mb-6 text-2xl font-semibold tracking-tight">Workspace Settings</h1>
 
         {/* Tab nav */}
-        <div className="flex gap-1 border-b border-border mb-6">
-          {(["members", "apps", "workspace"] as const).map((tab) => (
+        <div className="mb-6 flex gap-1 border-b border-border">
+          {(["members", "apps", "integrations", "workspace"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
-              className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors ${
+              className={`border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
                 activeTab === tab
                   ? "border-foreground text-foreground"
                   : "border-transparent text-muted-foreground hover:text-foreground"
@@ -247,6 +251,9 @@ export default function SettingsPage() {
             </button>
           ))}
         </div>
+
+        {/* ── INTEGRATIONS TAB ── */}
+        {activeTab === "integrations" && <IntegrationsTab workspaceId={workspace.id} />}
 
         {/* ── MEMBERS TAB ── */}
         {activeTab === "members" && (
@@ -261,12 +268,12 @@ export default function SettingsPage() {
                     onChange={(e) => setInviteEmail(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleInvite()}
                     placeholder="Enter email to invite"
-                    className="flex-1 h-10 px-3 border border-border rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                    className="h-8 flex-1 rounded-md border border-border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                   />
                   <button
                     onClick={handleInvite}
                     disabled={inviting || !inviteEmail.trim()}
-                    className="h-10 px-4 bg-foreground text-background rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="h-8 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
                   >
                     {inviting ? "Sending…" : "Invite"}
                   </button>
@@ -277,9 +284,9 @@ export default function SettingsPage() {
             {/* Pending invites */}
             {isOwner && (
               <div>
-                <h3 className="text-sm font-medium mb-3">Pending invites</h3>
+                <h3 className="mb-3 text-sm font-medium">Pending invites</h3>
                 {invitesLoading ? (
-                  <p className="text-sm text-muted-foreground">Loading…</p>
+                  <LoadingSpinner size="sm" />
                 ) : pendingInvites.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No pending invites</p>
                 ) : (
@@ -287,13 +294,13 @@ export default function SettingsPage() {
                     {pendingInvites.map((invite) => (
                       <div
                         key={invite.id}
-                        className="flex items-center gap-3 p-3 border border-border rounded-xl"
+                        className="flex items-center gap-3 rounded-lg border border-border p-3"
                       >
-                        <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center text-xs font-bold shrink-0 text-muted-foreground">
+                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-bold text-muted-foreground">
                           {invite.email[0].toUpperCase()}
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="text-sm truncate">{invite.email}</div>
+                        <div className="min-w-0 flex-1">
+                          <div className="truncate text-sm">{invite.email}</div>
                           <div className="text-xs text-muted-foreground">Pending invite</div>
                         </div>
                         <button
@@ -311,7 +318,7 @@ export default function SettingsPage() {
 
             {/* Current members */}
             <div>
-              <div className="flex items-center justify-between mb-3">
+              <div className="mb-3 flex items-center justify-between">
                 <h3 className="text-sm font-medium">Current members ({members.length})</h3>
               </div>
               {members.length > 3 && (
@@ -320,7 +327,7 @@ export default function SettingsPage() {
                   value={memberSearch}
                   onChange={(e) => setMemberSearch(e.target.value)}
                   placeholder="Search members..."
-                  className="w-full h-9 px-3 mb-3 border border-border rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="mb-3 h-8 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 />
               )}
               <div className="space-y-2">
@@ -333,16 +340,16 @@ export default function SettingsPage() {
                   .map((member) => (
                   <div
                     key={member.id}
-                    className="flex items-center gap-3 p-3 border border-border rounded-xl"
+                    className="flex items-center gap-3 rounded-lg border border-border p-3"
                   >
-                    <div className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center text-xs font-bold shrink-0">
+                    <div className="flex size-8 shrink-0 items-center justify-center rounded-full bg-foreground text-xs font-bold text-background">
                       {member.fullName?.[0]?.toUpperCase() || member.email[0].toUpperCase()}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="font-medium text-sm">{member.fullName || member.email}</div>
+                    <div className="min-w-0 flex-1">
+                      <div className="text-sm font-medium">{member.fullName || member.email}</div>
                       <div className="text-xs text-muted-foreground">{member.email}</div>
                     </div>
-                    <span className="text-xs px-2 py-1 bg-muted rounded-full text-muted-foreground">
+                    <span className="rounded-full bg-muted px-2 py-1 text-xs text-muted-foreground">
                       {member.role}
                     </span>
                     {isOwner && member.role !== "owner" && (
@@ -376,13 +383,13 @@ export default function SettingsPage() {
               installedApps.map((app) => (
                 <div
                   key={app.id}
-                  className="flex items-center gap-3 p-3 border border-border rounded-xl"
+                  className="flex items-center gap-3 rounded-lg border border-border p-3"
                 >
-                  <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground">
-                    <span className="text-xs">{app.name[0]}</span>
+                  <div className="flex size-8 items-center justify-center rounded-lg bg-muted text-xs text-muted-foreground">
+                    {app.name[0]}
                   </div>
                   <div className="flex-1">
-                    <div className="font-medium text-sm">{app.name}</div>
+                    <div className="text-sm font-medium">{app.name}</div>
                   </div>
                   {isOwner && (
                     <button
@@ -418,7 +425,7 @@ export default function SettingsPage() {
                   value={workspaceName}
                   onChange={(e) => setWorkspaceName(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleSaveName()}
-                  className="flex-1 h-10 px-3 border border-border rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="h-8 flex-1 rounded-md border border-border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
                 />
                 <button
                   onClick={handleSaveName}
@@ -427,7 +434,7 @@ export default function SettingsPage() {
                     !workspaceName.trim() ||
                     workspaceName.trim() === workspace.name
                   }
-                  className="h-10 px-4 bg-foreground text-background rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="h-8 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {savingName ? "Saving…" : "Save"}
                 </button>
@@ -443,20 +450,20 @@ export default function SettingsPage() {
                     key={theme.id}
                     onClick={() => handleThemeChange(theme.id)}
                     disabled={savingTheme}
-                    className={`p-3 rounded-xl border text-left transition-all disabled:opacity-60 ${
+                    className={`rounded-lg border p-3 text-left transition-all disabled:opacity-60 ${
                       workspace.theme === theme.id
                         ? "border-foreground ring-1 ring-foreground"
                         : "border-border hover:border-muted-foreground"
                     }`}
                   >
-                    <div className="flex gap-1 mb-2">
+                    <div className="mb-2 flex gap-1">
                       <div
-                        className="w-4 h-4 rounded-sm"
+                        className="size-4 rounded-sm"
                         style={{ background: theme.railBg, border: "1px solid #ddd" }}
                       />
-                      <div className="w-4 h-4 rounded-sm" style={{ background: theme.accent }} />
+                      <div className="size-4 rounded-sm" style={{ background: theme.accent }} />
                       <div
-                        className="w-4 h-4 rounded-sm"
+                        className="size-4 rounded-sm"
                         style={{ background: theme.sidebarBg, border: "1px solid #ddd" }}
                       />
                     </div>
@@ -468,10 +475,10 @@ export default function SettingsPage() {
 
             {/* Danger zone */}
             <div className="border-t border-border pt-6">
-              <h3 className="text-sm font-medium text-destructive mb-2">Danger zone</h3>
+              <h3 className="mb-2 text-sm font-medium text-destructive">Danger zone</h3>
               <button
                 onClick={() => setDeleteDialogOpen(true)}
-                className="text-sm text-destructive border border-destructive/30 px-4 py-2 rounded-lg hover:bg-destructive/10 transition-colors"
+                className="rounded-md border border-destructive/30 px-4 py-2 text-sm text-destructive transition-colors hover:bg-destructive/10"
               >
                 Delete workspace
               </button>
@@ -482,10 +489,10 @@ export default function SettingsPage() {
 
       {/* ── DELETE CONFIRMATION DIALOG ── */}
       {deleteDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-background border border-border rounded-2xl p-6 w-full max-w-md shadow-xl mx-4">
-            <h2 className="text-base font-semibold mb-1">Delete workspace</h2>
-            <p className="text-sm text-muted-foreground mb-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40" role="dialog" aria-modal="true" aria-label="Delete workspace">
+          <div ref={deleteTrapRef} className="mx-4 w-full max-w-md rounded-lg border border-border bg-background p-6 shadow-surface-lg">
+            <h2 className="mb-1 text-base font-semibold">Delete workspace</h2>
+            <p className="mb-4 text-sm text-muted-foreground">
               This action is permanent and cannot be undone. All data will be deleted.
               Type{" "}
               <span className="font-medium text-foreground">{workspace.name}</span>{" "}
@@ -496,22 +503,22 @@ export default function SettingsPage() {
               value={deleteConfirmText}
               onChange={(e) => setDeleteConfirmText(e.target.value)}
               placeholder={workspace.name}
-              className="w-full h-10 px-3 border border-border rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring mb-4"
+              className="mb-4 h-8 w-full rounded-md border border-border bg-background px-3 text-sm outline-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background"
             />
-            <div className="flex gap-2 justify-end">
+            <div className="flex justify-end gap-2">
               <button
                 onClick={() => {
                   setDeleteDialogOpen(false);
                   setDeleteConfirmText("");
                 }}
-                className="h-9 px-4 text-sm rounded-lg border border-border hover:bg-muted transition-colors"
+                className="h-8 rounded-md border border-border px-4 text-sm transition-colors hover:bg-muted"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDeleteWorkspace}
                 disabled={deleting || deleteConfirmText !== workspace.name}
-                className="h-9 px-4 text-sm rounded-lg bg-destructive text-white hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="h-8 rounded-md bg-destructive px-4 text-sm font-medium text-white transition-colors hover:bg-destructive/90 disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {deleting ? "Deleting…" : "Delete workspace"}
               </button>

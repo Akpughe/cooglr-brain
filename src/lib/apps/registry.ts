@@ -85,18 +85,6 @@ export const APP_REGISTRY: AppManifest[] = [
     route: "/calendar",
     setupRequired: true,
   },
-  {
-    id: "knowledge",
-    name: "Knowledge",
-    description: "AI map of your connected data — ask questions, get grounded answers",
-    icon: "Brain",
-    category: "add_on",
-    defaultInstalled: false,
-    sortOrder: 14,
-    hasSidebar: false,
-    route: "/knowledge",
-    setupRequired: true,
-  },
 ];
 
 export const PLATFORM_APPS = ["ai-home", "settings"] as const;
