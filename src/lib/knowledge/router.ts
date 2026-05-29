@@ -80,6 +80,9 @@ export async function runUnifiedQuery(
   }
 
   const map = await getContentMap(supabase, workspaceId);
-  const c = await runContentQuery(workspaceId, question, { mapOverview: contentMapOverview(map) });
+  const c = await runContentQuery(workspaceId, question, {
+    mapOverview: contentMapOverview(map),
+    categories: map.categories.map((x) => x.name),
+  });
   return { source: "content", answerMd: c.answerMd, citations: c.citations };
 }

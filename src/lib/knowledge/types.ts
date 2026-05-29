@@ -60,6 +60,7 @@ export interface QueryPlan {
   joinPath?: JoinPath[];
   sql: string; // grounded SQL to run (SQL dig)
   search?: string; // semantic query string (vector dig)
+  category?: string; // optional content category to scope the vector dig
   wantsChart: boolean;
   chartHint?: "bar" | "line" | "pie";
 }

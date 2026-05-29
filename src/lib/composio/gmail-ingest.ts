@@ -79,11 +79,15 @@ export async function ingestGmail(
   for (const doc of docs) {
     const chunks = chunkText(doc.text);
     if (chunks.length === 0) continue;
+
+    // Understand first so the category tags every chunk (enables filtered dig).
+    const synthesis = await synthesizeDocument(doc.text, doc.subject);
+
     const vectors = await embedDocuments(chunks);
     const fileRef = `gmail:${doc.id}`;
     await deleteFileChunks(workspaceId, fileRef);
     await upsertChunks(
-      chunks.map((t, i) => ({ workspaceId, fileId: fileRef, chunkIndex: i, text: t, vector: vectors[i] })),
+      chunks.map((t, i) => ({ workspaceId, fileId: fileRef, chunkIndex: i, text: t, vector: vectors[i], category: synthesis.category })),
     );
     await supabase.from("knowledge_documents").upsert(
       {
@@ -99,8 +103,6 @@ export async function ingestGmail(
       { onConflict: "workspace_id,source,source_ref" },
     );
 
-    // Understand it: categorize + extract entities + summarize into the content map.
-    const synthesis = await synthesizeDocument(doc.text, doc.subject);
     await persistUnderstanding(supabase, { workspaceId, source: "gmail", sourceRef: doc.id, synthesis });
 
     totalChunks += chunks.length;

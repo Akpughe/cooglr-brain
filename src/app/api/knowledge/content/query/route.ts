@@ -27,7 +27,10 @@ export async function POST(request: NextRequest) {
 
   try {
     const map = await getContentMap(supabase, workspaceId);
-    const answer = await runContentQuery(workspaceId, question, { mapOverview: contentMapOverview(map) });
+    const answer = await runContentQuery(workspaceId, question, {
+      mapOverview: contentMapOverview(map),
+      categories: map.categories.map((x) => x.name),
+    });
     return NextResponse.json(answer);
   } catch (err) {
     return NextResponse.json({ error: err instanceof Error ? err.message : "Query failed" }, { status: 500 });

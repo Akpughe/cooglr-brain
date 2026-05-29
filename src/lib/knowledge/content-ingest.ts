@@ -57,6 +57,9 @@ export async function ingestFile(
   const chunks = chunkText(text);
   if (chunks.length === 0) return { fileId: file.id, title: file.title, chunks: 0, skipped: "no text" };
 
+  // Understand first so the category can tag every chunk (enables filtered dig).
+  const synthesis = await synthesizeDocument(text, file.title);
+
   const vectors = await embedDocuments(chunks);
   const points: ChunkPoint[] = chunks.map((t, i) => ({
     workspaceId,
@@ -64,6 +67,7 @@ export async function ingestFile(
     chunkIndex: i,
     text: t,
     vector: vectors[i],
+    category: synthesis.category,
   }));
 
   await deleteFileChunks(workspaceId, file.id);
@@ -83,8 +87,6 @@ export async function ingestFile(
     { onConflict: "workspace_id,source,source_ref" },
   );
 
-  // Understand it: categorize + extract entities + summarize into the content map.
-  const synthesis = await synthesizeDocument(text, file.title);
   await persistUnderstanding(supabase, { workspaceId, source: "file", sourceRef: file.id, synthesis });
 
   return { fileId: file.id, title: file.title, chunks: chunks.length };
