@@ -18,6 +18,7 @@ export interface UnifiedAnswer {
   connectionId?: string;
   // content
   citations?: { fileId: string; score: number }[];
+  origins?: string[]; // human labels: e.g. ["Gmail"], ["a database"]
 }
 
 // What can this workspace answer from? A DB connection with a built map, and/or
@@ -76,6 +77,7 @@ export async function runUnifiedQuery(
       rowCount: r.dig.rowCount,
       chart: r.chart,
       connectionId: dbConnectionId,
+      origins: ["a database"],
     };
   }
 
@@ -84,5 +86,5 @@ export async function runUnifiedQuery(
     mapOverview: contentMapOverview(map),
     categories: map.categories.map((x) => x.name),
   });
-  return { source: "content", answerMd: c.answerMd, citations: c.citations };
+  return { source: "content", answerMd: c.answerMd, citations: c.citations, origins: c.origins };
 }

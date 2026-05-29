@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useWorkspace } from "@/lib/workspace/context";
 import { Paperclip, AtSign, ArrowUp, History, ChevronDown, Loader2 } from "lucide-react";
+import { Streamdown } from "streamdown";
 import {
   BarChart, Bar, LineChart, Line, PieChart, Pie, Cell,
   XAxis, YAxis, Tooltip, ResponsiveContainer,
@@ -16,6 +17,7 @@ interface AskResult {
   rowCount?: number;
   chart?: ChartSpec | null;
   citations?: { fileId: string; score: number }[];
+  origins?: string[];
 }
 interface Turn { question: string; result?: AskResult; error?: string }
 
@@ -76,9 +78,11 @@ export default function AIHomePage() {
             {t.result && (
               <div className="space-y-3 rounded-lg border bg-card p-4 shadow-surface">
                 <span className="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
-                  answered from {t.result.source === "database" ? "a database" : "documents"}
+                  answered from {t.result.origins?.length ? t.result.origins.join(" & ") : (t.result.source === "database" ? "a database" : "documents")}
                 </span>
-                <p className="whitespace-pre-wrap text-sm">{t.result.answerMd}</p>
+                <div className="text-sm leading-relaxed [&_p]:my-2 [&_ul]:my-2 [&_ul]:list-disc [&_ul]:pl-5 [&_strong]:font-semibold">
+                  <Streamdown>{t.result.answerMd}</Streamdown>
+                </div>
                 {t.result.chart && t.result.chart.data.length > 0 && (
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
