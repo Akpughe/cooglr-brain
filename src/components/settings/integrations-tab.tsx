@@ -8,17 +8,29 @@ interface ContentMap { documentCount: number; categories: { name: string; count:
 
 // Composio toolkits. `slug` matches Composio's connected-account toolkit slug.
 const TOOLKITS = [
-  { id: "gmail", slug: "gmail", name: "Gmail", Icon: Mail, ingestReady: true },
-  { id: "github", slug: "github", name: "GitHub", Icon: GitBranch, ingestReady: false },
-  { id: "slack", slug: "slack", name: "Slack", Icon: MessageSquare, ingestReady: false },
-  { id: "google-drive", slug: "googledrive", name: "Google Drive", Icon: HardDrive, ingestReady: false },
+  { id: "gmail", slug: "gmail", name: "Gmail", Icon: Mail },
+  { id: "github", slug: "github", name: "GitHub", Icon: GitBranch },
+  { id: "slack", slug: "slack", name: "Slack", Icon: MessageSquare },
+  { id: "google-drive", slug: "googledrive", name: "Google Drive", Icon: HardDrive },
 ];
+
+interface SyncState { source: string; last_synced_at: string | null; item_count: number }
+
+function timeAgo(iso: string | null): string {
+  if (!iso) return "never synced";
+  const s = Math.floor((Date.now() - new Date(iso).getTime()) / 1000);
+  if (s < 60) return "synced just now";
+  if (s < 3600) return `synced ${Math.floor(s / 60)}m ago`;
+  if (s < 86400) return `synced ${Math.floor(s / 3600)}h ago`;
+  return `synced ${Math.floor(s / 86400)}d ago`;
+}
 
 export function IntegrationsTab({ workspaceId }: { workspaceId: string }) {
   const [connections, setConnections] = useState<Connection[]>([]);
   const [contentMap, setContentMap] = useState<ContentMap | null>(null);
   const [configured, setConfigured] = useState<string[]>([]);
   const [connected, setConnected] = useState<string[]>([]);
+  const [sync, setSync] = useState<Record<string, SyncState>>({});
   const [busy, setBusy] = useState<string | null>(null);
   const [note, setNote] = useState<string | null>(null);
 
@@ -26,6 +38,11 @@ export function IntegrationsTab({ workspaceId }: { workspaceId: string }) {
     fetch(`/api/db/connections?workspaceId=${workspaceId}`).then((r) => r.json()).then((d) => setConnections(Array.isArray(d) ? d : [])).catch(() => {});
     fetch(`/api/knowledge/content/map?workspaceId=${workspaceId}`).then((r) => r.json()).then((d) => setContentMap(d?.categories ? d : null)).catch(() => {});
     fetch(`/api/composio/connect`).then((r) => r.json()).then((d) => { setConfigured(d?.configured ?? []); setConnected(d?.connected ?? []); }).catch(() => {});
+    fetch(`/api/knowledge/sources?workspaceId=${workspaceId}`).then((r) => r.json()).then((d) => {
+      const m: Record<string, SyncState> = {};
+      for (const s of (d?.sources ?? []) as SyncState[]) m[s.source] = s;
+      setSync(m);
+    }).catch(() => {});
   }, [workspaceId]);
   useEffect(() => { load(); }, [load]);
 
@@ -101,26 +118,26 @@ export function IntegrationsTab({ workspaceId }: { workspaceId: string }) {
       <div className="rounded-lg border p-4">
         <div className="mb-3 flex items-center gap-2 text-sm font-medium"><Mail className="h-4 w-4" /> Connected apps</div>
         <ul className="space-y-2">
-          {TOOLKITS.map(({ id, slug, name, Icon, ingestReady }) => {
+          {TOOLKITS.map(({ id, slug, name, Icon }) => {
             const isConfigured = configured.includes(id);
             const isConnected = connected.includes(slug);
+            const s = sync[id];
             return (
               <li key={id} className="flex items-center justify-between text-sm">
                 <span className="flex items-center gap-2">
                   <Icon className="h-4 w-4 text-muted-foreground" /> {name}
                   {isConnected && <span className="inline-flex items-center gap-1 text-xs text-emerald-600"><CheckCircle2 className="h-3 w-3" /> connected</span>}
                   {!isConfigured && <span className="text-xs text-muted-foreground">(not configured)</span>}
+                  {s && <span className="text-xs text-muted-foreground">· {timeAgo(s.last_synced_at)} · {s.item_count} items</span>}
                 </span>
                 {isConfigured && (
                   <span className="flex gap-1">
                     <button onClick={() => connectApp(id)} disabled={busy === `connect:${id}`} className="rounded-md border px-2 py-1 text-xs disabled:opacity-50">
                       {busy === `connect:${id}` ? "…" : isConnected ? "Reconnect" : "Connect"}
                     </button>
-                    {ingestReady ? (
-                      <button onClick={() => ingestApp(id)} disabled={busy === `ingest:${id}`} className="rounded-md border px-2 py-1 text-xs disabled:opacity-50">
-                        {busy === `ingest:${id}` ? <Loader2 className="h-3 w-3 animate-spin" /> : "Ingest"}
-                      </button>
-                    ) : <span className="rounded-md px-2 py-1 text-xs text-muted-foreground">ingest soon</span>}
+                    <button onClick={() => ingestApp(id)} disabled={busy === `ingest:${id}`} className="rounded-md border px-2 py-1 text-xs disabled:opacity-50">
+                      {busy === `ingest:${id}` ? <Loader2 className="h-3 w-3 animate-spin" /> : s ? "Sync" : "Ingest"}
+                    </button>
                   </span>
                 )}
               </li>
