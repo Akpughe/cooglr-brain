@@ -89,26 +89,44 @@ async function fetchDrive(userId: string, since: Date | null, max: number): Prom
   return docs;
 }
 
-// Best-effort; slugs/args may need a tweak after a live connect.
-async function fetchGithub(userId: string, _since: Date | null, max: number): Promise<SourceDoc[]> {
+// Ingest the user's repositories (name + description + language) AND any open
+// issues. Verified shapes: repos -> data.repositories[{name, full_name, owner.login,
+// description, language, open_issues_count}]; issues -> data.issues[{number,title,body}].
+async function fetchGithub(userId: string, since: Date | null, max: number): Promise<SourceDoc[]> {
+  void since; // GitHub ingest is not yet incremental
   const docs: SourceDoc[] = [];
   try {
-    const repoRes = await exec("GITHUB_LIST_REPOSITORIES_FOR_THE_AUTHENTICATED_USER", userId, { per_page: 10 });
+    const repoRes = await exec("GITHUB_LIST_REPOSITORIES_FOR_THE_AUTHENTICATED_USER", userId, { per_page: Math.min(max, 50) });
     const repos = arrOf(dataOf(repoRes), ["repositories", "results", "items"]);
-    for (const r of repos.slice(0, 5)) {
-      const owner = pickStr(r.owner as Record<string, unknown> | undefined ?? {}, ["login"]) || pickStr(r, ["owner"]);
+    for (const r of repos) {
+      const owner = pickStr((r.owner as Record<string, unknown> | undefined) ?? {}, ["login"]) || pickStr(r, ["owner"]);
       const name = pickStr(r, ["name"]);
-      if (!owner || !name) continue;
-      try {
-        const issRes = await exec("GITHUB_LIST_REPOSITORY_ISSUES", userId, { owner, repo: name, per_page: 20, state: "all" });
-        for (const is of arrOf(dataOf(issRes), ["issues", "results", "items"])) {
-          const title = pickStr(is, ["title"]);
-          if (!title) continue;
-          const num = (is as { number?: number }).number ?? "";
-          docs.push({ id: `${owner}/${name}#${num}`, title: `${name}#${num}: ${title}`, text: `${title}\n\n${pickStr(is, ["body"])}` });
-          if (docs.length >= max) return docs;
-        }
-      } catch { /* skip repo */ }
+      if (!name) continue;
+      const full = pickStr(r, ["full_name"]) || `${owner}/${name}`;
+      const desc = pickStr(r, ["description"]);
+      const lang = pickStr(r, ["language"]);
+      // The repo itself as a document.
+      docs.push({
+        id: `repo:${full}`,
+        title: `GitHub repo: ${full}`,
+        text: `GitHub repository ${full}.${desc ? `\n\n${desc}` : ""}${lang ? `\n\nPrimary language: ${lang}.` : ""}`,
+      });
+      if (docs.length >= max) return docs;
+
+      // Plus its open/closed issues, if any.
+      const issueCount = Number((r as { open_issues_count?: number }).open_issues_count ?? 0);
+      if (issueCount > 0 && owner) {
+        try {
+          const issRes = await exec("GITHUB_LIST_REPOSITORY_ISSUES", userId, { owner, repo: name, per_page: 20, state: "all" });
+          for (const is of arrOf(dataOf(issRes), ["issues", "results", "items"])) {
+            const title = pickStr(is, ["title"]);
+            if (!title) continue;
+            const num = (is as { number?: number }).number ?? "";
+            docs.push({ id: `${full}#${num}`, title: `${name}#${num}: ${title}`, text: `Issue in ${full}: ${title}\n\n${pickStr(is, ["body"])}` });
+            if (docs.length >= max) return docs;
+          }
+        } catch { /* skip repo's issues */ }
+      }
     }
   } catch { /* adapter unavailable */ }
   return docs;

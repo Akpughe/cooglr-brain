@@ -43,8 +43,11 @@ export async function runContentQuery(
   const topK = opts.topK ?? 8;
   const ctx = { workspaceId, maxRows: topK };
 
-  // Map plans the dig: scope to a category when one clearly fits.
-  const category = opts.categories?.length ? await pickCategory(question, opts.categories) : null;
+  // Map plans the dig: scope to a category when one clearly fits. But if the
+  // question names a SOURCE (gmail/github/slack/drive/...), don't narrow by
+  // content-category — let vector relevance surface that source's docs.
+  const namesSource = /\b(gmail|e?mails?|github|repos?|repositor|slack|drive|docs?|documents?|files?)\b/i.test(question);
+  const category = opts.categories?.length && !namesSource ? await pickCategory(question, opts.categories) : null;
   const plan: QueryPlan = {
     question,
     pagePaths: [],
