@@ -24,7 +24,7 @@ export async function ingestContentDoc(
 
   await deleteFileChunks(workspaceId, qdrantKey);
   await upsertChunks(
-    chunks.map((t, i) => ({ workspaceId, fileId: qdrantKey, chunkIndex: i, text: t, vector: vectors[i], category: synthesis.category })),
+    chunks.map((t, i) => ({ workspaceId, fileId: qdrantKey, chunkIndex: i, text: t, vector: vectors[i], category: synthesis.category, source })),
   );
   await supabase.from("knowledge_documents").upsert(
     {

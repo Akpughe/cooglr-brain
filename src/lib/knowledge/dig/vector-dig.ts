@@ -16,7 +16,7 @@ export const vectorDigTool: DigTool = {
 
   async run(plan: QueryPlan, ctx: DigContext): Promise<DigResult> {
     const vector = await embedQuery(plan.search!);
-    const hits = await search(ctx.workspaceId!, vector, ctx.maxRows, plan.category);
+    const hits = await search(ctx.workspaceId!, vector, ctx.maxRows, { category: plan.category, source: plan.source });
     return {
       tool: "vector",
       columns: ["file_id", "chunk_index", "text", "score"],

@@ -11,6 +11,7 @@ export interface ChunkPoint {
   text: string;
   vector: number[];
   category?: string;
+  source?: string; // gmail | github | slack | google-drive | file
 }
 
 export interface ChunkHit {
@@ -19,6 +20,7 @@ export interface ChunkHit {
   text: string;
   score: number;
   category?: string;
+  source?: string;
 }
 
 let client: QdrantClient | null = null;
@@ -71,22 +73,24 @@ export async function upsertChunks(points: ChunkPoint[]): Promise<void> {
         chunk_index: p.chunkIndex,
         text: p.text,
         ...(p.category ? { category: p.category } : {}),
+        ...(p.source ? { source: p.source } : {}),
       },
     })),
   });
 }
 
 // Similarity search scoped to a workspace (tenancy filter — Qdrant has no RLS),
-// optionally narrowed to a single content category (the map planning the dig).
+// optionally narrowed by content category and/or source (the map planning the dig).
 export async function search(
   workspaceId: string,
   vector: number[],
   topK: number,
-  category?: string,
+  filters?: { category?: string; source?: string },
 ): Promise<ChunkHit[]> {
   const c = getClient();
   const must: Record<string, unknown>[] = [{ key: "workspace_id", match: { value: workspaceId } }];
-  if (category) must.push({ key: "category", match: { value: category } });
+  if (filters?.category) must.push({ key: "category", match: { value: filters.category } });
+  if (filters?.source) must.push({ key: "source", match: { value: filters.source } });
   const res = await c.search(COLLECTION, {
     vector,
     limit: topK,
@@ -94,8 +98,8 @@ export async function search(
     with_payload: true,
   });
   return res.map((r) => {
-    const p = (r.payload ?? {}) as { file_id?: string; chunk_index?: number; text?: string; category?: string };
-    return { fileId: p.file_id ?? "", chunkIndex: p.chunk_index ?? 0, text: p.text ?? "", score: r.score, category: p.category };
+    const p = (r.payload ?? {}) as { file_id?: string; chunk_index?: number; text?: string; category?: string; source?: string };
+    return { fileId: p.file_id ?? "", chunkIndex: p.chunk_index ?? 0, text: p.text ?? "", score: r.score, category: p.category, source: p.source };
   });
 }
 

@@ -19,6 +19,18 @@ function originOf(fileId: string): string {
   return ORIGIN_LABELS[prefix] ?? "documents";
 }
 
+// If the question names a specific source, scope retrieval to it (hard filter).
+const SOURCE_KEYWORDS: [RegExp, string][] = [
+  [/\b(github|repos?|repositor\w*)\b/i, "github"],
+  [/\b(gmail|e?mails?|inbox)\b/i, "gmail"],
+  [/\bslack\b/i, "slack"],
+  [/\b(google ?drive|gdrive|drive)\b/i, "google-drive"],
+];
+function detectSource(question: string): string | null {
+  for (const [re, s] of SOURCE_KEYWORDS) if (re.test(question)) return s;
+  return null;
+}
+
 // The map plans the dig: pick the single most relevant category for the question
 // from those that exist, or null to search across all. Returns a category only
 // if it clearly matches one in the list.
@@ -43,11 +55,10 @@ export async function runContentQuery(
   const topK = opts.topK ?? 8;
   const ctx = { workspaceId, maxRows: topK };
 
-  // Map plans the dig: scope to a category when one clearly fits. But if the
-  // question names a SOURCE (gmail/github/slack/drive/...), don't narrow by
-  // content-category — let vector relevance surface that source's docs.
-  const namesSource = /\b(gmail|e?mails?|github|repos?|repositor|slack|drive|docs?|documents?|files?)\b/i.test(question);
-  const category = opts.categories?.length && !namesSource ? await pickCategory(question, opts.categories) : null;
+  // If the question names a specific source (gmail/github/...), HARD-filter the
+  // dig to that source. Otherwise, scope to a content-category when one fits.
+  const sourceFilter = detectSource(question);
+  const category = !sourceFilter && opts.categories?.length ? await pickCategory(question, opts.categories) : null;
   const plan: QueryPlan = {
     question,
     pagePaths: [],
@@ -55,13 +66,14 @@ export async function runContentQuery(
     sql: "",
     search: question,
     category: category ?? undefined,
+    source: sourceFilter ?? undefined,
     wantsChart: false,
   };
 
   let dig = await vectorDigTool.run(plan, ctx);
-  // Fallback: if the category filter found nothing, search across all categories.
-  if (dig.rowCount === 0 && category) {
-    dig = await vectorDigTool.run({ ...plan, category: undefined }, ctx);
+  // Fallback: if a filter found nothing, widen the search.
+  if (dig.rowCount === 0 && (category || sourceFilter)) {
+    dig = await vectorDigTool.run({ ...plan, category: undefined, source: undefined }, ctx);
   }
 
   if (dig.rowCount === 0) {

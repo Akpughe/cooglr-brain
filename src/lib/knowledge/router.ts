@@ -1,4 +1,4 @@
-import { complete } from "./llm";
+import { complete, BULK_MODEL } from "./llm";
 import { runDbQuery } from "./db-query";
 import { runContentQuery } from "./content-query";
 import { getContentMap, contentMapOverview } from "./content-understanding";
@@ -47,9 +47,12 @@ export async function detectSources(
 export async function classify(question: string, hasDb: boolean, hasContent: boolean): Promise<Source> {
   if (hasDb && !hasContent) return "database";
   if (hasContent && !hasDb) return "content";
+  // Routing is a trivial classification — use the fast model, not the reasoning
+  // one, so the router adds ~1s instead of ~20-50s when both sources exist.
   const t = await complete(
-    "You route a question to a data source. 'database' = structured records, counts, metrics, tables, rows. 'content' = documents, notes, policies, prose, files.",
+    "You route a question to a data source. 'database' = structured records, counts, metrics, tables, rows. 'content' = documents, notes, emails, files, prose.",
     `Question: ${question}\n\nReply with exactly one word: database OR content.`,
+    BULK_MODEL,
   );
   return /content/i.test(t) ? "content" : "database";
 }

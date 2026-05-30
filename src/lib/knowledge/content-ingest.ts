@@ -68,6 +68,7 @@ export async function ingestFile(
     text: t,
     vector: vectors[i],
     category: synthesis.category,
+    source: "file",
   }));
 
   await deleteFileChunks(workspaceId, file.id);

@@ -61,6 +61,7 @@ export interface QueryPlan {
   sql: string; // grounded SQL to run (SQL dig)
   search?: string; // semantic query string (vector dig)
   category?: string; // optional content category to scope the vector dig
+  source?: string; // optional source (gmail/github/...) to scope the vector dig
   wantsChart: boolean;
   chartHint?: "bar" | "line" | "pie";
 }
