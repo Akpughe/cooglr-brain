@@ -64,7 +64,7 @@ export function PropertyRow({
   return (
     <div className="flex items-center min-h-[32px] group/prop">
       <div className="w-[110px] shrink-0 flex items-center gap-2 text-muted-foreground">
-        <Icon className="w-3.5 h-3.5" />
+        <Icon className="size-3.5" />
         <span className="text-xs">{label}</span>
       </div>
       <div className="flex-1 min-w-0">{children}</div>
@@ -108,7 +108,7 @@ export function InlineSelect<T extends string>({
         className="flex items-center gap-1.5 px-2 py-1 -ml-2 rounded-md text-sm hover:bg-muted transition-colors w-full text-left"
       >
         {renderValue ? renderValue(value) : <span>{currentLabel}</span>}
-        <ChevronDown className="w-3 h-3 text-muted-foreground/50 ml-auto shrink-0" />
+        <ChevronDown className="size-3 text-muted-foreground/50 ml-auto shrink-0" />
       </button>
 
       {open && (
@@ -178,16 +178,16 @@ export function TaskDetailPanel({ task, columns, onClose, onExpand, onUpdate }: 
         <div className="flex items-center gap-2">
           <span className="text-xs text-muted-foreground font-mono">{task.displayId}</span>
           <span className={`inline-flex items-center gap-1 text-xs px-1.5 py-0.5 rounded ${taskTypeConf.color} bg-muted`}>
-            {(() => { const Icon = taskTypeConf.icon; return <Icon className="w-3 h-3" />; })()}
+            {(() => { const Icon = taskTypeConf.icon; return <Icon className="size-3" />; })()}
             {taskTypeConf.label}
           </span>
         </div>
         <div className="flex items-center gap-0.5">
-          <button onClick={onExpand} title="Expand" className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-            <Maximize2 className="w-3.5 h-3.5" />
+          <button onClick={onExpand} title="Expand" aria-label="Expand task" className="size-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+            <Maximize2 className="size-3.5" />
           </button>
-          <button onClick={onClose} className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-            <X className="w-4 h-4" />
+          <button onClick={onClose} aria-label="Close task detail" className="size-6 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
+            <X className="size-4" />
           </button>
         </div>
       </div>
@@ -207,7 +207,7 @@ export function TaskDetailPanel({ task, columns, onClose, onExpand, onUpdate }: 
 
           {/* Properties */}
           <div className="space-y-1">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2">Properties</p>
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Properties</p>
 
             {/* Status */}
             <PropertyRow icon={Columns3} label="Status">
@@ -222,7 +222,7 @@ export function TaskDetailPanel({ task, columns, onClose, onExpand, onUpdate }: 
                   const SIcon = si.icon;
                   return (
                     <span className="flex items-center gap-1.5">
-                      <SIcon className={`w-3.5 h-3.5 ${si.color}`} />
+                      <SIcon className={`size-3.5 ${si.color}`} />
                       <span>{col.name}</span>
                     </span>
                   );
@@ -233,7 +233,7 @@ export function TaskDetailPanel({ task, columns, onClose, onExpand, onUpdate }: 
                   const SIcon = si.icon;
                   return (
                     <span className="flex items-center gap-2">
-                      <SIcon className={`w-3.5 h-3.5 ${si.color}`} />
+                      <SIcon className={`size-3.5 ${si.color}`} />
                       {opt.label}
                     </span>
                   );
@@ -283,7 +283,7 @@ export function TaskDetailPanel({ task, columns, onClose, onExpand, onUpdate }: 
                   const name = m?.fullName || m?.email || "Unknown";
                   return (
                     <span className="flex items-center gap-1.5">
-                      <span className="w-4 h-4 rounded-full bg-foreground/10 flex items-center justify-center text-[8px] font-semibold text-foreground/60 shrink-0">
+                      <span className="size-4 rounded-full bg-foreground/10 flex items-center justify-center text-[8px] font-semibold text-foreground/60 shrink-0">
                         {name[0]?.toUpperCase()}
                       </span>
                       <span>{name}</span>
@@ -305,7 +305,7 @@ export function TaskDetailPanel({ task, columns, onClose, onExpand, onUpdate }: 
                   const TIcon = t.icon;
                   return (
                     <span className={`flex items-center gap-1.5 ${t.color}`}>
-                      <TIcon className="w-3.5 h-3.5" />
+                      <TIcon className="size-3.5" />
                       <span>{t.label}</span>
                     </span>
                   );
@@ -316,7 +316,7 @@ export function TaskDetailPanel({ task, columns, onClose, onExpand, onUpdate }: 
                   const TIcon = t.icon;
                   return (
                     <span className={`flex items-center gap-2 ${t.color}`}>
-                      <TIcon className="w-3.5 h-3.5" />
+                      <TIcon className="size-3.5" />
                       {opt.label}
                     </span>
                   );
@@ -330,7 +330,7 @@ export function TaskDetailPanel({ task, columns, onClose, onExpand, onUpdate }: 
                 type="date"
                 value={task.dueDate || ""}
                 onChange={(e) => handleImmediateUpdate("dueDate", e.target.value || null)}
-                className="px-2 py-1 -ml-2 rounded-md text-sm bg-transparent hover:bg-muted transition-colors focus:outline-none focus:bg-muted w-full"
+                className="px-2 py-1 -ml-2 rounded-md text-sm bg-transparent hover:bg-muted transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 outline-none focus:bg-muted w-full"
               />
             </PropertyRow>
 
@@ -341,14 +341,14 @@ export function TaskDetailPanel({ task, columns, onClose, onExpand, onUpdate }: 
                 value={task.githubRepo || ""}
                 onChange={(e) => debouncedUpdate("githubRepo", e.target.value || null)}
                 placeholder="owner/repo"
-                className="px-2 py-1 -ml-2 rounded-md text-sm bg-transparent hover:bg-muted transition-colors focus:outline-none focus:bg-muted placeholder:text-muted-foreground/40 w-full"
+                className="px-2 py-1 -ml-2 rounded-md text-sm bg-transparent hover:bg-muted transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 outline-none focus:bg-muted placeholder:text-muted-foreground/40 w-full"
               />
             </PropertyRow>
           </div>
 
           {/* Description */}
           <div>
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2">Description</p>
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Description</p>
             <textarea
               value={description}
               onChange={(e) => {
@@ -356,13 +356,13 @@ export function TaskDetailPanel({ task, columns, onClose, onExpand, onUpdate }: 
                 debouncedUpdate("description", e.target.value);
               }}
               placeholder="Add a description..."
-              className="w-full min-h-[120px] px-3 py-2 border border-border rounded-lg text-sm bg-transparent resize-none focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/40"
+              className="w-full min-h-[120px] px-3 py-2 border border-border rounded-lg text-sm bg-transparent resize-none focus-visible:ring-2 focus-visible:ring-ring/50 outline-none placeholder:text-muted-foreground/40"
             />
           </div>
 
           {/* Activity placeholder */}
           <div className="pt-4 border-t border-border">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-3">Activity</p>
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Activity</p>
             <p className="text-xs text-muted-foreground/60">Activity & comments coming soon</p>
           </div>
         </div>

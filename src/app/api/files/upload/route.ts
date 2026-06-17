@@ -1,4 +1,5 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server";
+import { ingestFile } from "@/lib/knowledge/content-ingest";
 import { NextResponse } from "next/server";
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
@@ -73,6 +74,41 @@ export async function POST(request: Request) {
     .single();
 
   if (insertError) return NextResponse.json({ error: insertError.message }, { status: 500 });
+
+  // Auto-ingest into the knowledge corpus + UltraMem (memory). Best-effort and
+  // detached so the upload returns immediately; uses the service client so it
+  // doesn't depend on the request's cookie lifetime. (Prod would use a queue.)
+  void ingestFile(
+    svc,
+    workspaceId,
+    {
+      id: fileNode.id,
+      type: "file",
+      title: fileNode.title,
+      content: null,
+      storage_path: fileNode.storage_path,
+      mime_type: fileNode.mime_type,
+    },
+    user.id,
+  ).catch(async (err) => {
+    console.error("[files/upload] ingest failed", err);
+    // Mark the file as errored so the UI shows a failure instead of a stuck spinner.
+    await svc
+      .from("knowledge_documents")
+      .upsert(
+        {
+          workspace_id: workspaceId,
+          file_id: fileNode.id,
+          source: "file",
+          source_ref: fileNode.id,
+          title: fileNode.title,
+          status: "error",
+          updated_at: new Date().toISOString(),
+        },
+        { onConflict: "workspace_id,source,source_ref" },
+      )
+      .then(() => {}, () => {});
+  });
 
   return NextResponse.json({
     file: {

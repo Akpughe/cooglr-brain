@@ -177,8 +177,8 @@ export function PageEditor({ file, onUpdate }: Props) {
       {displayCoverUrl ? (
         <div className="h-[160px] relative group bg-cover bg-center" style={{ backgroundImage: `url(${displayCoverUrl})` }}>
           <div className="absolute bottom-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            <button onClick={handleCoverUpload} className="text-[11px] bg-black/50 px-2 py-1 rounded text-white/70 hover:text-white">Change cover</button>
-            <button onClick={handleRemoveCover} className="text-[11px] bg-black/50 px-2 py-1 rounded text-white/70 hover:text-white">Remove</button>
+            <button onClick={handleCoverUpload} className="text-[11px] bg-black/50 px-2 py-1 rounded text-foreground/70 hover:text-foreground">Change cover</button>
+            <button onClick={handleRemoveCover} className="text-[11px] bg-black/50 px-2 py-1 rounded text-foreground/70 hover:text-foreground">Remove</button>
           </div>
         </div>
       ) : null}
@@ -196,7 +196,7 @@ export function PageEditor({ file, onUpdate }: Props) {
         {/* Add cover button */}
         <div className="flex gap-2 mt-1 opacity-40 hover:opacity-70 transition-opacity text-[12px]">
           {!displayCoverUrl && (
-            <button onClick={handleCoverUpload} className="px-1.5 py-0.5 rounded bg-white/5 hover:bg-white/10">
+            <button onClick={handleCoverUpload} className="px-1.5 py-0.5 rounded bg-foreground/5 hover:bg-foreground/10">
               🖼 Add cover
             </button>
           )}
@@ -208,7 +208,7 @@ export function PageEditor({ file, onUpdate }: Props) {
           value={title}
           onChange={(e) => handleTitleChange(e.target.value)}
           placeholder="Untitled"
-          className="w-full text-[32px] font-bold bg-transparent border-0 outline-none mt-4 placeholder:text-white/20"
+          className="w-full text-[32px] font-bold bg-transparent border-0 outline-none focus-visible:ring-2 focus-visible:ring-ring/50 mt-4 placeholder:text-foreground/20"
         />
 
         {/* Static toolbar for block-level actions */}

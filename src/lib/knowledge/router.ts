@@ -2,6 +2,7 @@ import { complete, BULK_MODEL } from "./llm";
 import { runDbQuery } from "./db-query";
 import { runContentQuery } from "./content-query";
 import { getContentMap, contentMapOverview } from "./content-understanding";
+import type { ChartSpec, TableSpec } from "./chart-builder";
 import type { createClient } from "@/lib/supabase/server";
 
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
@@ -14,7 +15,8 @@ export interface UnifiedAnswer {
   // database
   sql?: string;
   rowCount?: number;
-  chart?: unknown;
+  chart?: ChartSpec | null;
+  table?: TableSpec; // downloadable table computed from the real SQL rows
   connectionId?: string;
   // content
   citations?: { fileId: string; score: number }[];
@@ -49,11 +51,18 @@ export async function classify(question: string, hasDb: boolean, hasContent: boo
   if (hasContent && !hasDb) return "content";
   // Routing is a trivial classification — use the fast model, not the reasoning
   // one, so the router adds ~1s instead of ~20-50s when both sources exist.
-  const t = await complete(
-    "You route a question to a data source. 'database' = structured records, counts, metrics, tables, rows. 'content' = documents, notes, emails, files, prose.",
-    `Question: ${question}\n\nReply with exactly one word: database OR content.`,
-    BULK_MODEL,
-  );
+  let t: string;
+  try {
+    t = await complete(
+      "You route a question to a data source. 'database' = structured records, counts, metrics, tables, rows. 'content' = documents, notes, emails, files, prose.",
+      `Question: ${question}\n\nReply with exactly one word: database OR content.`,
+      BULK_MODEL,
+    );
+  } catch (err) {
+    // Model down → default to content (documents/memory), the safer fallback.
+    console.error("[classify] routing model failed, defaulting to content", err);
+    return "content";
+  }
   return /content/i.test(t) ? "content" : "database";
 }
 
@@ -79,6 +88,7 @@ export async function runUnifiedQuery(
       sql: r.dig.sql,
       rowCount: r.dig.rowCount,
       chart: r.chart,
+      table: r.table,
       connectionId: dbConnectionId,
       origins: ["a database"],
     };

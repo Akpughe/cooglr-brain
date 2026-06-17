@@ -12,9 +12,9 @@ import { EmailSidebarContent } from "@/components/emails/email-sidebar-content";
 
 function SidebarSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="mb-3">
+    <div className="mb-4">
       <div
-        className="px-3 py-1.5 text-[11px] font-medium uppercase tracking-wider"
+        className="px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider"
         style={{ color: "var(--sidebar-text-muted)" }}
       >
         {label}
@@ -28,7 +28,7 @@ function SidebarItem({ label, active = false }: { label: string; active?: boolea
   return (
     <div
       className={cn(
-        "px-3 py-1.5 text-[13px] rounded-md mx-2 cursor-pointer transition-colors duration-150",
+        "mx-2 cursor-pointer rounded-md px-3 py-1.5 text-[13px] transition-colors duration-150",
         active ? "font-medium" : ""
       )}
       style={{
@@ -90,25 +90,26 @@ export function AppSidebar() {
   if (!activeApp) return null;
 
   return (
-    <div
-      className="w-[220px] min-w-[220px] h-full border-r flex flex-col overflow-y-auto"
+    <aside
+      className="hidden md:flex h-full w-[220px] min-w-[220px] flex-col overflow-y-auto border-r"
       style={{ background: "var(--sidebar-bg)", borderColor: "var(--sidebar-hover)" }}
     >
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3">
         <h2
-          className="font-bold text-[14px]"
+          className="text-sm font-semibold"
           style={{ color: "var(--sidebar-text)" }}
         >
           {activeApp.name}
         </h2>
         <button
-          className="w-6 h-6 rounded-md flex items-center justify-center transition-colors duration-150"
+          aria-label={`Add new ${activeApp.name.toLowerCase()} item`}
+          className="flex size-6 items-center justify-center rounded-md transition-colors duration-150"
           style={{ color: "var(--sidebar-text-muted)" }}
           onMouseEnter={(e) => (e.currentTarget.style.background = "var(--sidebar-hover)")}
           onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
         >
-          <Plus className="w-3.5 h-3.5" />
+          <Plus className="size-3.5" />
         </button>
       </div>
 
@@ -116,6 +117,8 @@ export function AppSidebar() {
       <div className="pt-1">
         {renderSidebarContent(activeApp.id)}
       </div>
-    </div>
+    </aside>
   );
 }
+
+export { SidebarSection, SidebarItem };

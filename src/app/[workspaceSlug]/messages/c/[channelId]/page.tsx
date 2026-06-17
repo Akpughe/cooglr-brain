@@ -18,10 +18,10 @@ export default function ChannelPage() {
   const [channelName, setChannelName] = useState("");
   const [channelDescription, setChannelDescription] = useState("");
 
-  const { messages, loading, hasMore, loadMore, sendMessage, editMessage, deleteMessage } =
-    useMessages({ targetId: channelId, type: "channel", workspaceId: workspace.id });
-
   const currentMember = members.find((m) => m.userId === currentUserId);
+
+  const { messages, loading, hasMore, loadMore, sendMessage, editMessage, deleteMessage } =
+    useMessages({ targetId: channelId, type: "channel", workspaceId: workspace.id, currentUserName: currentMember?.fullName || "You" });
   const { typingUsers, sendTypingEvent } = useTyping(channelId, currentUserId);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function ChannelPage() {
   return (
     <div className="flex-1 flex flex-col h-full">
       <div className="h-12 border-b border-border flex items-center px-4 gap-2 shrink-0">
-        <Hash className="w-4 h-4 text-muted-foreground" />
+        <Hash className="size-4 text-muted-foreground" />
         <span className="font-semibold text-sm">{channelName}</span>
         {channelDescription && <span className="text-xs text-muted-foreground ml-2">{channelDescription}</span>}
       </div>

@@ -28,6 +28,17 @@ export function tiptapToText(doc: unknown): string {
   return parts.join("").replace(/\n{3,}/g, "\n\n").trim();
 }
 
+// Local PDF text extraction (no Nuton, no S3 round-trip) — reads the bytes we
+// already have in Supabase storage. Returns "" if the PDF has no extractable
+// text layer (e.g. scanned/image-only), so callers can fall back if they want.
+export async function extractPdfText(bytes: Uint8Array): Promise<string> {
+  const { getDocumentProxy, extractText } = await import("unpdf");
+  const pdf = await getDocumentProxy(bytes);
+  const { text } = await extractText(pdf, { mergePages: true });
+  const merged = typeof text === "string" ? text : (text as string[]).join("\n\n");
+  return merged.trim();
+}
+
 // Extract text from binary documents (PDF/Office) via Nuton. `files` are the
 // uploaded bytes; `userId` scopes the Nuton call (their X-External-User-Id).
 export async function extractViaNuton(
@@ -55,7 +66,17 @@ export async function extractViaNuton(
     const reason = docs.find((d) => d.error_message)?.error_message;
     throw new Error(reason || "Nuton returned no extractable text");
   }
-  return ready.map((d) => d.markdown).join("\n\n").trim();
+  const text = ready.map((d) => d.markdown).join("\n\n").trim();
+
+  // Guard: Nuton sometimes returns a fetch/S3 error page as "ready" markdown when
+  // its own presigned URL fails (e.g. SignatureDoesNotMatch). Never ingest that as
+  // document content — fail loudly so the file isn't falsely marked "indexed".
+  if (/SignatureDoesNotMatch|Target URL returned error \d|<Code>[A-Za-z]*Error<\/Code>|AWSAccessKeyId/i.test(text)) {
+    throw new Error(
+      "Nuton extraction returned a fetch error instead of document text (check Nuton's storage credentials / presigned-URL signing).",
+    );
+  }
+  return text;
 }
 
 // Defensive parse of Nuton's response into a single text blob. The API shape may

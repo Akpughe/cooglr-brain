@@ -1,0 +1,53 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e19]:
+      - button "Back" [ref=e20] [cursor=pointer]:
+        - img [ref=e21]
+        - text: Back
+      - generic [ref=e28]: 1 of 3
+      - generic [ref=e29]:
+        - heading "Name your workspace" [level=1] [ref=e30]
+        - paragraph [ref=e31]: Choose something your team will recognize like the name of your organization or team.
+      - generic [ref=e33]:
+        - textbox "e.g. Core Inc." [active] [ref=e34]
+        - generic [ref=e35]: 0/50
+      - generic [ref=e36]:
+        - button "Next"
+    - generic [ref=e39]:
+      - generic [ref=e40]:
+        - complementary [ref=e41]:
+          - generic [ref=e42]:
+            - generic [ref=e43]: "5"
+            - generic [ref=e44]: 500Chow
+          - generic [ref=e45]:
+            - img [ref=e47]
+            - text: New chat
+          - generic [ref=e50]:
+            - img [ref=e52]
+            - text: Search
+          - generic [ref=e55]:
+            - img [ref=e57]
+            - text: Folders
+          - generic [ref=e60]: Draft growth report
+          - generic [ref=e61]: Instagram carousel
+          - generic [ref=e62]: Research prospects
+        - generic [ref=e63]:
+          - generic [ref=e64]: What should we work on?
+          - generic [ref=e65]:
+            - generic [ref=e66]: Ask your workspace anything
+            - generic [ref=e67]: ↑
+          - generic [ref=e68]:
+            - generic [ref=e69]:
+              - text: Summarize my
+              - strong [ref=e70]: Teams
+              - text: meetings
+            - generic [ref=e71]:
+              - text: Plot data in
+              - strong [ref=e72]: graphs
+      - generic [ref=e73]:
+        - generic [ref=e74]: One workspace, one agent.
+        - generic [ref=e75]: Chat, files, and automations for Davak — grounded in everything you connect.
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e14] [cursor=pointer]:
+    - img [ref=e15]
+  - alert [ref=e18]

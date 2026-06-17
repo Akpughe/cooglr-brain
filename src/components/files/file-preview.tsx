@@ -55,14 +55,14 @@ export function FilePreview({ file }: Props) {
             <a
               href={url}
               download={file.title}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] bg-white/5 hover:bg-white/10 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] bg-foreground/5 hover:bg-foreground/10 transition-colors"
             >
-              <Download className="w-3.5 h-3.5" /> Download
+              <Download className="size-3.5" /> Download
             </a>
           )}
         </div>
 
-        <div className="rounded-lg overflow-hidden border border-white/[0.06]">
+        <div className="rounded-lg overflow-hidden border border-foreground/[0.06]">
           {isImage && url ? (
             <img src={url} alt={file.title} className="w-full object-contain max-h-[600px] bg-black/20" />
           ) : isPdf && url ? (
@@ -70,12 +70,12 @@ export function FilePreview({ file }: Props) {
           ) : isVideo && url ? (
             <video src={url} controls className="w-full max-h-[600px]" />
           ) : isAudio && url ? (
-            <div className="p-8 flex items-center justify-center bg-white/[0.02]">
+            <div className="p-8 flex items-center justify-center bg-foreground/[0.02]">
               <audio src={url} controls className="w-full max-w-md" />
             </div>
           ) : (
-            <div className="p-16 flex flex-col items-center justify-center gap-3 bg-white/[0.02]">
-              <File className="w-16 h-16 text-muted-foreground/30" />
+            <div className="p-16 flex flex-col items-center justify-center gap-3 bg-foreground/[0.02]">
+              <File className="size-16 text-muted-foreground/30" />
               <p className="text-muted-foreground">No preview available</p>
               {url && (
                 <a

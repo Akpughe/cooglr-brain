@@ -1,0 +1,96 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Plugins" [ref=e6]
+    - button "Automations" [ref=e7]
+    - button "Settings" [ref=e8]
+  - generic [ref=e9]:
+    - complementary [ref=e10]:
+      - navigation [ref=e11]:
+        - button "New chat" [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+          - text: New chat
+        - button "Search" [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+          - text: Search
+        - button "Plugins" [ref=e20] [cursor=pointer]:
+          - img [ref=e21]
+          - text: Plugins
+        - button "Automations" [active] [ref=e24] [cursor=pointer]:
+          - img [ref=e25]
+          - text: Automations
+      - generic [ref=e28]:
+        - generic [ref=e29]: Chats
+        - button "Draft this week's growth report ⌘1" [ref=e30] [cursor=pointer]:
+          - generic [ref=e31]: Draft this week's growth report
+          - generic [ref=e32]: ⌘1
+        - button "Create Instagram carousel concepts ⌘2" [ref=e33] [cursor=pointer]:
+          - generic [ref=e34]: Create Instagram carousel concepts
+          - generic [ref=e35]: ⌘2
+        - button "Create mind map designs ⌘3" [ref=e36] [cursor=pointer]:
+          - generic [ref=e37]: Create mind map designs
+          - generic [ref=e38]: ⌘3
+        - button "Plan screen-recording workflow ⌘4" [ref=e39] [cursor=pointer]:
+          - generic [ref=e40]: Plan screen-recording workflow
+          - generic [ref=e41]: ⌘4
+        - button "Find markdown files from 3 days ⌘5" [ref=e42] [cursor=pointer]:
+          - generic [ref=e43]: Find markdown files from 3 days
+          - generic [ref=e44]: ⌘5
+        - button "Create teen presentation ⌘6" [ref=e45] [cursor=pointer]:
+          - generic [ref=e46]: Create teen presentation
+          - generic [ref=e47]: ⌘6
+        - button "Find available domain names ⌘7" [ref=e48] [cursor=pointer]:
+          - generic [ref=e49]: Find available domain names
+          - generic [ref=e50]: ⌘7
+        - button "Schedule LinkedIn posts ⌘8" [ref=e51] [cursor=pointer]:
+          - generic [ref=e52]: Schedule LinkedIn posts
+          - generic [ref=e53]: ⌘8
+        - button "Research Newton prospects ⌘9" [ref=e54] [cursor=pointer]:
+          - generic [ref=e55]: Research Newton prospects
+          - generic [ref=e56]: ⌘9
+        - button "Open Zoho Mail login 1w" [ref=e57] [cursor=pointer]:
+          - generic [ref=e58]: Open Zoho Mail login
+          - generic [ref=e59]: 1w
+      - button "Settings" [ref=e62] [cursor=pointer]:
+        - generic [ref=e63]:
+          - img [ref=e64]
+          - text: Settings
+        - img [ref=e67]
+    - main [ref=e123]:
+      - generic [ref=e124]:
+        - generic [ref=e125]:
+          - button "View templates" [ref=e126] [cursor=pointer]
+          - button "Create manually" [ref=e128] [cursor=pointer]:
+            - text: Create manually
+            - img [ref=e129]
+        - generic [ref=e131]:
+          - heading "Automations" [level=1] [ref=e132]
+          - paragraph [ref=e133]:
+            - text: Run chats on a schedule or whenever you need them.
+            - button "Learn more" [ref=e134] [cursor=pointer]
+        - generic [ref=e136]:
+          - button "Daily tech & AI brief active Daily at 9:00 AM · last run 3h ago 3 runs" [ref=e137] [cursor=pointer]:
+            - img [ref=e139]
+            - generic [ref=e144]:
+              - generic [ref=e145]:
+                - generic [ref=e146]: Daily tech & AI brief
+                - generic [ref=e147]: active
+              - generic [ref=e148]: Daily at 9:00 AM · last run 3h ago
+            - generic [ref=e149]: 3 runs
+            - img [ref=e150]
+          - button "Weekly growth report paused Weekly at 8:00 AM · last run 5d ago 1 run" [ref=e152] [cursor=pointer]:
+            - img [ref=e154]
+            - generic [ref=e157]:
+              - generic [ref=e158]:
+                - generic [ref=e159]: Weekly growth report
+                - generic [ref=e160]: paused
+              - generic [ref=e161]: Weekly at 8:00 AM · last run 5d ago
+            - generic [ref=e162]: 1 run
+            - img [ref=e163]
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e118] [cursor=pointer]:
+    - img [ref=e119]
+  - alert [ref=e122]

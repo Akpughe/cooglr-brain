@@ -76,12 +76,12 @@ export function ListView({ columns, tasks, onSelectTask }: ListViewProps) {
     const active = sortField === field;
     return (
       <th
-        className={`text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wider py-2 px-3 cursor-pointer select-none hover:text-foreground transition-colors ${className || ""}`}
+        className={`text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider py-2 px-3 cursor-pointer select-none hover:text-foreground transition-colors ${className || ""}`}
         onClick={() => handleSort(field)}
       >
         <span className="inline-flex items-center gap-1">
           {label}
-          {active && (sortAsc ? <ArrowDownAZ className="w-3 h-3" /> : <ArrowUpAZ className="w-3 h-3" />)}
+          {active && (sortAsc ? <ArrowDownAZ className="size-3" /> : <ArrowUpAZ className="size-3" />)}
         </span>
       </th>
     );
@@ -103,7 +103,7 @@ export function ListView({ columns, tasks, onSelectTask }: ListViewProps) {
             <SortHeader field="taskNumber" label="ID" className="w-20 pl-4" />
             <SortHeader field="priority" label="Priority" className="w-20" />
             <SortHeader field="title" label="Title" />
-            <th className="text-left text-[11px] font-medium text-muted-foreground uppercase tracking-wider py-2 px-3 w-28">Status</th>
+            <th className="text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wider py-2 px-3 w-28">Status</th>
             <SortHeader field="assigneeName" label="Assignee" className="w-32" />
             <SortHeader field="dueDate" label="Due" className="w-28 pr-4" />
           </tr>
@@ -149,7 +149,7 @@ export function ListView({ columns, tasks, onSelectTask }: ListViewProps) {
                 {/* Title with type icon */}
                 <td className="py-2.5 px-3">
                   <div className="flex items-center gap-2">
-                    <TypeIcon className={`w-4 h-4 shrink-0 ${typeConf.color}`} />
+                    <TypeIcon className={`size-4 shrink-0 ${typeConf.color}`} />
                     <span className="text-sm">{task.title}</span>
                   </div>
                 </td>
@@ -158,7 +158,7 @@ export function ListView({ columns, tasks, onSelectTask }: ListViewProps) {
                 <td className="py-2.5 px-3">
                   {col && (
                     <span className="inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                      <StatusIcon className={`w-3.5 h-3.5 ${statusConf?.color || ""}`} />
+                      <StatusIcon className={`size-3.5 ${statusConf?.color || ""}`} />
                       {col.name}
                     </span>
                   )}
@@ -168,7 +168,7 @@ export function ListView({ columns, tasks, onSelectTask }: ListViewProps) {
                 <td className="py-2.5 px-3">
                   {task.assigneeName ? (
                     <div className="flex items-center gap-1.5">
-                      <div className="w-5 h-5 rounded-full bg-foreground/10 flex items-center justify-center text-[9px] font-semibold text-foreground/60">
+                      <div className="size-5 rounded-full bg-foreground/10 flex items-center justify-center text-[9px] font-semibold text-foreground/60">
                         {task.assigneeName[0]?.toUpperCase()}
                       </div>
                       <span className="text-xs truncate">{task.assigneeName}</span>
@@ -182,7 +182,7 @@ export function ListView({ columns, tasks, onSelectTask }: ListViewProps) {
                 <td className="py-2.5 px-3 pr-4">
                   {task.dueDate ? (
                     <span className={`inline-flex items-center gap-1 text-xs ${overdue ? "text-red-400" : "text-muted-foreground"}`}>
-                      <CalendarDays className="w-3 h-3" />
+                      <CalendarDays className="size-3" />
                       {new Date(task.dueDate).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
                     </span>
                   ) : (

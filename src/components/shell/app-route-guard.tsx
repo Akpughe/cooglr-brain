@@ -55,27 +55,27 @@ export function AppRouteGuard({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center">
-      <div className="text-center space-y-4 max-w-md">
-        <div className="w-12 h-12 rounded-xl bg-muted flex items-center justify-center mx-auto text-muted-foreground text-lg">
-          {matchedApp.name[0]}
-        </div>
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-12 text-center">
+      <div className="flex size-16 items-center justify-center rounded-2xl bg-muted text-xl text-muted-foreground">
+        {matchedApp.name[0]}
+      </div>
+      <div className="flex flex-col items-center gap-1">
         <h1 className="text-xl font-semibold">{matchedApp.name} is not installed</h1>
-        <p className="text-muted-foreground text-sm">
+        <p className="max-w-xs text-sm text-muted-foreground">
           {isOwner
             ? "Install this app to start using it in your workspace."
             : "Ask your workspace owner to install this app."}
         </p>
-        {isOwner && (
-          <button
-            onClick={handleInstall}
-            disabled={installing}
-            className="inline-flex items-center justify-center h-10 px-6 bg-foreground text-background rounded-lg text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50"
-          >
-            {installing ? "Installing..." : `Install ${matchedApp.name}`}
-          </button>
-        )}
       </div>
+      {isOwner && (
+        <button
+          onClick={handleInstall}
+          disabled={installing}
+          className="mt-2 inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+        >
+          {installing ? "Installing..." : `Install ${matchedApp.name}`}
+        </button>
+      )}
     </div>
   );
 }

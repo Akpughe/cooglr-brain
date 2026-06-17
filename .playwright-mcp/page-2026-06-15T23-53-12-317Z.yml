@@ -1,0 +1,90 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Plugins" [ref=e6]
+    - button "Automations" [ref=e7]
+    - button "Settings" [ref=e8]
+  - generic [ref=e9]:
+    - complementary [ref=e10]:
+      - navigation [ref=e11]:
+        - button "New chat" [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+          - text: New chat
+        - button "Search" [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+          - text: Search
+        - button "Plugins" [ref=e20] [cursor=pointer]:
+          - img [ref=e21]
+          - text: Plugins
+        - button "Automations" [active] [ref=e24] [cursor=pointer]:
+          - img [ref=e25]
+          - text: Automations
+      - generic [ref=e28]:
+        - generic [ref=e29]: Chats
+        - button "Draft this week's growth report ⌘1" [ref=e30] [cursor=pointer]:
+          - generic [ref=e31]: Draft this week's growth report
+          - generic [ref=e32]: ⌘1
+        - button "Create Instagram carousel concepts ⌘2" [ref=e33] [cursor=pointer]:
+          - generic [ref=e34]: Create Instagram carousel concepts
+          - generic [ref=e35]: ⌘2
+        - button "Create mind map designs ⌘3" [ref=e36] [cursor=pointer]:
+          - generic [ref=e37]: Create mind map designs
+          - generic [ref=e38]: ⌘3
+        - button "Plan screen-recording workflow ⌘4" [ref=e39] [cursor=pointer]:
+          - generic [ref=e40]: Plan screen-recording workflow
+          - generic [ref=e41]: ⌘4
+        - button "Find markdown files from 3 days ⌘5" [ref=e42] [cursor=pointer]:
+          - generic [ref=e43]: Find markdown files from 3 days
+          - generic [ref=e44]: ⌘5
+        - button "Create teen presentation ⌘6" [ref=e45] [cursor=pointer]:
+          - generic [ref=e46]: Create teen presentation
+          - generic [ref=e47]: ⌘6
+        - button "Find available domain names ⌘7" [ref=e48] [cursor=pointer]:
+          - generic [ref=e49]: Find available domain names
+          - generic [ref=e50]: ⌘7
+        - button "Schedule LinkedIn posts ⌘8" [ref=e51] [cursor=pointer]:
+          - generic [ref=e52]: Schedule LinkedIn posts
+          - generic [ref=e53]: ⌘8
+        - button "Research Newton prospects ⌘9" [ref=e54] [cursor=pointer]:
+          - generic [ref=e55]: Research Newton prospects
+          - generic [ref=e56]: ⌘9
+        - button "Open Zoho Mail login 1w" [ref=e57] [cursor=pointer]:
+          - generic [ref=e58]: Open Zoho Mail login
+          - generic [ref=e59]: 1w
+      - button "Settings" [ref=e62] [cursor=pointer]:
+        - generic [ref=e63]:
+          - img [ref=e64]
+          - text: Settings
+        - img [ref=e67]
+    - main [ref=e156]:
+      - generic [ref=e192]:
+        - generic [ref=e193]:
+          - button "View templates" [ref=e194] [cursor=pointer]
+          - button "Create via chat" [ref=e195] [cursor=pointer]:
+            - text: Create via chat
+            - img [ref=e196]
+        - generic [ref=e198]:
+          - heading "Automations" [level=1] [ref=e199]
+          - paragraph [ref=e200]:
+            - text: Run chats on a schedule or whenever you need them.
+            - button "Learn more" [ref=e201] [cursor=pointer]
+        - generic [ref=e202]:
+          - img [ref=e203]
+          - generic [ref=e206]: Create your first automation
+          - generic [ref=e207]:
+            - button "Daily brief" [ref=e208] [cursor=pointer]:
+              - img [ref=e209]
+              - text: Daily brief
+            - button "Weekly review" [ref=e211] [cursor=pointer]:
+              - img [ref=e212]
+              - text: Weekly review
+            - button "Project monitor" [ref=e215] [cursor=pointer]:
+              - img [ref=e216]
+              - text: Project monitor
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e116] [cursor=pointer]:
+    - img [ref=e117]
+  - alert [ref=e120]

@@ -21,6 +21,9 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -40,13 +43,15 @@
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Border radius — semantic scale */
+  --radius-sm: 0.375rem;   /* 6px — badges, small elements */
+  --radius-md: 0.5rem;     /* 8px — buttons, inputs, dropdown items */
+  --radius-lg: 0.75rem;    /* 12px — cards, dialogs, panels */
+  --radius-xl: 1rem;       /* 16px — feature cards, hero elements */
+  --radius-2xl: 1.25rem;
+  --radius-3xl: 1.5rem;
+  --radius-4xl: 9999px;    /* pills, avatars */
 
   /* Warm palette */
   --color-warm-50: #faf8f5;
@@ -89,6 +94,9 @@
   --accent: #f5f2ed;
   --accent-foreground: #292524;
   --destructive: #dc2626;
+  --success: #16a34a;
+  --warning: #d97706;
+  --info: #2563eb;
   --border: #e7e0d5;
   --input: #e7e0d5;
   --ring: #c2410c33;
@@ -97,7 +105,6 @@
   --chart-3: #2563eb;
   --chart-4: #d97706;
   --chart-5: #7c3aed;
-  --radius: 0.625rem;
   --sidebar: #f5f2ed;
   --sidebar-foreground: #292524;
   --sidebar-primary: #c2410c;
@@ -121,6 +128,82 @@
   --shell-accent: #1a1a1a;
 }
 
+/* ---- Agent shell (chat-first surface) ---- */
+/* A controlled, near-monochrome surface so the agent experience reads like a
+   focused operating desk (Codex/recally), independent of the warm app brand.
+   Brand orange is used only as a sparing accent. */
+:root {
+  --agent-bg: #ffffff;
+  /* Soft sage-tinted sidebar (matches the Codex desktop reference). */
+  --agent-rail: #e8ebe4;
+  --agent-rail-hover: #dfe3da;
+  --agent-rail-active: #d6dbcd;
+  --agent-border: #ededee;
+  --agent-border-strong: #e2e2e4;
+  --agent-text: #1a1a1a;
+  --agent-text-muted: #6b6f68;
+  --agent-text-faint: #9aa097;
+  --agent-accent: #c2410c;            /* brand, used sparingly */
+  --agent-blue: #2f6bff;              /* Codex-style action blue (Approve for me) */
+  --agent-canvas: #fcfcfc;
+  --agent-user-bubble: #f3f3f4;
+  --agent-radius-composer: 1rem;      /* 16px */
+  --agent-radius-bubble: 1.125rem;    /* 18px */
+  --agent-radius-card: 0.75rem;       /* 12px */
+  --agent-radius-row: 0.5rem;         /* 8px */
+  --agent-shadow-composer: 0 1px 2px rgba(0,0,0,0.04), 0 12px 32px -10px rgba(0,0,0,0.10);
+  --agent-shadow-composer-focus: 0 1px 2px rgba(0,0,0,0.05), 0 18px 44px -10px rgba(0,0,0,0.16);
+  --agent-shadow-pop: 0 0 0 1px rgba(0,0,0,0.05), 0 16px 44px -12px rgba(0,0,0,0.22);
+}
+.dark {
+  --agent-bg: #0f0e0d;
+  --agent-rail: #141210;
+  --agent-rail-hover: #1c1a18;
+  --agent-rail-active: #211e1b;
+  --agent-border: #221f1c;
+  --agent-border-strong: #2a2724;
+  --agent-text: #e7e5e4;
+  --agent-text-muted: #a1a1aa;
+  --agent-text-faint: #71717a;
+  --agent-accent: #ea580c;
+  --agent-blue: #5b8cff;
+  --agent-canvas: #131110;
+  --agent-user-bubble: #1e1c1a;
+  --agent-shadow-composer: 0 1px 2px rgba(0,0,0,0.3), 0 12px 32px -10px rgba(0,0,0,0.5);
+  --agent-shadow-composer-focus: 0 1px 2px rgba(0,0,0,0.4), 0 18px 44px -10px rgba(0,0,0,0.6);
+  --agent-shadow-pop: 0 0 0 1px rgba(255,255,255,0.06), 0 16px 44px -12px rgba(0,0,0,0.6);
+}
+
+/* The agent shell pins the loaded Geist sans explicitly — the app's global
+   --font-sans is self-referential, so without this headings fall back to serif. */
+.agent-shell-root {
+  font-family: var(--font-geist-sans), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+}
+
+@layer utilities {
+  /* Entrance for messages/cards in the agent shell */
+  .agent-rise {
+    animation: agentRise 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  /* Thinking dots */
+  .agent-thinking::after {
+    content: "";
+    animation: agentThinking 1.4s steps(4, end) infinite;
+  }
+}
+@keyframes agentRise {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes agentThinking {
+  0% { content: ""; }
+  25% { content: "·"; }
+  50% { content: "··"; }
+  75% { content: "···"; }
+  100% { content: ""; }
+}
+
 /* ---- Dark Mode ---- */
 .dark {
   --background: #0f0e0d;
@@ -138,6 +221,9 @@
   --accent: #252220;
   --accent-foreground: #e7e5e4;
   --destructive: #ef4444;
+  --success: #22c55e;
+  --warning: #f59e0b;
+  --info: #3b82f6;
   --border: #252220;
   --input: #252220;
   --ring: #ea580c33;

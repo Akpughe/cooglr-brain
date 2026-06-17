@@ -19,9 +19,9 @@ interface Props {
 function getIcon(node: FileTreeNodeType) {
   if (node.icon) return <span className="text-sm">{node.icon}</span>;
   switch (node.type) {
-    case "folder": return <Folder className="w-4 h-4 text-yellow-400/70" />;
-    case "page": return <FileText className="w-4 h-4 text-blue-400/70" />;
-    case "file": return <File className="w-4 h-4 text-gray-400/70" />;
+    case "folder": return <Folder className="size-4 text-yellow-400/70" />;
+    case "page": return <FileText className="size-4 text-blue-400/70" />;
+    case "file": return <File className="size-4 text-gray-400/70" />;
   }
 }
 
@@ -64,20 +64,21 @@ export function FileTreeNode({ node, children, allNodes, activeFileId, depth, on
           if (!isActive) e.currentTarget.style.background = "transparent";
         }}
       >
-        <span className="w-4 h-4 flex items-center justify-center shrink-0">
+        <span className="size-4 flex items-center justify-center shrink-0">
           {canExpand ? (
-            expanded ? <ChevronDown className="w-3 h-3 opacity-50" /> : <ChevronRight className="w-3 h-3 opacity-50" />
+            expanded ? <ChevronDown className="size-3 opacity-50" /> : <ChevronRight className="size-3 opacity-50" />
           ) : null}
         </span>
         <span className="shrink-0">{getIcon(node)}</span>
         <span className="truncate flex-1">{node.title}</span>
-        {node.isPrivate && <Lock className="w-3 h-3 opacity-30 shrink-0" />}
+        {node.isPrivate && <Lock className="size-3 opacity-30 shrink-0" />}
         {(isFolder || node.type === "page") && (
           <button
-            className="w-4 h-4 flex items-center justify-center opacity-0 group-hover:opacity-50 hover:!opacity-100 shrink-0"
+            className="size-4 flex items-center justify-center opacity-0 group-hover:opacity-50 hover:!opacity-100 shrink-0"
             onClick={(e) => { e.stopPropagation(); onCreateChild(node.id); }}
+            aria-label={`Create child page in ${node.title}`}
           >
-            <Plus className="w-3 h-3" />
+            <Plus className="size-3" />
           </button>
         )}
       </div>

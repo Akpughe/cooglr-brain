@@ -87,7 +87,7 @@ export function MessageComposer({ placeholder, workspaceId, targetId, onSend, on
         </div>
       )}
 
-      <div className="border border-border rounded-xl bg-card">
+      <div className="border border-border rounded-lg bg-card">
         <textarea
           ref={textareaRef}
           value={content}
@@ -110,12 +110,13 @@ export function MessageComposer({ placeholder, workspaceId, targetId, onSend, on
           <button
             onClick={handleSend}
             disabled={!hasContent}
+            aria-label="Send message"
             className={cn(
-              "w-7 h-7 rounded-full flex items-center justify-center transition-all",
+              "size-7 rounded-full flex items-center justify-center transition-all",
               hasContent ? "bg-foreground text-background hover:opacity-90" : "bg-muted text-muted-foreground"
             )}
           >
-            <ArrowUp className="w-4 h-4" />
+            <ArrowUp className="size-4" />
           </button>
         </div>
       </div>
@@ -126,9 +127,9 @@ export function MessageComposer({ placeholder, workspaceId, targetId, onSend, on
 
 function ToolbarButton({ icon: Icon, onClick, title, loading = false }: { icon: any; onClick: () => void; title: string; loading?: boolean }) {
   return (
-    <button onClick={onClick} title={title} disabled={loading}
-      className="w-7 h-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50">
-      <Icon className="w-4 h-4" />
+    <button onClick={onClick} title={title} aria-label={title} disabled={loading}
+      className="size-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors disabled:opacity-50">
+      <Icon className="size-4" />
     </button>
   );
 }

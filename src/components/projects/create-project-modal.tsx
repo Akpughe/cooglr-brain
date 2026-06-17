@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { X } from "lucide-react";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 import type { Project } from "@/lib/projects/types";
 
 interface CreateProjectModalProps {
@@ -14,6 +15,7 @@ interface CreateProjectModalProps {
 
 export function CreateProjectModal({ workspaceId, workspaceSlug, onClose, onCreate }: CreateProjectModalProps) {
   const router = useRouter();
+  const trapRef = useFocusTrap<HTMLDivElement>();
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
   const [creating, setCreating] = useState(false);
@@ -55,13 +57,13 @@ export function CreateProjectModal({ workspaceId, workspaceSlug, onClose, onCrea
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-popover rounded-2xl shadow-xl w-full max-w-md border border-border p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-label="Create project">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div ref={trapRef} className="relative bg-popover rounded-lg shadow-surface-lg w-full max-w-md border border-border p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Create project</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground">
-            <X className="w-5 h-5" />
+          <button onClick={onClose} aria-label="Close" className="text-muted-foreground hover:text-foreground">
+            <X className="size-5" />
           </button>
         </div>
 
@@ -73,7 +75,7 @@ export function CreateProjectModal({ workspaceId, workspaceSlug, onClose, onCrea
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="e.g. Q2 Launch"
-              className="w-full mt-1 h-10 px-3 border border-border rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full mt-1 h-8 px-3 border border-border rounded-md text-sm bg-background focus-visible:ring-2 focus-visible:ring-ring/50 outline-none"
               autoFocus
             />
           </div>
@@ -85,7 +87,7 @@ export function CreateProjectModal({ workspaceId, workspaceSlug, onClose, onCrea
               type="text"
               value={identifier}
               readOnly
-              className="w-full mt-1 h-10 px-3 border border-border rounded-lg text-sm bg-muted text-muted-foreground"
+              className="w-full mt-1 h-8 px-3 border border-border rounded-md text-sm bg-muted text-muted-foreground"
             />
           </div>
 
@@ -97,7 +99,7 @@ export function CreateProjectModal({ workspaceId, workspaceSlug, onClose, onCrea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="What's this project about?"
-              className="w-full mt-1 h-20 px-3 py-2 border border-border rounded-lg text-sm bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full mt-1 h-20 px-3 py-2 border border-border rounded-md text-sm bg-background resize-none focus-visible:ring-2 focus-visible:ring-ring/50 outline-none"
             />
           </div>
 
@@ -106,7 +108,7 @@ export function CreateProjectModal({ workspaceId, workspaceSlug, onClose, onCrea
           <button
             onClick={handleCreate}
             disabled={!name.trim() || creating}
-            className="w-full h-10 bg-foreground text-background rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+            className="w-full h-9 bg-foreground text-background rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
           >
             {creating ? "Creating..." : "Create Project"}
           </button>

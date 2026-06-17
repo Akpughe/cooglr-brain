@@ -10,13 +10,32 @@ export async function GET(request: NextRequest) {
   const workspaceId = request.nextUrl.searchParams.get("workspaceId");
   if (!workspaceId) return NextResponse.json({ error: "workspaceId required" }, { status: 400 });
 
-  const { data, error } = await supabase
+  // Optional: scope to a parent (?parentId=<id> for a folder's children, or
+  // ?parentId=null for top-level nodes) so callers don't fetch the whole tree.
+  const parentId = request.nextUrl.searchParams.get("parentId");
+
+  let query = supabase
     .from("files")
     .select("id, workspace_id, parent_id, type, title, icon, is_private, position, created_by, updated_at, created_at")
-    .eq("workspace_id", workspaceId)
-    .order("position", { ascending: true });
+    .eq("workspace_id", workspaceId);
+  if (parentId === "null") query = query.is("parent_id", null);
+  else if (parentId) query = query.eq("parent_id", parentId);
+
+  const { data, error } = await query.order("position", { ascending: true });
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Attach knowledge-ingest status per file (so the UI can show indexing state).
+  const ingestibleIds = (data || []).filter((f) => f.type !== "folder").map((f) => f.id as string);
+  const statusMap = new Map<string, string>();
+  if (ingestibleIds.length > 0) {
+    const { data: docs } = await supabase
+      .from("knowledge_documents")
+      .select("file_id, status")
+      .eq("workspace_id", workspaceId)
+      .in("file_id", ingestibleIds);
+    for (const d of docs || []) statusMap.set(d.file_id as string, d.status as string);
+  }
 
   const files = (data || []).map((f: Record<string, unknown>) => ({
     id: f.id,
@@ -28,6 +47,7 @@ export async function GET(request: NextRequest) {
     position: f.position,
     createdBy: f.created_by,
     updatedAt: f.updated_at,
+    indexStatus: f.type === "folder" ? null : statusMap.get(f.id as string) ?? null,
   }));
 
   return NextResponse.json({ files });

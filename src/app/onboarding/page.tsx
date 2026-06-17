@@ -15,15 +15,13 @@ export default async function OnboardingPage() {
     .single();
 
   return (
-    <div className="min-h-screen bg-background">
-      <OnboardingWizard
-        user={{
-          id: user.id,
-          email: user.email || "",
-          fullName: profile?.full_name || "",
-          avatarUrl: profile?.avatar_url || "",
-        }}
-      />
-    </div>
+    <OnboardingWizard
+      user={{
+        id: user.id,
+        email: user.email || "",
+        fullName: profile?.full_name || "",
+        avatarUrl: profile?.avatar_url || "",
+      }}
+    />
   );
 }

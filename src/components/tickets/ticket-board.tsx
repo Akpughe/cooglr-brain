@@ -36,9 +36,9 @@ const STATUS_META: Record<string, { label: string; color: string; dot: string }>
 };
 
 const PRIORITY_META: Record<string, { label: string; color: string; icon: string }> = {
-  critical: { label: "Critical", color: "text-red-600", icon: "!!!" },
-  high: { label: "High", color: "text-orange-600 dark:text-orange-400", icon: "!!" },
-  medium: { label: "Medium", color: "text-amber-600 dark:text-amber-400", icon: "!" },
+  critical: { label: "Critical", color: "text-destructive", icon: "!!!" },
+  high: { label: "High", color: "text-warning", icon: "!!" },
+  medium: { label: "Medium", color: "text-warning/70", icon: "!" },
   low: { label: "Low", color: "text-muted-foreground", icon: "-" },
 };
 

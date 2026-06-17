@@ -41,8 +41,8 @@ export function MessagesSidebarContent() {
       <div className="mb-3">
         <div className="flex items-center justify-between px-3 py-1.5">
           <span className="text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--sidebar-text-muted)" }}>Channels</span>
-          <button onClick={() => setShowCreateChannel(true)} className="w-5 h-5 rounded flex items-center justify-center transition-colors" style={{ color: "var(--sidebar-text-muted)" }}>
-            <Plus className="w-3.5 h-3.5" />
+          <button onClick={() => setShowCreateChannel(true)} aria-label="Create channel" className="size-5 rounded flex items-center justify-center transition-colors" style={{ color: "var(--sidebar-text-muted)" }}>
+            <Plus className="size-3.5" />
           </button>
         </div>
         <div className="space-y-px">
@@ -53,7 +53,7 @@ export function MessagesSidebarContent() {
               <Link key={ch.id} href={path}
                 className={cn("flex items-center gap-2 px-3 py-1.5 mx-2 rounded-md text-[13px] transition-colors", active ? "font-medium" : "")}
                 style={{ color: active ? "var(--sidebar-text)" : "var(--sidebar-text-muted)", background: active ? "var(--sidebar-hover)" : "transparent" }}>
-                <Hash className="w-3.5 h-3.5 shrink-0 opacity-50" />
+                <Hash className="size-3.5 shrink-0 opacity-50" />
                 {ch.name}
               </Link>
             );
@@ -64,8 +64,8 @@ export function MessagesSidebarContent() {
       <div>
         <div className="flex items-center justify-between px-3 py-1.5">
           <span className="text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--sidebar-text-muted)" }}>Direct Messages</span>
-          <button onClick={() => setShowNewDm(true)} className="w-5 h-5 rounded flex items-center justify-center transition-colors" style={{ color: "var(--sidebar-text-muted)" }}>
-            <Plus className="w-3.5 h-3.5" />
+          <button onClick={() => setShowNewDm(true)} aria-label="New direct message" className="size-5 rounded flex items-center justify-center transition-colors" style={{ color: "var(--sidebar-text-muted)" }}>
+            <Plus className="size-3.5" />
           </button>
         </div>
         <div className="space-y-px">
@@ -78,11 +78,11 @@ export function MessagesSidebarContent() {
                 className={cn("flex items-center gap-2 px-3 py-1.5 mx-2 rounded-md text-[13px] transition-colors", active ? "font-medium" : "")}
                 style={{ color: active ? "var(--sidebar-text)" : "var(--sidebar-text-muted)", background: active ? "var(--sidebar-hover)" : "transparent" }}>
                 <div className="relative shrink-0">
-                  <div className="w-5 h-5 rounded-full bg-foreground text-background flex items-center justify-center text-[10px] font-bold">
+                  <div className="size-5 rounded-full bg-foreground text-background flex items-center justify-center text-[10px] font-bold">
                     {other.fullName?.[0]?.toUpperCase() || other.email[0].toUpperCase()}
                   </div>
                   {isOnline(other.id) && (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full bg-green-500 border border-[var(--sidebar-bg)]" />
+                    <div className="absolute -bottom-0.5 -right-0.5 size-2 rounded-full bg-success border border-[var(--sidebar-bg)]" />
                   )}
                 </div>
                 <span className="truncate">{other.fullName || other.email}</span>

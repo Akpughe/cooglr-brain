@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import type { CSSProperties } from "react";
 import { useRouter } from "next/navigation";
 import { slugify } from "@/lib/workspace/helpers";
-import { cn } from "@/lib/utils";
+import { AuthShowcase } from "@/components/auth/auth-showcase";
 import { ArrowLeft, Plus, X } from "lucide-react";
 
 interface OnboardingWizardProps {
@@ -17,70 +18,133 @@ interface OnboardingWizardProps {
 
 const TOTAL_STEPS = 4;
 
-function ProgressBar({ current }: { current: number }) {
+// ── shared inline style helpers ──────────────────────────────────────────────
+
+const primaryBtn: CSSProperties = {
+  height: 44,
+  padding: "0 22px",
+  borderRadius: 999,
+  background: "var(--ink)",
+  color: "#fff",
+  fontWeight: 500,
+  fontSize: 14,
+  border: "none",
+  cursor: "pointer",
+  display: "inline-flex",
+  alignItems: "center",
+  justifyContent: "center",
+  transition: "background 0.15s, opacity 0.15s",
+};
+
+function primaryBtnProps(disabled?: boolean) {
+  return {
+    style: {
+      ...primaryBtn,
+      ...(disabled ? { opacity: 0.4, pointerEvents: "none" as const } : {}),
+    },
+    onMouseEnter: (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (!disabled) e.currentTarget.style.background = "#000";
+    },
+    onMouseLeave: (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.currentTarget.style.background = "var(--ink)";
+    },
+  };
+}
+
+const textBtn: CSSProperties = {
+  display: "inline-flex",
+  alignItems: "center",
+  gap: 4,
+  background: "none",
+  border: "none",
+  padding: 0,
+  cursor: "pointer",
+  fontSize: 14,
+  color: "var(--ink-2)",
+  transition: "color 0.15s",
+};
+
+function textBtnProps() {
+  return {
+    style: textBtn,
+    onMouseEnter: (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.currentTarget.style.color = "var(--ink)";
+    },
+    onMouseLeave: (e: React.MouseEvent<HTMLButtonElement>) => {
+      e.currentTarget.style.color = "var(--ink-2)";
+    },
+  };
+}
+
+const headingStyle: CSSProperties = {
+  fontSize: 22,
+  color: "var(--ink)",
+  fontWeight: 600,
+  letterSpacing: "-0.02em",
+};
+
+const bodyStyle: CSSProperties = {
+  fontSize: 14,
+  color: "var(--ink-3)",
+  marginTop: 6,
+  lineHeight: 1.5,
+};
+
+function LogoTile({ size = 44 }: { size?: number }) {
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex gap-1 flex-1">
-        {Array.from({ length: TOTAL_STEPS - 1 }).map((_, i) => (
-          <div
-            key={i}
-            className={cn(
-              "h-1 flex-1 rounded-full transition-colors duration-300",
-              i < current ? "bg-foreground" : "bg-muted"
-            )}
-          />
-        ))}
-      </div>
-      <span className="text-xs text-muted-foreground tabular-nums">
-        {current} of {TOTAL_STEPS - 1}
-      </span>
+    <div
+      aria-hidden="true"
+      style={{
+        width: size,
+        height: size,
+        borderRadius: 12,
+        background: "var(--ink)",
+        color: "#fff",
+        fontWeight: 800,
+        fontSize: size >= 60 ? 24 : 17,
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      5C
     </div>
   );
 }
 
-function WorkspacePreview({
-  workspaceName,
-  displayName,
-}: {
-  workspaceName: string;
-  displayName: string;
-}) {
-  const initial = workspaceName.trim()
-    ? workspaceName.trim()[0].toUpperCase()
-    : "W";
-  const name = workspaceName.trim() || "Workspace";
-  const userName = displayName.trim() || "You";
-
+function ProgressBar({ current }: { current: number }) {
   return (
-    <div className="flex-1 hidden lg:flex items-center justify-center">
-      <div className="w-64 rounded-xl border border-border bg-muted/30 shadow-sm overflow-hidden text-sm select-none">
-        {/* Header */}
-        <div className="flex items-center gap-2.5 px-4 py-3 border-b border-border">
-          <div className="w-7 h-7 rounded-lg bg-foreground text-background flex items-center justify-center text-xs font-bold shrink-0">
-            {initial}
-          </div>
-          <span className="font-semibold text-foreground truncate">
-            {name}
-          </span>
-        </div>
-
-        {/* Channels */}
-        <div className="px-4 py-2.5 space-y-1 border-b border-border">
-          <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1.5">
-            Channels
-          </p>
-          <p className="text-muted-foreground"># general</p>
-          <p className="text-muted-foreground"># random</p>
-        </div>
-
-        {/* User */}
-        <div className="px-4 py-2.5 flex items-center gap-2">
-          <div className="w-5 h-5 rounded-full bg-foreground/10 flex items-center justify-center text-[10px] font-bold text-foreground">
-            {userName[0].toUpperCase()}
-          </div>
-          <span className="text-foreground truncate">{userName}</span>
-        </div>
+    <div
+      role="progressbar"
+      aria-valuenow={current}
+      aria-valuemin={1}
+      aria-valuemax={TOTAL_STEPS - 1}
+      aria-label="Onboarding progress"
+      style={{ display: "flex", alignItems: "center", gap: 12 }}
+    >
+      <div aria-hidden="true" style={{ display: "flex", gap: 4, flex: 1 }}>
+        {Array.from({ length: TOTAL_STEPS - 1 }).map((_, i) => (
+          <div
+            key={i}
+            style={{
+              height: 3,
+              flex: 1,
+              borderRadius: 999,
+              background: i < current ? "var(--ink)" : "var(--line)",
+              transition: "background 0.3s",
+            }}
+          />
+        ))}
       </div>
+      <span
+        style={{
+          fontSize: 12,
+          color: "var(--ink-3)",
+          fontVariantNumeric: "tabular-nums",
+        }}
+      >
+        {current} of {TOTAL_STEPS - 1}
+      </span>
     </div>
   );
 }
@@ -142,21 +206,45 @@ export function OnboardingWizard({ user }: OnboardingWizardProps) {
       }
 
       router.push(`/${workspace.slug}`);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong");
       setLoading(false);
     }
   }
 
-  // Loading state
+  // Loading state — centered full-screen
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-4 animate-in fade-in duration-300">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-foreground rounded-2xl text-background text-xl font-extrabold animate-pulse">
-            5C
+      <div
+        className="agent-shell-root"
+        style={{
+          minHeight: "100vh",
+          background: "var(--bg)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <div
+          className="rise"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            gap: 18,
+          }}
+        >
+          <div
+            aria-hidden="true"
+            style={{ animation: "rcBreathe 2.2s ease-in-out infinite" }}
+          >
+            <LogoTile size={64} />
           </div>
-          <p className="text-lg font-medium text-foreground">
+          <p
+            role="status"
+            aria-live="polite"
+            style={{ fontSize: 16, fontWeight: 500, color: "var(--ink)" }}
+          >
             Setting up your workspace...
           </p>
         </div>
@@ -164,226 +252,395 @@ export function OnboardingWizard({ user }: OnboardingWizardProps) {
     );
   }
 
-  // Step 0: Welcome
+  // Step 0: Welcome — centered full-screen
   if (step === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {/* Logo with radial glow */}
-          <div className="relative inline-flex items-center justify-center">
-            <div className="absolute w-40 h-40 rounded-full bg-gradient-radial from-foreground/10 to-transparent blur-2xl" />
-            <div className="relative inline-flex items-center justify-center w-20 h-20 bg-foreground rounded-2xl text-background text-2xl font-extrabold">
-              5C
-            </div>
-          </div>
+      <div
+        className="agent-shell-root"
+        style={{
+          minHeight: "100vh",
+          background: "var(--bg)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <main
+          role="main"
+          className="rise"
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            textAlign: "center",
+            gap: 28,
+            padding: "0 24px",
+          }}
+        >
+          <LogoTile size={64} />
 
-          <div className="space-y-2">
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <h1 style={{ ...headingStyle, fontSize: 30 }}>
               Welcome to 500Claw
             </h1>
-            <p className="text-muted-foreground text-base max-w-sm mx-auto">
+            <p style={{ ...bodyStyle, marginTop: 0, maxWidth: 360 }}>
               Let&apos;s get you set up in a few quick steps.
             </p>
           </div>
 
-          <button
-            onClick={() => setStep(1)}
-            className="inline-flex items-center justify-center h-11 px-8 bg-foreground text-background rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
-          >
+          <button onClick={() => setStep(1)} {...primaryBtnProps()}>
             Get Started
           </button>
-        </div>
+        </main>
       </div>
     );
   }
 
-  // Step 1: Name workspace
+  // Step 1: Name workspace — split layout
   if (step === 1) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-6">
-        <div className="flex w-full max-w-4xl gap-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {/* Left: form */}
-          <div className="flex-1 max-w-md space-y-6">
-            <button
-              onClick={() => setStep(0)}
-              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
+      <div
+        className="agent-shell-root"
+        style={{
+          display: "flex",
+          minHeight: "100vh",
+          background: "var(--bg)",
+        }}
+      >
+        {/* Left — form */}
+        <div
+          style={{
+            flex: "1 1 0",
+            minWidth: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "40px 48px",
+          }}
+        >
+          <main
+            role="main"
+            className="rise"
+            style={{
+              width: "100%",
+              maxWidth: 400,
+              display: "flex",
+              flexDirection: "column",
+              gap: 24,
+            }}
+          >
+            <button onClick={() => setStep(0)} {...textBtnProps()}>
+              <ArrowLeft size={16} aria-hidden="true" />
               Back
             </button>
 
             <ProgressBar current={1} />
 
             <div>
-              <h1 className="text-xl font-bold text-foreground">
-                Name your workspace
-              </h1>
-              <p className="text-muted-foreground text-sm mt-1">
+              <h1 style={headingStyle}>Name your workspace</h1>
+              <p style={bodyStyle}>
                 Choose something your team will recognize like the name of your
                 organization or team.
               </p>
             </div>
 
-            <div className="space-y-2">
-              <div className="relative">
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              <div style={{ position: "relative" }}>
                 <input
                   type="text"
+                  id="workspace-name"
+                  aria-label="Workspace name"
+                  aria-describedby="workspace-url-hint"
                   placeholder="e.g. Core Inc."
                   value={workspaceName}
                   onChange={(e) =>
                     setWorkspaceName(e.target.value.slice(0, 50))
                   }
-                  className="w-full h-11 px-4 pr-12 border border-border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                  style={{
+                    width: "100%",
+                    height: 44,
+                    paddingRight: 48,
+                    borderRadius: 12,
+                  }}
                   autoFocus
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">
+                <span
+                  aria-hidden="true"
+                  style={{
+                    position: "absolute",
+                    right: 14,
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    fontSize: 12,
+                    color: "var(--ink-3)",
+                  }}
+                >
                   {workspaceName.length}/50
                 </span>
               </div>
               {workspaceName && (
-                <p className="text-xs text-muted-foreground">
+                <p
+                  id="workspace-url-hint"
+                  style={{ fontSize: 12.5, color: "var(--ink-3)" }}
+                >
                   Workspace URL: .../{slugify(workspaceName)}
                 </p>
               )}
             </div>
 
-            <button
-              onClick={() => setStep(2)}
-              disabled={!workspaceName.trim()}
-              className="inline-flex items-center justify-center h-11 px-8 bg-foreground text-background rounded-full text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
-            >
-              Next
-            </button>
-          </div>
+            <div>
+              <button
+                onClick={() => setStep(2)}
+                {...primaryBtnProps(!workspaceName.trim())}
+              >
+                Next
+              </button>
+            </div>
+          </main>
+        </div>
 
-          {/* Right: live preview */}
-          <WorkspacePreview
-            workspaceName={workspaceName}
-            displayName={displayName}
-          />
+        {/* Right — showcase (hidden on small screens) */}
+        <div
+          className="auth-showcase-wrap"
+          style={{ flex: "1 1 0", minWidth: 0 }}
+        >
+          <AuthShowcase workspaceName={workspaceName} userName={displayName} />
         </div>
       </div>
     );
   }
 
-  // Step 2: Profile
+  // Step 2: Profile — split layout
   if (step === 2) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-6">
-        <div className="flex w-full max-w-4xl gap-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {/* Left: form */}
-          <div className="flex-1 max-w-md space-y-6">
-            <button
-              onClick={() => setStep(1)}
-              className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
+      <div
+        className="agent-shell-root"
+        style={{
+          display: "flex",
+          minHeight: "100vh",
+          background: "var(--bg)",
+        }}
+      >
+        {/* Left — form */}
+        <div
+          style={{
+            flex: "1 1 0",
+            minWidth: 0,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            padding: "40px 48px",
+          }}
+        >
+          <main
+            role="main"
+            className="rise"
+            style={{
+              width: "100%",
+              maxWidth: 400,
+              display: "flex",
+              flexDirection: "column",
+              gap: 24,
+            }}
+          >
+            <button onClick={() => setStep(1)} {...textBtnProps()}>
+              <ArrowLeft size={16} aria-hidden="true" />
               Back
             </button>
 
             <ProgressBar current={2} />
 
             <div>
-              <h1 className="text-xl font-bold text-foreground">
-                What&apos;s your name?
-              </h1>
-              <p className="text-muted-foreground text-sm mt-1">
+              <h1 style={headingStyle}>What&apos;s your name?</h1>
+              <p style={bodyStyle}>
                 This is how your teammates will see you.
               </p>
             </div>
 
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-foreground text-background flex items-center justify-center text-sm font-bold shrink-0">
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div
+                aria-hidden="true"
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 999,
+                  background: "var(--ink)",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontSize: 14,
+                  fontWeight: 600,
+                  flexShrink: 0,
+                }}
+              >
                 {displayName
                   ? displayName[0].toUpperCase()
                   : user.email[0].toUpperCase()}
               </div>
               <input
                 type="text"
+                id="display-name"
+                aria-label="Display name"
                 placeholder="Your name"
                 value={displayName}
                 onChange={(e) => setDisplayName(e.target.value.slice(0, 50))}
-                className="flex-1 h-11 px-4 border border-border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                style={{ flex: 1, height: 44, borderRadius: 12 }}
                 autoFocus
               />
             </div>
 
-            <button
-              onClick={() => setStep(3)}
-              disabled={!displayName.trim()}
-              className="inline-flex items-center justify-center h-11 px-8 bg-foreground text-background rounded-full text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-40"
-            >
-              Next
-            </button>
-          </div>
+            <div>
+              <button
+                onClick={() => setStep(3)}
+                {...primaryBtnProps(!displayName.trim())}
+              >
+                Next
+              </button>
+            </div>
+          </main>
+        </div>
 
-          {/* Right: live preview */}
-          <WorkspacePreview
-            workspaceName={workspaceName}
-            displayName={displayName}
-          />
+        {/* Right — showcase (hidden on small screens) */}
+        <div
+          className="auth-showcase-wrap"
+          style={{ flex: "1 1 0", minWidth: 0 }}
+        >
+          <AuthShowcase workspaceName={workspaceName} userName={displayName} />
         </div>
       </div>
     );
   }
 
-  // Step 3: Invite team (full-width centered, no preview)
+  // Step 3: Invite team — centered full-screen, no split
   if (step === 3) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background px-6">
-        <div className="w-full max-w-md space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <button
-            onClick={() => setStep(2)}
-            className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
-          >
-            <ArrowLeft className="w-4 h-4" />
+      <div
+        className="agent-shell-root"
+        style={{
+          minHeight: "100vh",
+          background: "var(--bg)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "40px 24px",
+        }}
+      >
+        <main
+          role="main"
+          className="rise"
+          style={{
+            width: "100%",
+            maxWidth: 420,
+            display: "flex",
+            flexDirection: "column",
+            gap: 24,
+          }}
+        >
+          <button onClick={() => setStep(2)} {...textBtnProps()}>
+            <ArrowLeft size={16} aria-hidden="true" />
             Back
           </button>
 
           <ProgressBar current={3} />
 
           <div>
-            <h1 className="text-xl font-bold text-foreground">
-              Invite your team
-            </h1>
-            <p className="text-muted-foreground text-sm mt-1">
+            <h1 style={headingStyle}>Invite your team</h1>
+            <p style={bodyStyle}>
               Add teammates by email. You can always invite more later.
             </p>
           </div>
 
-          <div className="space-y-3">
-            <div className="flex gap-2">
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ display: "flex", gap: 8 }}>
               <input
                 type="email"
+                id="invite-email"
+                aria-label="Teammate email"
                 placeholder="teammate@company.com"
                 value={emailInput}
                 onChange={(e) => setEmailInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && addEmail()}
-                className="flex-1 h-11 px-4 border border-border rounded-lg bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+                style={{
+                  flex: 1,
+                  height: 44,
+                  padding: "0 14px",
+                  border: "1px solid var(--line)",
+                  borderRadius: 12,
+                  background: "var(--bg)",
+                  color: "var(--ink)",
+                  outline: "none",
+                  fontSize: 14,
+                }}
                 autoFocus
               />
               <button
                 onClick={addEmail}
-                className="h-11 px-4 border border-border rounded-lg text-sm hover:bg-muted transition-colors inline-flex items-center gap-1.5"
+                style={{
+                  height: 44,
+                  padding: "0 16px",
+                  border: "1px solid var(--line)",
+                  borderRadius: 12,
+                  background: "var(--bg)",
+                  color: "var(--ink)",
+                  fontSize: 14,
+                  cursor: "pointer",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  transition: "background 0.15s",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "var(--hover-soft)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "var(--bg)";
+                }}
               >
-                <Plus className="w-4 h-4" />
+                <Plus size={16} aria-hidden="true" />
                 Add
               </button>
             </div>
 
             {inviteEmails.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                 {inviteEmails.map((email) => (
                   <div
                     key={email}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-muted rounded-full text-sm"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 6,
+                      padding: "6px 6px 6px 12px",
+                      borderRadius: 999,
+                      background: "var(--hover-soft)",
+                      fontSize: 13,
+                      color: "var(--ink)",
+                    }}
                   >
                     <span>{email}</span>
                     <button
                       onClick={() => removeEmail(email)}
-                      className="text-muted-foreground hover:text-foreground transition-colors"
+                      aria-label={`Remove ${email}`}
+                      style={{
+                        display: "inline-flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "none",
+                        border: "none",
+                        padding: 0,
+                        cursor: "pointer",
+                        color: "var(--ink-3)",
+                        transition: "color 0.15s",
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.color = "var(--ink)";
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.color = "var(--ink-3)";
+                      }}
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <X size={14} aria-hidden="true" />
                     </button>
                   </div>
                 ))}
@@ -391,25 +648,23 @@ export function OnboardingWizard({ user }: OnboardingWizardProps) {
             )}
           </div>
 
-          {error && <p className="text-sm text-destructive">{error}</p>}
+          {error && (
+            <p role="alert" style={{ color: "var(--red)", fontSize: 13 }}>
+              {error}
+            </p>
+          )}
 
-          <div className="flex items-center gap-3">
-            <button
-              onClick={handleFinish}
-              className="inline-flex items-center justify-center h-11 px-8 bg-foreground text-background rounded-full text-sm font-medium hover:opacity-90 transition-opacity"
-            >
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <button onClick={handleFinish} {...primaryBtnProps()}>
               {inviteEmails.length > 0 ? "Send Invites & Continue" : "Continue"}
             </button>
             {inviteEmails.length === 0 && (
-              <button
-                onClick={handleFinish}
-                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
-              >
+              <button onClick={handleFinish} {...textBtnProps()}>
                 Skip for now
               </button>
             )}
           </div>
-        </div>
+        </main>
       </div>
     );
   }

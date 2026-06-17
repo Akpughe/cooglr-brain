@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { MessageSquare } from "lucide-react";
 import { MessageItem } from "./message-item";
 import { TypingIndicator } from "./typing-indicator";
+import { PageLoading } from "@/components/ui/loading-spinner";
+import { EmptyState } from "@/components/ui/empty-state";
 import { useCurrentUserId } from "@/lib/workspace/context";
 import type { Message } from "@/lib/messages/types";
 
@@ -42,22 +45,11 @@ export function MessageList({ messages, loading, hasMore, onLoadMore, onEdit, on
   }
 
   if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-sm text-muted-foreground">Loading messages...</div>
-      </div>
-    );
+    return <PageLoading label="Loading messages..." />;
   }
 
   if (messages.length === 0) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="text-center space-y-2">
-          <p className="text-sm text-muted-foreground">No messages yet</p>
-          <p className="text-xs text-muted-foreground">Be the first to send a message!</p>
-        </div>
-      </div>
-    );
+    return <EmptyState icon={MessageSquare} title="No messages yet" description="Be the first to send a message!" />;
   }
 
   let lastDate = "";

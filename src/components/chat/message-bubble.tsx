@@ -26,7 +26,7 @@ export function MessageBubble({
   // AI message — left-aligned, full width, with avatar
   return (
     <div className="flex gap-3">
-      <div className="w-7 h-7 rounded-[8px] bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center shrink-0 mt-0.5">
+      <div className="size-7 rounded-[8px] bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center shrink-0 mt-0.5">
         <span className="text-[10px] font-bold text-primary">AI</span>
       </div>
       <div className="flex-1 min-w-0 text-[14px] leading-[1.75] text-foreground/90 pt-0.5">

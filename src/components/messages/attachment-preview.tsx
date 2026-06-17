@@ -19,12 +19,12 @@ export function AttachmentPreview({ attachment }: { attachment: Attachment }) {
   return (
     <a href={attachment.url} target="_blank" rel="noopener noreferrer"
       className="flex items-center gap-3 mt-1 p-3 border border-border rounded-lg hover:bg-muted transition-colors max-w-[300px]">
-      <FileText className="w-8 h-8 text-muted-foreground shrink-0" />
+      <FileText className="size-8 text-muted-foreground shrink-0" />
       <div className="flex-1 min-w-0">
         <div className="text-sm font-medium truncate">{attachment.name}</div>
         <div className="text-xs text-muted-foreground">{sizeStr}</div>
       </div>
-      <Download className="w-4 h-4 text-muted-foreground shrink-0" />
+      <Download className="size-4 text-muted-foreground shrink-0" />
     </a>
   );
 }

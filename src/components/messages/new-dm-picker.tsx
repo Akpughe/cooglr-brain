@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useWorkspace, useCurrentUserId } from "@/lib/workspace/context";
 import { usePresenceContext } from "@/lib/messages/presence-context";
 import { X, Search } from "lucide-react";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 
 interface NewDmPickerProps {
   workspaceId: string;
@@ -37,19 +38,21 @@ export function NewDmPicker({ workspaceId, workspaceSlug, onClose }: NewDmPicker
     } catch {} finally { setCreating(false); }
   }
 
+  const trapRef = useFocusTrap<HTMLDivElement>();
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-popover rounded-2xl shadow-xl w-full max-w-sm border border-border">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-label="New message">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div ref={trapRef} className="relative bg-popover rounded-lg shadow-surface-lg w-full max-w-sm border border-border">
         <div className="flex items-center justify-between px-4 py-3 border-b border-border">
           <h2 className="text-sm font-semibold">New message</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="w-4 h-4" /></button>
+          <button onClick={onClose} aria-label="Close" className="text-muted-foreground hover:text-foreground"><X className="size-4" /></button>
         </div>
         <div className="p-3">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-muted-foreground" />
             <input type="text" value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search members..."
-              className="w-full h-9 pl-9 pr-3 border border-border rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring" autoFocus />
+              className="w-full h-8 pl-9 pr-3 border border-border rounded-md text-sm bg-background focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background outline-none" autoFocus />
           </div>
         </div>
         <div className="max-h-[300px] overflow-y-auto pb-2">
@@ -57,11 +60,11 @@ export function NewDmPicker({ workspaceId, workspaceSlug, onClose }: NewDmPicker
             <button key={member.userId} onClick={() => handleSelect(member.userId)} disabled={creating}
               className="w-full flex items-center gap-3 px-4 py-2 hover:bg-muted transition-colors text-left disabled:opacity-50">
               <div className="relative shrink-0">
-                <div className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center text-xs font-bold">
+                <div className="size-8 rounded-full bg-foreground text-background flex items-center justify-center text-xs font-bold">
                   {member.fullName?.[0]?.toUpperCase() || member.email[0].toUpperCase()}
                 </div>
                 {isOnline(member.userId) && (
-                  <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-popover" />
+                  <div className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full bg-success border-2 border-popover" />
                 )}
               </div>
               <div className="flex-1 min-w-0">

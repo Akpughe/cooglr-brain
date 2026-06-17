@@ -14,19 +14,21 @@
 
 import { generateText } from "ai";
 import { fireworks } from "@ai-sdk/fireworks";
+import { groq } from "@ai-sdk/groq";
 
-// Reasoning model (planning, synthesis) — quality first.
-const DEFAULT_MODEL = "accounts/fireworks/models/kimi-k2p5";
+// Reasoning + synthesis model. Currently gpt-oss-120b on Groq.
+const DEFAULT_MODEL = "groq/openai/gpt-oss-120b";
 // Bulk model (schema enrichment over many tables) — fast, non-thinking.
-// gpt-oss-120b on Fireworks: ~1.3s/call vs Kimi's 20-50s, clean JSON.
 export const BULK_MODEL =
-  process.env.KNOWLEDGE_MODEL_BULK || "accounts/fireworks/models/gpt-oss-120b";
+  process.env.KNOWLEDGE_MODEL_BULK || "groq/openai/gpt-oss-120b";
 
 function resolveModel(modelId?: string) {
   const id = modelId || process.env.KNOWLEDGE_MODEL || DEFAULT_MODEL;
-  // Fireworks account paths use the Fireworks provider (FIREWORKS_API_KEY);
-  // any other "provider/model" string routes through the Vercel AI Gateway.
-  return id.startsWith("accounts/fireworks/") ? fireworks(id) : id;
+  // "groq/<model>" -> Groq provider (GROQ_API_KEY); "accounts/fireworks/..." ->
+  // Fireworks; any other "provider/model" string -> the Vercel AI Gateway.
+  if (id.startsWith("groq/")) return groq(id.slice("groq/".length));
+  if (id.startsWith("accounts/fireworks/")) return fireworks(id);
+  return id;
 }
 
 // `model` overrides the model for this call (e.g. BULK_MODEL for enrichment).

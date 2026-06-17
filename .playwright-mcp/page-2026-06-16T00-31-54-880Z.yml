@@ -1,0 +1,124 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Plugins" [ref=e6]
+    - button "Automations" [ref=e7]
+    - button "Settings" [ref=e8]
+  - generic [ref=e9]:
+    - complementary [ref=e10]:
+      - navigation [ref=e11]:
+        - button "New chat" [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+          - text: New chat
+        - button "Search" [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+          - text: Search
+        - button "Plugins" [ref=e20] [cursor=pointer]:
+          - img [ref=e21]
+          - text: Plugins
+        - button "Automations" [ref=e24] [cursor=pointer]:
+          - img [ref=e25]
+          - text: Automations
+      - generic [ref=e28]:
+        - generic [ref=e29]: Chats
+        - button "Draft this week's growth report ⌘1" [ref=e30] [cursor=pointer]:
+          - generic [ref=e31]: Draft this week's growth report
+          - generic [ref=e32]: ⌘1
+        - button "Create Instagram carousel concepts ⌘2" [ref=e33] [cursor=pointer]:
+          - generic [ref=e34]: Create Instagram carousel concepts
+          - generic [ref=e35]: ⌘2
+        - button "Create mind map designs ⌘3" [ref=e36] [cursor=pointer]:
+          - generic [ref=e37]: Create mind map designs
+          - generic [ref=e38]: ⌘3
+        - button "Plan screen-recording workflow ⌘4" [ref=e39] [cursor=pointer]:
+          - generic [ref=e40]: Plan screen-recording workflow
+          - generic [ref=e41]: ⌘4
+        - button "Find markdown files from 3 days ⌘5" [ref=e42] [cursor=pointer]:
+          - generic [ref=e43]: Find markdown files from 3 days
+          - generic [ref=e44]: ⌘5
+        - button "Create teen presentation ⌘6" [ref=e45] [cursor=pointer]:
+          - generic [ref=e46]: Create teen presentation
+          - generic [ref=e47]: ⌘6
+        - button "Find available domain names ⌘7" [ref=e48] [cursor=pointer]:
+          - generic [ref=e49]: Find available domain names
+          - generic [ref=e50]: ⌘7
+        - button "Schedule LinkedIn posts ⌘8" [ref=e51] [cursor=pointer]:
+          - generic [ref=e52]: Schedule LinkedIn posts
+          - generic [ref=e53]: ⌘8
+        - button "Research Newton prospects ⌘9" [ref=e54] [cursor=pointer]:
+          - generic [ref=e55]: Research Newton prospects
+          - generic [ref=e56]: ⌘9
+        - button "Open Zoho Mail login 1w" [ref=e57] [cursor=pointer]:
+          - generic [ref=e58]: Open Zoho Mail login
+          - generic [ref=e59]: 1w
+      - button "Settings" [ref=e62] [cursor=pointer]:
+        - generic [ref=e63]:
+          - img [ref=e64]
+          - text: Settings
+        - img [ref=e67]
+    - main [ref=e123]:
+      - generic [ref=e124]:
+        - generic [ref=e125]:
+          - button "View templates" [ref=e126] [cursor=pointer]
+          - button "Create manually" [ref=e128] [cursor=pointer]:
+            - text: Create manually
+            - img [ref=e129]
+        - generic [ref=e131]:
+          - heading "Automations" [level=1] [ref=e132]
+          - paragraph [ref=e133]:
+            - text: Run chats on a schedule or whenever you need them.
+            - button "Learn more" [ref=e134] [cursor=pointer]
+        - generic [ref=e135]:
+          - img [ref=e136]
+          - generic [ref=e141]: Create your first automation
+          - generic [ref=e142]: Start from one of these, or describe it in chat.
+          - generic [ref=e143]:
+            - button "Daily brief A morning summary of what changed" [ref=e144] [cursor=pointer]:
+              - img [ref=e146]
+              - generic [ref=e151]: Daily brief
+              - generic [ref=e152]: A morning summary of what changed
+            - button "Weekly review A weekly report, sent after you approve" [ref=e153] [cursor=pointer]:
+              - img [ref=e155]
+              - generic [ref=e158]: Weekly review
+              - generic [ref=e159]: A weekly report, sent after you approve
+            - button "Project monitor Alerts when projects stall or block" [ref=e160] [cursor=pointer]:
+              - img [ref=e162]
+              - generic [ref=e169]: Project monitor
+              - generic [ref=e170]: Alerts when projects stall or block
+        - generic [ref=e172]:
+          - generic [ref=e173]:
+            - textbox "Automation title" [ref=e174]
+            - button "Clear" [ref=e175] [cursor=pointer]
+            - button "Tips" [ref=e176] [cursor=pointer]:
+              - img [ref=e177]
+              - text: Tips
+            - button "Use template" [ref=e179] [cursor=pointer]
+            - button "Close" [ref=e180] [cursor=pointer]:
+              - img [ref=e181]
+          - textbox "Describe what you want to automate — what it should do, which sources or tools to use, and what to produce. It runs on the schedule below without you." [active] [ref=e185]: Every morning at 8am, brief me on what changed across the company.
+          - generic [ref=e186]:
+            - button "Daily at 9:00 AM" [ref=e188] [cursor=pointer]:
+              - img [ref=e189]
+              - text: Daily at 9:00 AM
+              - img [ref=e192]
+            - button "Select project" [ref=e194] [cursor=pointer]:
+              - img [ref=e195]
+              - text: Select project
+              - img [ref=e197]
+            - button "All sources" [ref=e199] [cursor=pointer]:
+              - img [ref=e200]
+              - text: All sources
+              - img [ref=e204]
+            - button "Auto" [ref=e206] [cursor=pointer]:
+              - img [ref=e207]
+              - text: Auto
+              - img [ref=e210]
+            - button "Cancel" [ref=e212] [cursor=pointer]
+            - button "Create" [ref=e213] [cursor=pointer]
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e118] [cursor=pointer]:
+    - img [ref=e119]
+  - alert [ref=e122]

@@ -1,6 +1,8 @@
 import type { QueryPlan, DigResult } from "./types";
 import { complete, extractJson } from "./llm";
 import { DEFAULT_AGENTS_MD } from "./agents-md";
+import { buildTable, buildChart } from "./chart-builder";
+import type { ChartSpec, TableSpec } from "./chart-builder";
 
 export interface SynthesisResult {
   answerMd: string;
@@ -11,7 +13,10 @@ export interface QueryOutcome {
   plan: QueryPlan;
   dig: DigResult;
   answerMd: string;
-  chart: SynthesisResult["chart"];
+  // Computed DETERMINISTICALLY from the real dig rows (preferred over the LLM's
+  // fabricated chart). chart is null when the data isn't sensibly chartable.
+  chart: ChartSpec | null;
+  table?: TableSpec;
 }
 
 // Injected dependencies — keeps the loop testable without LLM/DB.
@@ -32,7 +37,22 @@ export async function runQueryLoop(question: string, deps: LoopDeps): Promise<Qu
       const plan = await deps.plan(question);
       const dig = await deps.dig(plan);
       const synth = await deps.synthesize(question, plan, dig);
-      return { plan, dig, answerMd: synth.answerMd, chart: synth.chart ?? null };
+      // Build the REAL table + chart deterministically from the actual rows.
+      // These replace the LLM-fabricated chart and add the (previously missing)
+      // downloadable table whenever the dig produced rows.
+      const table =
+        dig.rows.length > 0
+          ? buildTable(dig.columns, dig.rows, { filename: plan.tables[0] ?? "export" })
+          : undefined;
+      const computedChart = dig.rows.length > 0 ? buildChart(dig.columns, dig.rows) : null;
+      return {
+        plan,
+        dig,
+        answerMd: synth.answerMd,
+        // Prefer the deterministic chart; fall back to nothing (never the LLM's).
+        chart: computedChart,
+        table,
+      };
     } catch (err) {
       lastErr = err;
     }

@@ -9,7 +9,7 @@ import { OAUTH_PROVIDERS } from "@/types/accounts";
 
 function ProviderIcon({ icon, name }: { icon: string; name: string }) {
   return (
-    <div className="w-9 h-9 rounded-lg bg-muted border border-border/60 flex items-center justify-center text-xs font-semibold text-foreground/70 shrink-0">
+    <div className="size-9 rounded-lg bg-muted border border-border/60 flex items-center justify-center text-xs font-semibold text-foreground/70 shrink-0">
       {icon}
     </div>
   );

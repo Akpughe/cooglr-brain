@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -200,11 +201,11 @@ export function DbConnections() {
               <Button
                 type="submit"
                 disabled={isBusy}
-                className="rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground"
+                className="rounded-md bg-primary hover:bg-primary/90 text-primary-foreground"
               >
                 {step === "testing" ? (
                   <span className="flex items-center gap-2">
-                    <span className="w-3.5 h-3.5 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                    <LoadingSpinner size="sm" />
                     Testing...
                   </span>
                 ) : "Connect"}
@@ -217,7 +218,7 @@ export function DbConnections() {
         {step === "select-db" && (
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
             <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 mt-0.5">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <ellipse cx="12" cy="5" rx="9" ry="3"/>
                   <path d="M3 5V19A9 3 0 0 0 21 19V5"/>
@@ -244,11 +245,11 @@ export function DbConnections() {
                       : "bg-background border border-border hover:border-primary/40 hover:bg-primary/5"
                   }`}
                 >
-                  <div className={`w-3.5 h-3.5 rounded-full border-2 flex items-center justify-center ${
+                  <div className={`size-3.5 rounded-full border-2 flex items-center justify-center ${
                     selectedDatabase === db ? "border-white" : "border-muted-foreground/40"
                   }`}>
                     {selectedDatabase === db && (
-                      <div className="w-1.5 h-1.5 rounded-full bg-white" />
+                      <div className="size-1.5 rounded-full bg-white" />
                     )}
                   </div>
                   <span className="text-sm font-medium">{db}</span>
@@ -280,7 +281,7 @@ export function DbConnections() {
         {/* Saving indicator */}
         {step === "saving" && (
           <div className="flex items-center gap-2 text-sm text-muted-foreground py-3">
-            <span className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+            <LoadingSpinner size="sm" />
             Saving connection...
           </div>
         )}
@@ -298,7 +299,7 @@ export function DbConnections() {
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center text-xs font-bold ${
+                  <div className={`size-9 rounded-lg flex items-center justify-center text-xs font-bold ${
                     conn.is_active
                       ? "bg-primary/10 text-primary border border-primary/20"
                       : "bg-muted text-muted-foreground border border-border/60"

@@ -65,8 +65,9 @@ export function MessageInput({ onSend, disabled, connected = true }: Props) {
             <button
               onClick={handleSend}
               disabled={disabled || !hasContent}
+              aria-label="Send message"
               className={cn(
-                "flex items-center justify-center w-8 h-8 rounded-xl transition-all duration-200",
+                "flex items-center justify-center size-8 rounded-xl transition-all duration-200",
                 hasContent && !disabled
                   ? "bg-primary text-primary-foreground shadow-surface hover:bg-primary/90 scale-100"
                   : "bg-transparent text-muted-foreground/30 scale-95"
@@ -83,7 +84,7 @@ export function MessageInput({ onSend, disabled, connected = true }: Props) {
         <div className="flex items-center justify-between mt-2 px-1">
           <div className="flex items-center gap-1.5">
             <span className={cn(
-              "w-1.5 h-1.5 rounded-full",
+              "size-1.5 rounded-full",
               connected ? "bg-emerald-500" : "bg-red-400"
             )} />
             <span className="text-[10px] text-muted-foreground/40">

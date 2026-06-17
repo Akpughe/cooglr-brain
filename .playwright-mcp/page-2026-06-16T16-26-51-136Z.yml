@@ -1,0 +1,48 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic [ref=e4]:
+      - generic [ref=e5]: 5C
+      - heading "Welcome to 500Claw" [level=1] [ref=e6]
+      - paragraph [ref=e7]: Sign in to your team's all-in-one agentic workspace.
+      - button "Continue with Google" [ref=e10] [cursor=pointer]:
+        - img [ref=e11]
+        - text: Continue with Google
+      - paragraph [ref=e16]: By continuing, you agree to our Terms of Service and Privacy Policy.
+    - generic [ref=e19]:
+      - generic [ref=e20]:
+        - complementary [ref=e21]:
+          - generic [ref=e22]:
+            - generic [ref=e23]: "5"
+            - generic [ref=e24]: 500Chow
+          - generic [ref=e25]:
+            - img [ref=e27]
+            - text: New chat
+          - generic [ref=e30]:
+            - img [ref=e32]
+            - text: Search
+          - generic [ref=e35]:
+            - img [ref=e37]
+            - text: Folders
+          - generic [ref=e40]: Draft growth report
+          - generic [ref=e41]: Instagram carousel
+          - generic [ref=e42]: Research prospects
+        - generic [ref=e43]:
+          - generic [ref=e44]: What should we work on?
+          - generic [ref=e45]:
+            - generic [ref=e46]: Ask your workspace anything
+            - generic [ref=e47]: ↑
+          - generic [ref=e48]:
+            - generic [ref=e49]:
+              - text: Summarize my
+              - strong [ref=e50]: Teams
+              - text: meetings
+            - generic [ref=e51]:
+              - text: Plot data in
+              - strong [ref=e52]: graphs
+      - generic [ref=e53]:
+        - generic [ref=e54]: One workspace, one agent.
+        - generic [ref=e55]: Chat, files, and automations for your team — grounded in everything you connect.
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e61] [cursor=pointer]:
+    - img [ref=e62]
+  - alert [ref=e65]

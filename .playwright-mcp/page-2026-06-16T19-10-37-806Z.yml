@@ -1,0 +1,139 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Folders" [ref=e6]
+    - button "Plugins" [ref=e7]
+    - button "Settings" [ref=e8]
+    - button "Profile" [ref=e9]
+  - generic [ref=e10]:
+    - complementary [ref=e11]:
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: 500Chow
+          - button "Collapse sidebar" [ref=e15] [cursor=pointer]:
+            - img [ref=e16]
+        - navigation [ref=e19]:
+          - button "New chat" [ref=e20] [cursor=pointer]:
+            - img [ref=e21]
+            - text: New chat
+          - button "Search" [ref=e24] [cursor=pointer]:
+            - img [ref=e25]
+            - text: Search
+          - button "Plugins" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+            - text: Plugins
+          - button "Folders" [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+            - text: Folders
+        - generic [ref=e35]:
+          - generic [ref=e36]: Chats
+          - button "Draft this week's growth report ⌘1" [ref=e37] [cursor=pointer]:
+            - generic [ref=e38]: Draft this week's growth report
+            - generic [ref=e39]: ⌘1
+          - button "Create Instagram carousel concepts ⌘2" [ref=e40] [cursor=pointer]:
+            - generic [ref=e41]: Create Instagram carousel concepts
+            - generic [ref=e42]: ⌘2
+          - button "Create mind map designs ⌘3" [ref=e43] [cursor=pointer]:
+            - generic [ref=e44]: Create mind map designs
+            - generic [ref=e45]: ⌘3
+          - button "Plan screen-recording workflow ⌘4" [ref=e46] [cursor=pointer]:
+            - generic [ref=e47]: Plan screen-recording workflow
+            - generic [ref=e48]: ⌘4
+          - button "Find markdown files from 3 days ⌘5" [ref=e49] [cursor=pointer]:
+            - generic [ref=e50]: Find markdown files from 3 days
+            - generic [ref=e51]: ⌘5
+          - button "Create teen presentation ⌘6" [ref=e52] [cursor=pointer]:
+            - generic [ref=e53]: Create teen presentation
+            - generic [ref=e54]: ⌘6
+          - button "Find available domain names ⌘7" [ref=e55] [cursor=pointer]:
+            - generic [ref=e56]: Find available domain names
+            - generic [ref=e57]: ⌘7
+          - button "Schedule LinkedIn posts ⌘8" [ref=e58] [cursor=pointer]:
+            - generic [ref=e59]: Schedule LinkedIn posts
+            - generic [ref=e60]: ⌘8
+          - button "Research Newton prospects ⌘9" [ref=e61] [cursor=pointer]:
+            - generic [ref=e62]: Research Newton prospects
+            - generic [ref=e63]: ⌘9
+          - button "Open Zoho Mail login 1w" [ref=e64] [cursor=pointer]:
+            - generic [ref=e65]: Open Zoho Mail login
+            - generic [ref=e66]: 1w
+        - button "Settings" [ref=e69] [cursor=pointer]:
+          - generic [ref=e70]:
+            - img [ref=e71]
+            - text: Settings
+          - img [ref=e74]
+      - generic:
+        - button "Expand sidebar":
+          - img
+        - button "New chat":
+          - img
+        - button "Search":
+          - img
+        - button "Plugins":
+          - img
+        - button "Folders":
+          - img
+        - generic:
+          - button "Account":
+            - generic: D
+    - main [ref=e78]:
+      - generic [ref=e80]: New chat
+      - generic [ref=e81]:
+        - heading "What should we work on?" [level=1] [ref=e82]
+        - generic [ref=e84]:
+          - textbox "Ask your workspace anything" [active] [ref=e85]
+          - generic [ref=e86]:
+            - button "Add files" [ref=e87] [cursor=pointer]:
+              - img [ref=e88]
+              - text: Add files
+            - generic [ref=e89]:
+              - img [ref=e90]
+              - text: All sources
+            - button "Model profile" [ref=e95] [cursor=pointer]:
+              - text: Auto
+              - img [ref=e96]
+            - button "Dictate" [ref=e98] [cursor=pointer]:
+              - img [ref=e99]
+              - text: Dictate
+            - button "Send" [ref=e102]:
+              - img [ref=e103]
+        - generic [ref=e105]:
+          - button "Google Meet List my action points from my Google Meet" [ref=e106] [cursor=pointer]:
+            - img "Google Meet" [ref=e108]
+            - generic [ref=e109]:
+              - text: List my action points from my
+              - strong [ref=e110]: Google Meet
+          - button "Browse the web and write a newsletter" [ref=e111] [cursor=pointer]:
+            - img [ref=e113]
+            - generic [ref=e116]:
+              - text: Browse the
+              - strong [ref=e117]: web
+              - text: and write a newsletter
+          - button "Create a financial analysis and plot data in graphs" [ref=e118] [cursor=pointer]:
+            - img [ref=e120]
+            - generic [ref=e122]:
+              - text: Create a financial analysis and plot data in
+              - strong [ref=e123]: graphs
+          - button "Notion Analyze our Notion documentation" [ref=e124] [cursor=pointer]:
+            - img "Notion" [ref=e126]
+            - generic [ref=e127]:
+              - text: Analyze our
+              - strong [ref=e128]: Notion
+              - text: documentation
+          - button "Microsoft Teams Summarize my Teams meetings from yesterday" [ref=e129] [cursor=pointer]:
+            - img "Microsoft Teams" [ref=e131]
+            - generic [ref=e132]:
+              - text: Summarize my
+              - strong [ref=e133]: Teams
+              - text: meetings from yesterday
+          - button "Connect your apps for better answers" [ref=e134] [cursor=pointer]:
+            - img [ref=e136]
+            - generic [ref=e140]: Connect your apps for better answers
+            - img [ref=e141]
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e148] [cursor=pointer]:
+    - img [ref=e149]
+  - alert [ref=e152]

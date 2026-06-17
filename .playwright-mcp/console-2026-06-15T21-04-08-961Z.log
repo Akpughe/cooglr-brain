@@ -1,0 +1,1429 @@
+[     380ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     462ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     705ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     908ms] [LOG] [Fast Refresh] done in 312ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   41798ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   41798ms] [WARNING] The width(-1) and height(-1) of chart should be greater than 0,
+       please check the style of container, or the props width(100%) and height(100%),
+       or add a minWidth(0) or minHeight(undefined) or use aspect(undefined) to control the
+       height and width. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   42058ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   42120ms] [LOG] [Fast Refresh] done in 164ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1013102ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1013509ms] [LOG] [Fast Refresh] done in 501ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1018656ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1018721ms] [LOG] [Fast Refresh] done in 130ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1037416ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1037466ms] [LOG] [Fast Refresh] done in 115ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1064087ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1064719ms] [LOG] [Fast Refresh] done in 724ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1078823ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1078865ms] [LOG] [Fast Refresh] done in 92ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1133323ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1133350ms] [LOG] [Fast Refresh] done in 54ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1141631ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1141661ms] [LOG] [Fast Refresh] done in 42ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1146457ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1146486ms] [LOG] [Fast Refresh] done in 38ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1207681ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1208167ms] [ERROR] ./src/components/agent-shell/agent-chat-surface.tsx:8:1
+Export AgentOutputsCard doesn't exist in target module
+   6 | import { AgentComposer } from "./agent-composer";
+   7 | import { AgentMessage } from "./agent-message";
+>  8 | import { AgentOutputsCard } from "./agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import type { AgentArtifact, ModelProfile } from "./types";
+  10 |
+  11 | interface UIMessageLike {
+
+The export AgentOutputsCard was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentCanvasPanel?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 1208167ms] [ERROR] ./src/components/agent-shell/agent-chat-surface.tsx:8:1
+Export AgentOutputsCard doesn't exist in target module
+   6 | import { AgentComposer } from "./agent-composer";
+   7 | import { AgentMessage } from "./agent-message";
+>  8 | import { AgentOutputsCard } from "./agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import type { AgentArtifact, ModelProfile } from "./types";
+  10 |
+  11 | interface UIMessageLike {
+
+The export AgentOutputsCard was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentCanvasPanel?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 1208168ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview?_rsc=17osx:0
+[ 1208201ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview?_rsc=17osx:0
+[ 1208202ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview?_rsc=17osx:0
+[ 1208218ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview?_rsc=17osx:0
+[ 1208233ms] [ERROR] ./src/components/agent-shell/agent-chat-surface.tsx:8:1
+Export AgentOutputsCard doesn't exist in target module
+   6 | import { AgentComposer } from "./agent-composer";
+   7 | import { AgentMessage } from "./agent-message";
+>  8 | import { AgentOutputsCard } from "./agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import type { AgentArtifact, ModelProfile } from "./types";
+  10 |
+  11 | interface UIMessageLike {
+
+The export AgentOutputsCard was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentCanvasPanel?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 1208233ms] [ERROR] ./src/components/agent-shell/agent-chat-surface.tsx:8:1
+Export AgentOutputsCard doesn't exist in target module
+   6 | import { AgentComposer } from "./agent-composer";
+   7 | import { AgentMessage } from "./agent-message";
+>  8 | import { AgentOutputsCard } from "./agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import type { AgentArtifact, ModelProfile } from "./types";
+  10 |
+  11 | interface UIMessageLike {
+
+The export AgentOutputsCard was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentCanvasPanel?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 1208271ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview:0
+[ 1208348ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0bruynb._.js:15305
+[ 1208388ms] Error: ./src/components/agent-shell/agent-chat-surface.tsx:8:1
+Export AgentOutputsCard doesn't exist in target module
+   6 | import { AgentComposer } from "./agent-composer";
+   7 | import { AgentMessage } from "./agent-message";
+>  8 | import { AgentOutputsCard } from "./agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import type { AgentArtifact, ModelProfile } from "./types";
+  10 |
+  11 | interface UIMessageLike {
+
+The export AgentOutputsCard was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentCanvasPanel?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/components/agent-shell/agent-chat-surface.tsx:8:1)
+    at Object.getCompilationErrors (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/hot-reloader-turbopack.js:1189:59)
+    at DevBundlerService.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/lib/dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:719:42)
+    at DevServer.findPageComponents (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:689:43)
+    at async DevServer.renderErrorToResponseImpl (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/base-server.js:1745:26)
+[ 1208387ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1208390ms] [ERROR] ./src/components/agent-shell/agent-chat-surface.tsx:8:1
+Export AgentOutputsCard doesn't exist in target module
+   6 | import { AgentComposer } from "./agent-composer";
+   7 | import { AgentMessage } from "./agent-message";
+>  8 | import { AgentOutputsCard } from "./agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import type { AgentArtifact, ModelProfile } from "./types";
+  10 |
+  11 | interface UIMessageLike {
+
+The export AgentOutputsCard was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentCanvasPanel?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1208391ms] [ERROR] ./src/components/agent-shell/agent-chat-surface.tsx:8:1
+Export AgentOutputsCard doesn't exist in target module
+   6 | import { AgentComposer } from "./agent-composer";
+   7 | import { AgentMessage } from "./agent-message";
+>  8 | import { AgentOutputsCard } from "./agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import type { AgentArtifact, ModelProfile } from "./types";
+  10 |
+  11 | interface UIMessageLike {
+
+The export AgentOutputsCard was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentCanvasPanel?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1208430ms] [ERROR] ./src/components/agent-shell/agent-chat-surface.tsx:8:1
+Export AgentOutputsCard doesn't exist in target module
+   6 | import { AgentComposer } from "./agent-composer";
+   7 | import { AgentMessage } from "./agent-message";
+>  8 | import { AgentOutputsCard } from "./agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import type { AgentArtifact, ModelProfile } from "./types";
+  10 |
+  11 | interface UIMessageLike {
+
+The export AgentOutputsCard was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentCanvasPanel?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1208430ms] [ERROR] ./src/components/agent-shell/agent-chat-surface.tsx:8:1
+Export AgentOutputsCard doesn't exist in target module
+   6 | import { AgentComposer } from "./agent-composer";
+   7 | import { AgentMessage } from "./agent-message";
+>  8 | import { AgentOutputsCard } from "./agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import type { AgentArtifact, ModelProfile } from "./types";
+  10 |
+  11 | interface UIMessageLike {
+
+The export AgentOutputsCard was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentCanvasPanel?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1208523ms] [ERROR] ./src/components/agent-shell/agent-chat-surface.tsx:8:1
+Export AgentOutputsCard doesn't exist in target module
+   6 | import { AgentComposer } from "./agent-composer";
+   7 | import { AgentMessage } from "./agent-message";
+>  8 | import { AgentOutputsCard } from "./agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import type { AgentArtifact, ModelProfile } from "./types";
+  10 |
+  11 | interface UIMessageLike {
+
+The export AgentOutputsCard was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentCanvasPanel?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1208523ms] [ERROR] ./src/components/agent-shell/agent-chat-surface.tsx:8:1
+Export AgentOutputsCard doesn't exist in target module
+   6 | import { AgentComposer } from "./agent-composer";
+   7 | import { AgentMessage } from "./agent-message";
+>  8 | import { AgentOutputsCard } from "./agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import type { AgentArtifact, ModelProfile } from "./types";
+  10 |
+  11 | interface UIMessageLike {
+
+The export AgentOutputsCard was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentCanvasPanel?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1208532ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1209214ms] [ERROR] ./src/components/agent-shell/agent-chat-surface.tsx:8:1
+Export AgentOutputsCard doesn't exist in target module
+   6 | import { AgentComposer } from "./agent-composer";
+   7 | import { AgentMessage } from "./agent-message";
+>  8 | import { AgentOutputsCard } from "./agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import type { AgentArtifact, ModelProfile } from "./types";
+  10 |
+  11 | interface UIMessageLike {
+
+The export AgentOutputsCard was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentCanvasPanel?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1209214ms] [ERROR] ./src/components/agent-shell/agent-chat-surface.tsx:8:1
+Export AgentOutputsCard doesn't exist in target module
+   6 | import { AgentComposer } from "./agent-composer";
+   7 | import { AgentMessage } from "./agent-message";
+>  8 | import { AgentOutputsCard } from "./agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   9 | import type { AgentArtifact, ModelProfile } from "./types";
+  10 |
+  11 | interface UIMessageLike {
+
+The export AgentOutputsCard was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentCanvasPanel?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1209286ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1248182ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1248297ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview:0
+[ 1248320ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0bruynb._.js:15305
+[ 1248340ms] Error: ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/app/agent-preview/page.tsx:14:1)
+    at Object.getCompilationErrors (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/hot-reloader-turbopack.js:1189:59)
+    at DevBundlerService.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/lib/dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:719:42)
+    at DevServer.findPageComponents (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:689:43)
+    at async DevServer.renderErrorToResponseImpl (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/base-server.js:1745:26)
+[ 1248331ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1248333ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1248333ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1248373ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1248373ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1248441ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1260402ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1260402ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1260427ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1269372ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1269372ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1269406ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1289756ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1289756ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1289794ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1294564ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1294565ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1294602ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1336827ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1340083ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview:0
+[ 1340099ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0bruynb._.js:15305
+[ 1340107ms] Error: ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/app/agent-preview/page.tsx:14:1)
+    at Object.getCompilationErrors (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/hot-reloader-turbopack.js:1189:59)
+    at DevBundlerService.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/lib/dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:719:42)
+    at DevServer.findPageComponents (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:689:43)
+    at async DevServer.renderErrorToResponseImpl (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/base-server.js:1745:26)
+[ 1340108ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1340108ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1340109ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1340109ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1340109ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1340110ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1340110ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1340110ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1340110ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1340147ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1340147ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1340147ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1340147ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1340211ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1419515ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1419855ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview:0
+[ 1419905ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0bruynb._.js:15305
+[ 1419928ms] Error: ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/app/agent-preview/page.tsx:14:1)
+    at Object.getCompilationErrors (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/hot-reloader-turbopack.js:1189:59)
+    at DevBundlerService.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/lib/dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:719:42)
+    at DevServer.findPageComponents (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:689:43)
+    at async DevServer.renderErrorToResponseImpl (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/base-server.js:1745:26)
+[ 1419926ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1419929ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1419929ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1419929ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1419929ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1419969ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-client] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1419969ms] [ERROR] ./src/app/agent-preview/page.tsx:14:1
+Export AgentCanvasPanel doesn't exist in target module
+  12 | import { AgentThreadRail } from "@/components/agent-shell/agent-thread-rail";
+  13 | import { AgentChatSurface } from "@/components/agent-shell/agent-chat-surface";
+> 14 | import { AgentCanvasPanel } from "@/components/agent-shell/agent-canvas-panel";
+     | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  15 | import type { AgentArtifact, ModelProfile, ThreadSummary } from "@/components/agent-shell/...
+  16 |
+  17 | const MOCK_WS = {
+
+The export AgentCanvasPanel was not found in module [project]/src/components/agent-shell/agent-canvas-panel.tsx [app-ssr] (ecmascript).
+Did you mean to import AgentOutputsCard?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1419969ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1419969ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1420032ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1432898ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1432898ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1432904ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1437435ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1437435ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1437470ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1444304ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1444304ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1444329ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1452666ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-client] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1452666ms] [ERROR] ./src/components/agent-shell/agent-empty-state.tsx:3:1
+Export Github doesn't exist in target module
+  1 | "use client";
+  2 |
+> 3 | import { MessageSquare, Github, FolderOpen, ChevronDown, FolderGit2 } from "lucide-react";
+    | ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  4 | import { toast } from "sonner";
+  5 | import { AgentComposer } from "./agent-composer";
+  6 | import type { ModelProfile } from "./types";
+
+The export Github was not found in module [project]/node_modules/lucide-react/dist/esm/lucide-react.js [app-ssr] (ecmascript).
+Did you mean to import Gift?
+All exports of the module are statically known (It doesn't have dynamic exports). So it's known statically that the requested export doesn't exist.
+
+Import traces:
+  Client Component Browser:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component Browser]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/agent-shell/agent-empty-state.tsx [Client Component SSR]
+    ./src/components/agent-shell/agent-chat-surface.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 1452698ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1476430ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1476734ms] [LOG] [Fast Refresh] done in 308ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 1477102ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1477148ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431

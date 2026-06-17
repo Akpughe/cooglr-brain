@@ -18,10 +18,10 @@ export default function DmPage() {
 
   const [otherUser, setOtherUser] = useState<{ id: string; fullName: string; email: string; avatarUrl: string | null } | null>(null);
 
-  const { messages, loading, hasMore, loadMore, sendMessage, editMessage, deleteMessage } =
-    useMessages({ targetId: conversationId, type: "dm", workspaceId: workspace.id });
-
   const currentMember = members.find((m) => m.userId === currentUserId);
+
+  const { messages, loading, hasMore, loadMore, sendMessage, editMessage, deleteMessage } =
+    useMessages({ targetId: conversationId, type: "dm", workspaceId: workspace.id, currentUserName: currentMember?.fullName || "You" });
   const { typingUsers, sendTypingEvent } = useTyping(conversationId, currentUserId);
 
   useEffect(() => {
@@ -50,11 +50,11 @@ export default function DmPage() {
     <div className="flex-1 flex flex-col h-full">
       <div className="h-12 border-b border-border flex items-center px-4 gap-3 shrink-0">
         <div className="relative">
-          <div className="w-6 h-6 rounded-full bg-foreground text-background flex items-center justify-center text-xs font-bold">
+          <div className="flex size-6 items-center justify-center rounded-full bg-foreground text-xs font-bold text-background">
             {otherName[0]?.toUpperCase() || "?"}
           </div>
           {otherOnline && (
-            <div className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-green-500 border-2 border-background" />
+            <div className="absolute -bottom-0.5 -right-0.5 size-2.5 rounded-full border-2 border-background bg-success" />
           )}
         </div>
         <div>

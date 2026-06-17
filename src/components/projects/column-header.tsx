@@ -57,7 +57,7 @@ export function ColumnHeader({ column, taskCount, onRename, onDelete, onAddTask 
   return (
     <div className="flex items-center justify-between px-2 pb-3">
       <div className="flex items-center gap-2 min-w-0">
-        <StatusIcon className={`w-4 h-4 shrink-0 ${status.color}`} />
+        <StatusIcon className={`size-4 shrink-0 ${status.color}`} />
         {editing ? (
           <input
             value={editName}
@@ -76,16 +76,18 @@ export function ColumnHeader({ column, taskCount, onRename, onDelete, onAddTask 
       <div className="flex items-center gap-0.5 shrink-0">
         <button
           onClick={() => setMenuOpen(!menuOpen)}
-          className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-muted transition-colors"
+          aria-label="Column options"
+          className="size-6 rounded flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-muted transition-colors"
         >
-          <MoreHorizontal className="w-3.5 h-3.5" />
+          <MoreHorizontal className="size-3.5" />
         </button>
         <button
           onClick={onAddTask}
-          className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-muted transition-colors"
+          aria-label="Add task"
+          className="size-6 rounded flex items-center justify-center text-muted-foreground/50 hover:text-foreground hover:bg-muted transition-colors"
           title="Add task"
         >
-          <Plus className="w-3.5 h-3.5" />
+          <Plus className="size-3.5" />
         </button>
 
         {menuOpen && (
@@ -96,13 +98,13 @@ export function ColumnHeader({ column, taskCount, onRename, onDelete, onAddTask 
                 onClick={() => { setMenuOpen(false); setEditing(true); setEditName(column.name); }}
                 className="w-full flex items-center gap-2 px-3 py-1.5 text-sm hover:bg-muted transition-colors"
               >
-                <Pencil className="w-3.5 h-3.5" /> Rename
+                <Pencil className="size-3.5" /> Rename
               </button>
               <button
                 onClick={() => { setMenuOpen(false); onDelete(); }}
                 className="w-full flex items-center gap-2 px-3 py-1.5 text-sm text-destructive hover:bg-destructive/10 transition-colors"
               >
-                <Trash2 className="w-3.5 h-3.5" /> Delete
+                <Trash2 className="size-3.5" /> Delete
               </button>
             </div>
           </>

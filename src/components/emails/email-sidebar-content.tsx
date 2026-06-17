@@ -28,7 +28,7 @@ export function EmailSidebarContent() {
   return (
     <div className="mb-3">
       <div className="px-3 py-1.5">
-        <span className="text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--sidebar-text-muted)" }}>
+        <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--sidebar-text-muted)" }}>
           Email Marketing
         </span>
       </div>
@@ -50,7 +50,7 @@ export function EmailSidebarContent() {
                 maxWidth: "calc(100% - 16px)",
               }}
             >
-              <Icon className="w-3.5 h-3.5 shrink-0 opacity-50" />
+              <Icon className="size-3.5 shrink-0 opacity-50" />
               <span>{section.label}</span>
             </button>
           );

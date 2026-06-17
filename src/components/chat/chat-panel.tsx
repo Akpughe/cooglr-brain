@@ -34,7 +34,7 @@ export function ChatPanel({ sessionId, onFirstMessage }: Props) {
             {processSteps.map((step, i) => (
               <div key={i} className="flex items-center gap-2.5 text-[12px] text-muted-foreground">
                 {step.status === "running" ? (
-                  <div className="w-3.5 h-3.5 rounded-full border-[1.5px] border-primary/60 border-t-transparent animate-spin shrink-0" />
+                  <div className="size-3.5 rounded-full border-[1.5px] border-primary/60 border-t-transparent animate-spin shrink-0" />
                 ) : (
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-emerald-500 shrink-0">
                     <polyline points="20 6 9 17 4 12"/>
@@ -50,7 +50,7 @@ export function ChatPanel({ sessionId, onFirstMessage }: Props) {
             ))}
             {statusText && processSteps.every((s) => s.status === "done") && (
               <div className="flex items-center gap-2.5 text-[12px] text-muted-foreground">
-                <div className="w-3.5 h-3.5 rounded-full border-[1.5px] border-primary/60 border-t-transparent animate-spin shrink-0" />
+                <div className="size-3.5 rounded-full border-[1.5px] border-primary/60 border-t-transparent animate-spin shrink-0" />
                 <span>{statusText}</span>
               </div>
             )}

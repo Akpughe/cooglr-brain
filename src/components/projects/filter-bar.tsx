@@ -87,7 +87,7 @@ export function FilterBar({ filters, onFilterChange, doneColumnId }: FilterBarPr
           onClick={() => onFilterChange({ assignee: null, priority: null, taskType: null, activeOnly: false })}
           className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
         >
-          <X className="w-3 h-3" /> Clear
+          <X className="size-3" /> Clear
         </button>
       )}
     </div>

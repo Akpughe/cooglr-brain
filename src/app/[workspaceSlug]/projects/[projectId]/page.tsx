@@ -12,6 +12,7 @@ import { AiChatPanel } from "@/components/projects/ai-chat-panel";
 import { Plus, Filter, Sparkles, LayoutGrid, List } from "lucide-react";
 import type { Project, ProjectColumn, Task, TaskType, Priority, TaskLabel } from "@/lib/projects/types";
 import { cn } from "@/lib/utils";
+import { PageLoading } from "@/components/ui/loading-spinner";
 
 type ViewMode = "board" | "list";
 
@@ -205,11 +206,7 @@ export default function ProjectPage() {
   }
 
   if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <p className="text-sm text-muted-foreground">Loading project...</p>
-      </div>
-    );
+    return <PageLoading label="Loading project..." />;
   }
 
   // Expanded task view takes over the entire content area
@@ -241,7 +238,7 @@ export default function ProjectPage() {
               showFilters ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted"
             )}
           >
-            <Filter className="w-3.5 h-3.5" /> Filter
+            <Filter className="size-3.5" /> Filter
           </button>
         </div>
 
@@ -255,7 +252,7 @@ export default function ProjectPage() {
                 view === "board" ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted"
               )}
             >
-              <LayoutGrid className="w-3.5 h-3.5" /> Board
+              <LayoutGrid className="size-3.5" /> Board
             </button>
             <button
               onClick={() => setView("list")}
@@ -264,7 +261,7 @@ export default function ProjectPage() {
                 view === "list" ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted"
               )}
             >
-              <List className="w-3.5 h-3.5" /> List
+              <List className="size-3.5" /> List
             </button>
           </div>
 
@@ -273,7 +270,7 @@ export default function ProjectPage() {
               onClick={handleAddColumn}
               className="h-7 px-2 rounded-md text-xs text-muted-foreground hover:bg-muted flex items-center gap-1 transition-colors"
             >
-              <Plus className="w-3.5 h-3.5" /> Column
+              <Plus className="size-3.5" /> Column
             </button>
           )}
 
@@ -284,7 +281,7 @@ export default function ProjectPage() {
               showAiChat ? "bg-foreground text-background" : "text-muted-foreground hover:bg-muted"
             )}
           >
-            <Sparkles className="w-3.5 h-3.5" />
+            <Sparkles className="size-3.5" />
           </button>
         </div>
       </div>

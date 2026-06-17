@@ -73,8 +73,8 @@ export function ReportsOnboarding({ workspaceId, onComplete }: Props) {
       case "intro":
         return (
           <div className="text-center max-w-lg mx-auto space-y-6">
-            <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mx-auto">
-              <BarChart3 className="w-8 h-8 text-indigo-400" />
+            <div className="size-16 rounded-2xl bg-indigo-500/10 flex items-center justify-center mx-auto">
+              <BarChart3 className="size-8 text-indigo-400" />
             </div>
             <h1 className="text-2xl font-bold">Reports</h1>
             <p className="text-muted-foreground leading-relaxed">
@@ -86,8 +86,8 @@ export function ReportsOnboarding({ workspaceId, onComplete }: Props) {
                 { icon: PieChart, title: "Visual Reports", desc: "Auto-generated charts, key metrics, and executive summaries" },
                 { icon: FileSpreadsheet, title: "Export", desc: "Export results to Google Sheets or download as PDF" },
               ].map((feature) => (
-                <div key={feature.title} className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-                  <feature.icon className="w-5 h-5 text-indigo-400 mb-2" />
+                <div key={feature.title} className="p-4 rounded-xl bg-foreground/[0.03] border border-foreground/[0.06]">
+                  <feature.icon className="size-5 text-indigo-400 mb-2" />
                   <h3 className="font-medium text-sm mb-1">{feature.title}</h3>
                   <p className="text-xs text-muted-foreground">{feature.desc}</p>
                 </div>
@@ -99,7 +99,7 @@ export function ReportsOnboarding({ workspaceId, onComplete }: Props) {
                 onClick={() => setStep(1)}
                 className="px-6 py-2.5 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white font-medium transition-colors inline-flex items-center gap-2"
               >
-                Get Started <ArrowRight className="w-4 h-4" />
+                Get Started <ArrowRight className="size-4" />
               </button>
             </div>
           </div>
@@ -119,7 +119,7 @@ export function ReportsOnboarding({ workspaceId, onComplete }: Props) {
                 <select
                   value={dbType}
                   onChange={(e) => setDbType(e.target.value)}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm outline-none"
+                  className="w-full bg-foreground/5 border border-foreground/10 rounded-lg px-3 py-2.5 text-sm outline-none"
                 >
                   <option value="postgresql">PostgreSQL</option>
                   <option value="clickhouse">ClickHouse</option>
@@ -133,7 +133,7 @@ export function ReportsOnboarding({ workspaceId, onComplete }: Props) {
                   value={connName}
                   onChange={(e) => setConnName(e.target.value)}
                   placeholder="e.g. Production DB"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm outline-none placeholder:text-white/20"
+                  className="w-full bg-foreground/5 border border-foreground/10 rounded-lg px-3 py-2.5 text-sm outline-none placeholder:text-foreground/20"
                 />
               </div>
 
@@ -144,7 +144,7 @@ export function ReportsOnboarding({ workspaceId, onComplete }: Props) {
                   value={connectionString}
                   onChange={(e) => setConnectionString(e.target.value)}
                   placeholder={placeholderConnString}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2.5 text-sm outline-none placeholder:text-white/20 font-mono"
+                  className="w-full bg-foreground/5 border border-foreground/10 rounded-lg px-3 py-2.5 text-sm outline-none placeholder:text-foreground/20 font-mono"
                 />
                 <p className="text-xs text-muted-foreground mt-1.5">
                   Include credentials and database name in the URL.
@@ -165,20 +165,20 @@ export function ReportsOnboarding({ workspaceId, onComplete }: Props) {
       case "ready":
         return (
           <div className="text-center max-w-md mx-auto space-y-6">
-            <div className="w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mx-auto">
-              <Check className="w-8 h-8 text-green-400" />
+            <div className="size-16 rounded-full bg-success/10 flex items-center justify-center mx-auto">
+              <Check className="size-8 text-success" />
             </div>
             <h2 className="text-xl font-semibold">You're all set!</h2>
             <p className="text-sm text-muted-foreground">Your database is connected. Start asking questions about your data in plain English.</p>
 
             <div className="space-y-2 text-left max-w-sm mx-auto">
               <div className="flex items-center gap-2 py-1.5 text-sm">
-                <Check className="w-4 h-4 text-green-400" />
+                <Check className="size-4 text-success" />
                 <span className="text-white">Database connected</span>
               </div>
             </div>
 
-            <div className="p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] text-left max-w-sm mx-auto">
+            <div className="p-4 rounded-xl bg-foreground/[0.03] border border-foreground/[0.06] text-left max-w-sm mx-auto">
               <p className="text-xs text-muted-foreground mb-2">Try asking something like:</p>
               <p className="text-sm italic text-indigo-300">"Show me the top 10 customers by revenue this month"</p>
             </div>
@@ -187,7 +187,7 @@ export function ReportsOnboarding({ workspaceId, onComplete }: Props) {
               onClick={onComplete}
               className="px-6 py-2.5 rounded-lg bg-indigo-500 hover:bg-indigo-600 text-white font-medium transition-colors inline-flex items-center gap-2"
             >
-              Start Querying <ArrowRight className="w-4 h-4" />
+              Start Querying <ArrowRight className="size-4" />
             </button>
           </div>
         );
@@ -197,23 +197,23 @@ export function ReportsOnboarding({ workspaceId, onComplete }: Props) {
   return (
     <div className="flex-1 flex flex-col">
       {/* Step indicator */}
-      <div className="flex items-center justify-center gap-2 py-4 border-b border-white/[0.06]">
+      <div className="flex items-center justify-center gap-2 py-4 border-b border-foreground/[0.06]">
         {STEPS.map((s, i) => {
           const Icon = s.icon;
           const isActive = i === step;
           const isDone = i < step;
           return (
             <div key={s.id} className="flex items-center gap-2">
-              {i > 0 && <div className={cn("w-8 h-px", isDone ? "bg-indigo-400/40" : "bg-white/10")} />}
+              {i > 0 && <div className={cn("w-8 h-px", isDone ? "bg-indigo-400/40" : "bg-foreground/10")} />}
               <button
                 onClick={() => { if (isDone) setStep(i); }}
                 className={cn(
                   "flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs transition-colors",
                   isActive ? "bg-indigo-500/20 text-indigo-300" :
-                  isDone ? "text-green-400/70 cursor-pointer" : "text-white/20 cursor-default"
+                  isDone ? "text-success/70 cursor-pointer" : "text-foreground/20 cursor-default"
                 )}
               >
-                {isDone ? <Check className="w-3 h-3" /> : <Icon className="w-3 h-3" />}
+                {isDone ? <Check className="size-3" /> : <Icon className="size-3" />}
                 <span className="hidden sm:inline">{s.label}</span>
               </button>
             </div>
@@ -233,7 +233,7 @@ export function ReportsOnboarding({ workspaceId, onComplete }: Props) {
             onClick={() => setStep(step - 1)}
             className="text-sm text-muted-foreground hover:text-white transition-colors inline-flex items-center gap-1"
           >
-            <ArrowLeft className="w-3.5 h-3.5" /> Back
+            <ArrowLeft className="size-3.5" /> Back
           </button>
         </div>
       )}

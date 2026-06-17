@@ -1,0 +1,1041 @@
+[     708ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     772ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     902ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     924ms] [LOG] [Fast Refresh] done in 125ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[    7876ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/files?workspaceId=ws_demo:0
+[    7883ms] [ERROR] Failed to load resource: the server responded with a status of 401 (Unauthorized) @ http://localhost:3000/api/files?workspaceId=ws_demo:0
+[   22765ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   22801ms] [LOG] [Fast Refresh] done in 139ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  415716ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  415731ms] [LOG] [Fast Refresh] done in 118ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  454468ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  454705ms] [LOG] [Fast Refresh] done in 338ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  466016ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  466035ms] [LOG] [Fast Refresh] done in 82ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  485507ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  485531ms] [LOG] [Fast Refresh] done in 54ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  510652ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  510656ms] [LOG] [Fast Refresh] done in 107ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  530137ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  530160ms] [LOG] [Fast Refresh] done in 55ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1329212ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3183773ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3183887ms] [LOG] [Fast Refresh] done in 197ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3188990ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3189018ms] [LOG] [Fast Refresh] done in 66ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3276171ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3276188ms] [LOG] [Fast Refresh] done in 103ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3713784ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3713821ms] [LOG] [Fast Refresh] done in 118ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3718723ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3718752ms] [LOG] [Fast Refresh] done in 48ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3774269ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3774291ms] [LOG] [Fast Refresh] done in 98ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3779672ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3779696ms] [LOG] [Fast Refresh] done in 54ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3797620ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3797637ms] [LOG] [Fast Refresh] done in 99ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3817004ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3817029ms] [LOG] [Fast Refresh] done in 73ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3863268ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 3863287ms] [LOG] [Fast Refresh] done in 105ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5258714ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5258768ms] [LOG] [Fast Refresh] done in 139ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5259462ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5260071ms] [ERROR] ./src/app/(auth)/login/page.tsx:58:13
+Expected '</', got 'jsx text'
+  56 |           </p>
+  57 |         </div>
+> 58 |       </div>
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 59 |
+     | ^
+> 60 |       {/* Right — showcase (hidden on small screens) */}
+     | ^^^^^^
+  61 |       <div className="auth-showcase-wrap" style={{ flex: "1 1 0", minWidth: 0 }}>
+  62 |         <AuthShowcase />
+  63 |       </div>
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 5265171ms] [ERROR] ./src/app/(auth)/login/page.tsx:58:13
+Expected '</', got 'jsx text'
+  56 |           </p>
+  57 |         </div>
+> 58 |       </div>
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 59 |
+     | ^
+> 60 |       {/* Right — showcase (hidden on small screens) */}
+     | ^^^^^^
+  61 |       <div className="auth-showcase-wrap" style={{ flex: "1 1 0", minWidth: 0 }}>
+  62 |         <AuthShowcase />
+  63 |       </div>
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 5265276ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5265499ms] [ERROR] ./src/app/(auth)/login/page.tsx:59:13
+Expected '</', got 'jsx text'
+  57 |           </p>
+  58 |         </div>
+> 59 |       </div>
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 60 |
+     | ^
+> 61 |       {/* Right — showcase (hidden on small screens) */}
+     | ^^^^^^
+  62 |       <div className="auth-showcase-wrap" style={{ flex: "1 1 0", minWidth: 0 }}>
+  63 |         <AuthShowcase />
+  64 |       </div>
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 5268946ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5269319ms] [ERROR] ./src/app/(auth)/login/page.tsx:59:13
+Expected '</', got 'jsx text'
+  57 |           </p>
+  58 |         </div>
+> 59 |       </div>
+     |             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 60 |
+     | ^
+> 61 |       {/* Right — showcase (hidden on small screens) */}
+     | ^^^^^^
+  62 |       <div className="auth-showcase-wrap" style={{ flex: "1 1 0", minWidth: 0 }}>
+  63 |         <AuthShowcase />
+  64 |       </div>
+
+Parsing ecmascript source code failed @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 5271101ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5271544ms] [LOG] [Fast Refresh] done in 517ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5271900ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5272160ms] [LOG] [Fast Refresh] done in 363ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5275619ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5275653ms] [LOG] [Fast Refresh] done in 126ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5942815ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5942837ms] [LOG] [Fast Refresh] done in 86ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5948164ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5948191ms] [LOG] [Fast Refresh] done in 74ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5952484ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5952492ms] [LOG] [Fast Refresh] done in 97ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5957450ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5957472ms] [LOG] [Fast Refresh] done in 72ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5959456ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5959481ms] [LOG] [Fast Refresh] done in 60ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5963334ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5963358ms] [LOG] [Fast Refresh] done in 50ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5964269ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5964293ms] [LOG] [Fast Refresh] done in 53ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5991507ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5991532ms] [LOG] [Fast Refresh] done in 109ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5991841ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5991867ms] [LOG] [Fast Refresh] done in 57ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5995807ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 5995851ms] [LOG] [Fast Refresh] done in 120ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 6767831ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 6767871ms] [LOG] [Fast Refresh] done in 124ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7203665ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7203845ms] [LOG] [Fast Refresh] done in 265ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7217974ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7218082ms] [LOG] [Fast Refresh] done in 190ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7231391ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7231460ms] [LOG] [Fast Refresh] done in 160ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7244056ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7244094ms] [LOG] [Fast Refresh] done in 129ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7254632ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7254711ms] [LOG] [Fast Refresh] done in 168ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7256031ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7256057ms] [LOG] [Fast Refresh] done in 47ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7267964ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7267998ms] [LOG] [Fast Refresh] done in 120ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7275763ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7275767ms] [LOG] [Fast Refresh] done in 96ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7283593ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7283605ms] [LOG] [Fast Refresh] done in 102ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7288986ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7289004ms] [LOG] [Fast Refresh] done in 63ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7291927ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7291952ms] [LOG] [Fast Refresh] done in 79ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7301495ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7301518ms] [LOG] [Fast Refresh] done in 88ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7309306ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7309323ms] [LOG] [Fast Refresh] done in 94ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7316920ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7316942ms] [LOG] [Fast Refresh] done in 74ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7330409ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7330429ms] [LOG] [Fast Refresh] done in 89ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7336341ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7336365ms] [LOG] [Fast Refresh] done in 54ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7362642ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7362650ms] [LOG] [Fast Refresh] done in 105ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7366003ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7366025ms] [LOG] [Fast Refresh] done in 68ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7382178ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7382202ms] [LOG] [Fast Refresh] done in 107ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7395483ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7395502ms] [LOG] [Fast Refresh] done in 63ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7407862ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7407883ms] [LOG] [Fast Refresh] done in 57ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7409167ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7409194ms] [LOG] [Fast Refresh] done in 61ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7415241ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7415260ms] [LOG] [Fast Refresh] done in 101ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7429026ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7429043ms] [LOG] [Fast Refresh] done in 111ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7431020ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7431044ms] [LOG] [Fast Refresh] done in 66ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7436118ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7436137ms] [LOG] [Fast Refresh] done in 58ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7439837ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7439856ms] [LOG] [Fast Refresh] done in 63ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7442375ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7442390ms] [LOG] [Fast Refresh] done in 93ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7448365ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7448392ms] [LOG] [Fast Refresh] done in 50ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7453702ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7453727ms] [LOG] [Fast Refresh] done in 45ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7464446ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7464471ms] [LOG] [Fast Refresh] done in 55ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7471161ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7471176ms] [LOG] [Fast Refresh] done in 95ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7475027ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7475048ms] [LOG] [Fast Refresh] done in 61ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7475769ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7475778ms] [LOG] [Fast Refresh] done in 67ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7486824ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7486834ms] [LOG] [Fast Refresh] done in 78ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7488792ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7488821ms] [LOG] [Fast Refresh] done in 47ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7494977ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7495003ms] [LOG] [Fast Refresh] done in 50ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7495394ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7495416ms] [LOG] [Fast Refresh] done in 56ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7500055ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7500082ms] [LOG] [Fast Refresh] done in 57ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7505620ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7505647ms] [LOG] [Fast Refresh] done in 49ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7513708ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7513732ms] [LOG] [Fast Refresh] done in 51ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7516374ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7516399ms] [LOG] [Fast Refresh] done in 49ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7519387ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7519413ms] [LOG] [Fast Refresh] done in 55ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7539517ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7539535ms] [LOG] [Fast Refresh] done in 73ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7547887ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7547904ms] [LOG] [Fast Refresh] done in 69ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7554877ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7554894ms] [LOG] [Fast Refresh] done in 73ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7562154ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7562175ms] [LOG] [Fast Refresh] done in 58ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7567583ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7567606ms] [LOG] [Fast Refresh] done in 55ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7646443ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7646499ms] [LOG] [Fast Refresh] done in 154ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7651864ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7651890ms] [LOG] [Fast Refresh] done in 68ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7656514ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7656539ms] [LOG] [Fast Refresh] done in 86ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7660421ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7660447ms] [LOG] [Fast Refresh] done in 56ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7674293ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7674310ms] [LOG] [Fast Refresh] done in 101ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7779348ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7779366ms] [LOG] [Fast Refresh] done in 101ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7785209ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7785233ms] [LOG] [Fast Refresh] done in 56ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7791144ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7791168ms] [LOG] [Fast Refresh] done in 52ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7931641ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7931768ms] [LOG] [Fast Refresh] done in 235ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7965640ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7966022ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:294:15
+Expected '</', got 'jsx text'
+  292 |             Get Started
+  293 |           </button>
+> 294 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 295 |       </div>
+      | ^^^^^^
+  296 |     );
+  297 |   }
+  298 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 7966258ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:294:15
+Expected '</', got 'jsx text'
+  292 |             Get Started
+  293 |           </button>
+> 294 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 295 |       </div>
+      | ^^^^^^
+  296 |     );
+  297 |   }
+  298 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 7966259ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview?_rsc=17osx:0
+[ 7966273ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:294:15
+Expected '</', got 'jsx text'
+  292 |             Get Started
+  293 |           </button>
+> 294 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 295 |       </div>
+      | ^^^^^^
+  296 |     );
+  297 |   }
+  298 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 7966274ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:294:15
+Expected '</', got 'jsx text'
+  292 |             Get Started
+  293 |           </button>
+> 294 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 295 |       </div>
+      | ^^^^^^
+  296 |     );
+  297 |   }
+  298 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 7966376ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7966469ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:294:15
+Expected '</', got 'jsx text'
+  292 |             Get Started
+  293 |           </button>
+> 294 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 295 |       </div>
+      | ^^^^^^
+  296 |     );
+  297 |   }
+  298 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 7966508ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview:0
+[ 7966584ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0bruynb._.js:15305
+[ 7966646ms] Error: ./src/components/onboarding/onboarding-wizard.tsx:294:15
+Expected '</', got 'jsx text'
+  292 |             Get Started
+  293 |           </button>
+> 294 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 295 |       </div>
+      | ^^^^^^
+  296 |     );
+  297 |   }
+  298 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/components/onboarding/onboarding-wizard.tsx:294:15)
+    at Object.getCompilationErrors (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/hot-reloader-turbopack.js:1189:59)
+    at DevBundlerService.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/lib/dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:719:42)
+    at DevServer.findPageComponents (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:689:43)
+    at async DevServer.renderErrorToResponseImpl (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/base-server.js:1745:26)
+[ 7966643ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 7966654ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:294:15
+Expected '</', got 'jsx text'
+  292 |             Get Started
+  293 |           </button>
+> 294 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 295 |       </div>
+      | ^^^^^^
+  296 |     );
+  297 |   }
+  298 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 7966739ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:294:15
+Expected '</', got 'jsx text'
+  292 |             Get Started
+  293 |           </button>
+> 294 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 295 |       </div>
+      | ^^^^^^
+  296 |     );
+  297 |   }
+  298 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 7966768ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 7969352ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 7969436ms] [LOG] [Fast Refresh] done in 127ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 7969661ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 7969835ms] [LOG] [Fast Refresh] done in 275ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 7970540ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7970582ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7977375ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7977442ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview?_rsc=17osx:0
+[ 7977486ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview:0
+[ 7977556ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0bruynb._.js:15305
+[ 7977570ms] Error: ./src/components/onboarding/onboarding-wizard.tsx:392:17
+Expected '</', got 'jsx text'
+  390 |               </button>
+  391 |             </div>
+> 392 |           </div>
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 393 |         </div>
+      | ^^^^^^^^
+  394 |
+  395 |         {/* Right — showcase (hidden on small screens) */}
+  396 |         <div
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/components/onboarding/onboarding-wizard.tsx:392:17)
+    at Object.getCompilationErrors (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/hot-reloader-turbopack.js:1189:59)
+    at DevBundlerService.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/lib/dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:719:42)
+    at DevServer.findPageComponents (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:689:43)
+    at async DevServer.renderErrorToResponseImpl (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/base-server.js:1745:26)
+[ 7977572ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 7977605ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:392:17
+Expected '</', got 'jsx text'
+  390 |               </button>
+  391 |             </div>
+> 392 |           </div>
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 393 |         </div>
+      | ^^^^^^^^
+  394 |
+  395 |         {/* Right — showcase (hidden on small screens) */}
+  396 |         <div
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 7977648ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:392:17
+Expected '</', got 'jsx text'
+  390 |               </button>
+  391 |             </div>
+> 392 |           </div>
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 393 |         </div>
+      | ^^^^^^^^
+  394 |
+  395 |         {/* Right — showcase (hidden on small screens) */}
+  396 |         <div
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 7977757ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:392:17
+Expected '</', got 'jsx text'
+  390 |               </button>
+  391 |             </div>
+> 392 |           </div>
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 393 |         </div>
+      | ^^^^^^^^
+  394 |
+  395 |         {/* Right — showcase (hidden on small screens) */}
+  396 |         <div
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 7977819ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 7987541ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 7987552ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:399:17
+Expected '</', got 'jsx text'
+  397 |               </button>
+  398 |             </div>
+> 399 |           </div>
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 400 |         </div>
+      | ^^^^^^^^
+  401 |
+  402 |         {/* Right — showcase (hidden on small screens) */}
+  403 |         <div
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 7994852ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 7994910ms] [LOG] [Fast Refresh] done in 103ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 7995034ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 7995191ms] [LOG] [Fast Refresh] done in 258ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 7995654ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 7995688ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8001419ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8001473ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:498:17
+Expected '</', got 'jsx text'
+  496 |               </button>
+  497 |             </div>
+> 498 |           </div>
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 499 |         </div>
+      | ^^^^^^^^
+  500 |
+  501 |         {/* Right — showcase (hidden on small screens) */}
+  502 |         <div
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 8001595ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8001601ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:498:17
+Expected '</', got 'jsx text'
+  496 |               </button>
+  497 |             </div>
+> 498 |           </div>
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 499 |         </div>
+      | ^^^^^^^^
+  500 |
+  501 |         {/* Right — showcase (hidden on small screens) */}
+  502 |         <div
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 8001605ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview?_rsc=17osx:0
+[ 8001668ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview:0
+[ 8001817ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0bruynb._.js:15305
+[ 8001827ms] Error: ./src/components/onboarding/onboarding-wizard.tsx:498:17
+Expected '</', got 'jsx text'
+  496 |               </button>
+  497 |             </div>
+> 498 |           </div>
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 499 |         </div>
+      | ^^^^^^^^
+  500 |
+  501 |         {/* Right — showcase (hidden on small screens) */}
+  502 |         <div
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/components/onboarding/onboarding-wizard.tsx:498:17)
+    at Object.getCompilationErrors (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/hot-reloader-turbopack.js:1189:59)
+    at DevBundlerService.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/lib/dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:719:42)
+    at DevServer.findPageComponents (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:689:43)
+    at async DevServer.renderErrorToResponseImpl (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/base-server.js:1745:26)
+[ 8001862ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8001882ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:498:17
+Expected '</', got 'jsx text'
+  496 |               </button>
+  497 |             </div>
+> 498 |           </div>
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 499 |         </div>
+      | ^^^^^^^^
+  500 |
+  501 |         {/* Right — showcase (hidden on small screens) */}
+  502 |         <div
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 8001915ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:498:17
+Expected '</', got 'jsx text'
+  496 |               </button>
+  497 |             </div>
+> 498 |           </div>
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 499 |         </div>
+      | ^^^^^^^^
+  500 |
+  501 |         {/* Right — showcase (hidden on small screens) */}
+  502 |         <div
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 8001981ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:498:17
+Expected '</', got 'jsx text'
+  496 |               </button>
+  497 |             </div>
+> 498 |           </div>
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 499 |         </div>
+      | ^^^^^^^^
+  500 |
+  501 |         {/* Right — showcase (hidden on small screens) */}
+  502 |         <div
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 8002043ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8010863ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8010990ms] [LOG] [Fast Refresh] done in 89ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8011460ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8011483ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8016769ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8016805ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview?_rsc=17osx:0
+[ 8016859ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/agent-preview:0
+[ 8016904ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_react-dom_0bruynb._.js:15305
+[ 8016922ms] Error: ./src/components/onboarding/onboarding-wizard.tsx:662:15
+Expected '</', got 'jsx text'
+  660 |             )}
+  661 |           </div>
+> 662 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 663 |       </div>
+      | ^^^^^^
+  664 |     );
+  665 |   }
+  666 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+
+    at <unknown> (Error: ./src/components/onboarding/onboarding-wizard.tsx:662:15)
+    at Object.getCompilationErrors (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/hot-reloader-turbopack.js:1189:59)
+    at DevBundlerService.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/lib/dev-bundler-service.js:44:55)
+    at DevServer.getCompilationError (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:719:42)
+    at DevServer.findPageComponents (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/dev/next-dev-server.js:689:43)
+    at async DevServer.renderErrorToResponseImpl (file:///Users/davak/Documents/500claw-platform/node_modules/next/dist/server/base-server.js:1745:26)
+[ 8016935ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8016972ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:662:15
+Expected '</', got 'jsx text'
+  660 |             )}
+  661 |           </div>
+> 662 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 663 |       </div>
+      | ^^^^^^
+  664 |     );
+  665 |   }
+  666 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 8016989ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:662:15
+Expected '</', got 'jsx text'
+  660 |             )}
+  661 |           </div>
+> 662 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 663 |       </div>
+      | ^^^^^^
+  664 |     );
+  665 |   }
+  666 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 8017087ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:662:15
+Expected '</', got 'jsx text'
+  660 |             )}
+  661 |           </div>
+> 662 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 663 |       </div>
+      | ^^^^^^
+  664 |     );
+  665 |   }
+  666 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 8017152ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8020344ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:664:15
+Expected '</', got 'jsx text'
+  662 |             )}
+  663 |           </div>
+> 664 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 665 |       </div>
+      | ^^^^^^
+  666 |     );
+  667 |   }
+  668 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 8020368ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8023923ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:664:15
+Expected '</', got 'jsx text'
+  662 |             )}
+  663 |           </div>
+> 664 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 665 |       </div>
+      | ^^^^^^
+  666 |     );
+  667 |   }
+  668 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 8023928ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8027799ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:665:15
+Expected '</', got 'jsx text'
+  663 |             )}
+  664 |           </div>
+> 665 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 666 |       </div>
+      | ^^^^^^
+  667 |     );
+  668 |   }
+  669 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 8027823ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8030665ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:665:15
+Expected '</', got 'jsx text'
+  663 |             )}
+  664 |           </div>
+> 665 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 666 |       </div>
+      | ^^^^^^
+  667 |     );
+  668 |   }
+  669 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 8030689ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8034499ms] [ERROR] ./src/components/onboarding/onboarding-wizard.tsx:667:15
+Expected '</', got 'jsx text'
+  665 |             )}
+  666 |           </div>
+> 667 |         </div>
+      |               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> 668 |       </div>
+      | ^^^^^^
+  669 |     );
+  670 |   }
+  671 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/components/onboarding/onboarding-wizard.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/onboarding/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1945
+[ 8034523ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8038613ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8038652ms] [LOG] [Fast Refresh] done in 107ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8038795ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8038875ms] [LOG] [Fast Refresh] done in 181ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_0u_w_5s._.js:1226
+[ 8039270ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8039289ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8084262ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8084295ms] [LOG] [Fast Refresh] done in 134ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8118697ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8119531ms] [LOG] [Fast Refresh] done in 821ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8183001ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8183025ms] [LOG] [Fast Refresh] done in 96ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8204143ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8204165ms] [LOG] [Fast Refresh] done in 104ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8232513ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8232597ms] [LOG] [Fast Refresh] done in 153ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8297948ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8297986ms] [LOG] [Fast Refresh] done in 118ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8311443ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8311481ms] [LOG] [Fast Refresh] done in 81ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8330612ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8330742ms] [ERROR] ./src/app/agent-preview/page.tsx:297:1
+Unexpected token. Did you mean `{'}'}` or `&rbrace;`?
+  295 |     </WorkspaceProvider>
+  296 |   );
+> 297 | }
+      | ^
+  298 |
+
+Parsing ecmascript source code failed
+
+Import traces:
+  Client Component Browser:
+    ./src/app/agent-preview/page.tsx [Client Component Browser]
+    ./src/app/agent-preview/page.tsx [Server Component]
+
+  Client Component SSR:
+    ./src/app/agent-preview/page.tsx [Client Component SSR]
+    ./src/app/agent-preview/page.tsx [Server Component] @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 8350098ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 8350564ms] [LOG] [Fast Refresh] done in 537ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431

@@ -1,0 +1,175 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Folders" [ref=e6]
+    - button "Plugins" [ref=e7]
+    - button "Settings" [ref=e8]
+    - button "Profile" [ref=e9]
+  - generic [ref=e10]:
+    - complementary [ref=e11]:
+      - generic:
+        - generic:
+          - generic: 500Chow
+          - button "Collapse sidebar":
+            - img
+        - navigation:
+          - button "New chat":
+            - img
+            - text: New chat
+          - button "Search":
+            - img
+            - text: Search
+          - button "Plugins":
+            - img
+            - text: Plugins
+          - button "Folders":
+            - img
+            - text: Folders
+        - generic:
+          - generic: Chats
+          - button "Draft this week's growth report ⌘1":
+            - generic: Draft this week's growth report
+            - generic: ⌘1
+          - button "Create Instagram carousel concepts ⌘2":
+            - generic: Create Instagram carousel concepts
+            - generic: ⌘2
+          - button "Create mind map designs ⌘3":
+            - generic: Create mind map designs
+            - generic: ⌘3
+          - button "Plan screen-recording workflow ⌘4":
+            - generic: Plan screen-recording workflow
+            - generic: ⌘4
+          - button "Find markdown files from 3 days ⌘5":
+            - generic: Find markdown files from 3 days
+            - generic: ⌘5
+          - button "Create teen presentation ⌘6":
+            - generic: Create teen presentation
+            - generic: ⌘6
+          - button "Find available domain names ⌘7":
+            - generic: Find available domain names
+            - generic: ⌘7
+          - button "Schedule LinkedIn posts ⌘8":
+            - generic: Schedule LinkedIn posts
+            - generic: ⌘8
+          - button "Research Newton prospects ⌘9":
+            - generic: Research Newton prospects
+            - generic: ⌘9
+          - button "Open Zoho Mail login 1w":
+            - generic: Open Zoho Mail login
+            - generic: 1w
+        - generic:
+          - generic:
+            - button "Settings":
+              - generic:
+                - img
+                - text: Settings
+              - img
+      - generic [ref=e152]:
+        - button "Expand sidebar" [ref=e153] [cursor=pointer]:
+          - img [ref=e154]
+        - button "New chat" [ref=e156] [cursor=pointer]:
+          - img [ref=e157]
+        - button "Search" [ref=e160] [cursor=pointer]:
+          - img [ref=e161]
+        - button "Plugins" [ref=e164] [cursor=pointer]:
+          - img [ref=e165]
+        - button "Folders" [ref=e168] [cursor=pointer]:
+          - img [ref=e169]
+        - button "Account" [ref=e172] [cursor=pointer]:
+          - generic [ref=e173]: D
+    - main [ref=e174]:
+      - generic [ref=e230]:
+        - generic [ref=e231]:
+          - button "Remove" [ref=e232] [cursor=pointer]
+          - button "Share" [ref=e233] [cursor=pointer]
+          - button "More" [ref=e234] [cursor=pointer]:
+            - img [ref=e235]
+          - button "Help" [ref=e239] [cursor=pointer]
+        - generic [ref=e240]:
+          - generic [ref=e241]: D
+          - button "Add people" [ref=e242] [cursor=pointer]:
+            - img [ref=e243]
+        - generic [ref=e244]:
+          - heading "Nuton" [level=1] [ref=e245]
+          - button "Folder options" [ref=e246] [cursor=pointer]:
+            - img [ref=e247]
+        - button "Add a description…" [ref=e251]
+        - generic [ref=e252]:
+          - generic [ref=e253]:
+            - img [ref=e254]
+            - textbox "Ask Nuton anything" [ref=e256]
+            - button "Send" [disabled] [ref=e257]:
+              - img [ref=e258]
+          - generic [ref=e260]:
+            - button "Create" [ref=e261] [cursor=pointer]:
+              - img [ref=e262]
+              - text: Create
+            - generic [ref=e265]:
+              - img [ref=e266]
+              - text: Sources
+              - button "Remove sources" [ref=e267] [cursor=pointer]:
+                - img [ref=e268]
+            - button "Default" [ref=e271] [cursor=pointer]:
+              - img [ref=e272]
+              - text: Default
+        - generic [ref=e277]:
+          - button "Content" [ref=e278] [cursor=pointer]
+          - button "Chats" [ref=e279] [cursor=pointer]
+          - button "Add content" [ref=e280] [cursor=pointer]:
+            - img [ref=e281]
+            - text: Add content
+        - generic [ref=e282]:
+          - generic [ref=e283]:
+            - img
+            - textbox "Search content" [ref=e284]
+          - button "Relevance" [ref=e285] [cursor=pointer]:
+            - text: Relevance
+            - img [ref=e286]
+        - generic [ref=e288]:
+          - generic [ref=e289] [cursor=pointer]:
+            - img [ref=e291]
+            - generic [ref=e294]:
+              - generic [ref=e295]: Demo - Customer email
+              - generic [ref=e296]: PDF · Jun 14, 4:10pm
+          - generic [ref=e297] [cursor=pointer]:
+            - img [ref=e299]
+            - generic [ref=e302]:
+              - generic [ref=e303]: Demo - Sample Job Description
+              - generic [ref=e304]: PDF · Jun 14, 4:10pm
+          - generic [ref=e305] [cursor=pointer]:
+            - img [ref=e307]
+            - generic [ref=e310]:
+              - generic [ref=e311]: Demo - Product Description Product 1
+              - generic [ref=e312]: PDF · Jun 14, 4:10pm
+          - generic [ref=e313] [cursor=pointer]:
+            - img [ref=e315]
+            - generic [ref=e318]:
+              - generic [ref=e319]: Demo - Acme Series B Term Sheet
+              - generic [ref=e320]: PDF · Jun 14, 4:10pm
+          - generic [ref=e321] [cursor=pointer]:
+            - img [ref=e323]
+            - generic [ref=e326]:
+              - generic [ref=e327]: Demo - Blog Post
+              - generic [ref=e328]: PDF · Jun 14, 4:10pm
+          - generic [ref=e329] [cursor=pointer]:
+            - img [ref=e331]
+            - generic [ref=e334]:
+              - generic [ref=e335]: Demo - Product Description Product 2
+              - generic [ref=e336]: PDF · Jun 14, 4:10pm
+          - generic [ref=e337] [cursor=pointer]:
+            - img [ref=e339]
+            - generic [ref=e342]:
+              - generic [ref=e343]: Demo - CV John Doe
+              - generic [ref=e344]: PDF · Jun 14, 4:10pm
+          - generic [ref=e345] [cursor=pointer]:
+            - img [ref=e347]
+            - generic [ref=e350]:
+              - generic [ref=e351]: Demo - Acme Series A Term Sheet
+              - generic [ref=e352]: PDF · Jun 14, 4:10pm
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e147] [cursor=pointer]:
+    - img [ref=e148]
+  - alert [ref=e151]

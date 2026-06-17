@@ -33,13 +33,13 @@ export default async function ProjectsPage({
   }
 
   return (
-    <div className="flex-1 flex items-center justify-center">
-      <div className="text-center space-y-3">
-        <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto">
-          <LayoutGrid className="w-7 h-7 text-muted-foreground" />
-        </div>
+    <div className="flex flex-1 flex-col items-center justify-center gap-4 px-6 py-12 text-center">
+      <div className="flex size-16 items-center justify-center rounded-2xl bg-muted">
+        <LayoutGrid className="size-7 text-muted-foreground" />
+      </div>
+      <div className="flex flex-col items-center gap-1">
         <h1 className="text-xl font-semibold">No projects yet</h1>
-        <p className="text-muted-foreground text-sm">Create a project from the sidebar to get started.</p>
+        <p className="max-w-xs text-sm text-muted-foreground">Create a project from the sidebar to get started.</p>
       </div>
     </div>
   );

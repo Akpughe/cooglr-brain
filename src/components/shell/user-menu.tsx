@@ -36,13 +36,15 @@ export function UserMenu() {
     <div className="relative mt-2" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-[30px] h-[30px] rounded-full bg-foreground text-background flex items-center justify-center text-xs font-bold cursor-pointer transition-transform duration-150 hover:scale-105 shadow-sm"
+        aria-label="User menu"
+        aria-expanded={open}
+        className="flex size-8 items-center justify-center rounded-full bg-foreground text-xs font-bold text-background shadow-sm transition-transform duration-150 hover:scale-105"
       >
         {initial}
       </button>
 
       {open && (
-        <div className="absolute left-[52px] bottom-0 z-50 w-[220px] bg-popover border border-border rounded-xl shadow-lg py-1 animate-in fade-in slide-in-from-left-2 duration-150">
+        <div className="absolute left-[52px] bottom-0 z-50 w-56 animate-in fade-in slide-in-from-left-2 rounded-lg border border-border bg-popover py-1.5 shadow-surface-lg duration-150">
           {/* User info */}
           <div className="px-3 py-2.5 border-b border-border">
             <div className="font-medium text-sm truncate">

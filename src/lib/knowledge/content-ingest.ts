@@ -1,8 +1,9 @@
 import { chunkText } from "./chunk";
-import { tiptapToText, extractViaNuton } from "./extract";
+import { tiptapToText, extractViaNuton, extractPdfText } from "./extract";
 import { embedDocuments } from "./embeddings";
 import { ensureCollection, upsertChunks, deleteFileChunks, type ChunkPoint } from "./qdrant";
 import { synthesizeDocument, persistUnderstanding } from "./content-understanding";
+import { ingestToMemory } from "@/lib/memory/ingest";
 
 import type { createClient } from "@/lib/supabase/server";
 type SupabaseServerClient = Awaited<ReturnType<typeof createClient>>;
@@ -42,6 +43,16 @@ async function fileToText(
   if (file.mime_type && TEXT_MIME.test(file.mime_type)) {
     return await data.text();
   }
+
+  // PDFs: extract locally from the Supabase-stored bytes (Nuton's S3 round-trip
+  // is unreliable). Fall back to Nuton only if the PDF has no text layer.
+  const isPdf = file.mime_type === "application/pdf" || /\.pdf$/i.test(file.title);
+  if (isPdf) {
+    const bytes = new Uint8Array(await data.arrayBuffer());
+    const text = await extractPdfText(bytes);
+    if (text) return text;
+  }
+
   return extractViaNuton([{ name: file.title, blob: data }], userId);
 }
 
@@ -56,6 +67,20 @@ export async function ingestFile(
   const text = await fileToText(supabase, file, userId);
   const chunks = chunkText(text);
   if (chunks.length === 0) return { fileId: file.id, title: file.title, chunks: 0, skipped: "no text" };
+
+  // Mark as indexing immediately so the UI can show per-file progress.
+  await supabase.from("knowledge_documents").upsert(
+    {
+      workspace_id: workspaceId,
+      file_id: file.id,
+      source: "file",
+      source_ref: file.id,
+      title: file.title,
+      status: "indexing",
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "workspace_id,source,source_ref" },
+  );
 
   // Understand first so the category can tag every chunk (enables filtered dig).
   const synthesis = await synthesizeDocument(text, file.title);
@@ -89,6 +114,14 @@ export async function ingestFile(
   );
 
   await persistUnderstanding(supabase, { workspaceId, source: "file", sourceRef: file.id, synthesis });
+
+  // Also push into UltraMem (the memory + retrieval foundation). Best-effort —
+  // never fail ingestion if the memory service is unavailable.
+  try {
+    await ingestToMemory({ workspaceId, reference: file.id, title: file.title, text, source: "file" });
+  } catch (err) {
+    console.error("[ingestFile] UltraMem write failed", err);
+  }
 
   return { fileId: file.id, title: file.title, chunks: chunks.length };
 }

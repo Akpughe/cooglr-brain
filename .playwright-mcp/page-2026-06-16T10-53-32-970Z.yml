@@ -1,0 +1,81 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Folders" [ref=e6]
+    - button "Plugins" [ref=e7]
+    - button "Settings" [ref=e8]
+  - generic [ref=e9]:
+    - complementary [ref=e10]:
+      - button "Expand sidebar" [ref=e147] [cursor=pointer]:
+        - img [ref=e148]
+      - button "New chat" [ref=e150] [cursor=pointer]:
+        - img [ref=e151]
+      - button "Search" [ref=e154] [cursor=pointer]:
+        - img [ref=e155]
+      - button "Plugins" [ref=e158] [cursor=pointer]:
+        - img [ref=e159]
+      - button "Folders" [ref=e162] [cursor=pointer]:
+        - img [ref=e163]
+      - button "Account" [ref=e166] [cursor=pointer]:
+        - generic [ref=e167]: D
+    - main [ref=e74]:
+      - generic [ref=e76]: New chat
+      - generic [ref=e77]:
+        - heading "What should we work on?" [level=1] [ref=e78]
+        - generic [ref=e80]:
+          - textbox "Ask your workspace anything" [active] [ref=e81]: Summarize @Gmail
+          - generic [ref=e82]:
+            - button "Add files" [ref=e83] [cursor=pointer]:
+              - img [ref=e84]
+              - text: Add files
+            - generic [ref=e85]:
+              - img [ref=e86]
+              - text: All sources
+            - button "Auto" [ref=e91] [cursor=pointer]:
+              - text: Auto
+              - img [ref=e92]
+            - button "Dictate" [ref=e94] [cursor=pointer]:
+              - img [ref=e95]
+              - text: Dictate
+            - button "Send" [ref=e98] [cursor=pointer]:
+              - img [ref=e99]
+        - generic [ref=e101]:
+          - button "Google Meet List my action points from my Google Meet" [ref=e102] [cursor=pointer]:
+            - img "Google Meet" [ref=e104]
+            - generic [ref=e105]:
+              - text: List my action points from my
+              - strong [ref=e106]: Google Meet
+          - button "Browse the web and write a newsletter" [ref=e107] [cursor=pointer]:
+            - img [ref=e109]
+            - generic [ref=e112]:
+              - text: Browse the
+              - strong [ref=e113]: web
+              - text: and write a newsletter
+          - button "Create a financial analysis and plot data in graphs" [ref=e114] [cursor=pointer]:
+            - img [ref=e116]
+            - generic [ref=e118]:
+              - text: Create a financial analysis and plot data in
+              - strong [ref=e119]: graphs
+          - button "Notion Analyze our Notion documentation" [ref=e120] [cursor=pointer]:
+            - img "Notion" [ref=e122]
+            - generic [ref=e123]:
+              - text: Analyze our
+              - strong [ref=e124]: Notion
+              - text: documentation
+          - button "Microsoft Teams Summarize my Teams meetings from yesterday" [ref=e125] [cursor=pointer]:
+            - img "Microsoft Teams" [ref=e127]
+            - generic [ref=e128]:
+              - text: Summarize my
+              - strong [ref=e129]: Teams
+              - text: meetings from yesterday
+          - button "Connect your apps for better answers" [ref=e130] [cursor=pointer]:
+            - img [ref=e132]
+            - generic [ref=e135]: Connect your apps for better answers
+            - img [ref=e136]
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e143] [cursor=pointer]:
+    - img [ref=e144]
+  - alert [ref=e168]

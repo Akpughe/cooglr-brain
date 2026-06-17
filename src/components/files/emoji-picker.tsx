@@ -38,16 +38,16 @@ export function EmojiPicker({ currentEmoji, onSelect, onRemove }: Props) {
       </button>
 
       {open && (
-        <div className="absolute top-full left-0 mt-2 z-50 bg-[#1e1e2e] border border-white/10 rounded-xl shadow-2xl p-3 w-[280px]">
+        <div className="absolute top-full left-0 mt-2 z-50 bg-[#1e1e2e] border border-foreground/10 rounded-xl shadow-2xl p-3 w-[280px]">
           {EMOJI_GROUPS.map((group) => (
             <div key={group.label} className="mb-2">
-              <p className="text-[10px] uppercase tracking-wider text-white/30 mb-1 px-0.5">{group.label}</p>
+              <p className="text-[10px] uppercase tracking-wider text-foreground/30 mb-1 px-0.5">{group.label}</p>
               <div className="flex flex-wrap gap-0.5">
                 {group.emojis.map((emoji) => (
                   <button
                     key={emoji}
                     onClick={() => { onSelect(emoji); setOpen(false); }}
-                    className="w-8 h-8 flex items-center justify-center rounded-md hover:bg-white/10 transition-colors text-lg"
+                    className="size-8 flex items-center justify-center rounded-md hover:bg-foreground/10 transition-colors text-lg"
                   >
                     {emoji}
                   </button>
@@ -58,7 +58,7 @@ export function EmojiPicker({ currentEmoji, onSelect, onRemove }: Props) {
           {currentEmoji && (
             <button
               onClick={() => { onRemove(); setOpen(false); }}
-              className="w-full mt-1 text-xs text-red-400/60 hover:text-red-400 py-1.5 rounded-md hover:bg-white/5 transition-colors"
+              className="w-full mt-1 text-xs text-red-400/60 hover:text-red-400 py-1.5 rounded-md hover:bg-foreground/5 transition-colors"
             >
               Remove icon
             </button>

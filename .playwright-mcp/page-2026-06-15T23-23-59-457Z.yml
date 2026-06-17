@@ -1,0 +1,191 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Plugins" [ref=e6]
+    - button "Settings" [ref=e7]
+  - generic [ref=e8]:
+    - complementary [ref=e9]:
+      - navigation [ref=e10]:
+        - button "New chat" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - text: New chat
+        - button "Search" [ref=e15] [cursor=pointer]:
+          - img [ref=e16]
+          - text: Search
+        - button "Plugins" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+          - text: Plugins
+        - button "Automations" [ref=e23] [cursor=pointer]:
+          - img [ref=e24]
+          - text: Automations
+      - generic [ref=e27]:
+        - generic [ref=e28]: Chats
+        - button "Draft this week's growth report ⌘1" [ref=e29] [cursor=pointer]:
+          - generic [ref=e30]: Draft this week's growth report
+          - generic [ref=e31]: ⌘1
+        - button "Create Instagram carousel concepts ⌘2" [ref=e32] [cursor=pointer]:
+          - generic [ref=e33]: Create Instagram carousel concepts
+          - generic [ref=e34]: ⌘2
+        - button "Create mind map designs ⌘3" [ref=e35] [cursor=pointer]:
+          - generic [ref=e36]: Create mind map designs
+          - generic [ref=e37]: ⌘3
+        - button "Plan screen-recording workflow ⌘4" [ref=e38] [cursor=pointer]:
+          - generic [ref=e39]: Plan screen-recording workflow
+          - generic [ref=e40]: ⌘4
+        - button "Find markdown files from 3 days ⌘5" [ref=e41] [cursor=pointer]:
+          - generic [ref=e42]: Find markdown files from 3 days
+          - generic [ref=e43]: ⌘5
+        - button "Create teen presentation ⌘6" [ref=e44] [cursor=pointer]:
+          - generic [ref=e45]: Create teen presentation
+          - generic [ref=e46]: ⌘6
+        - button "Find available domain names ⌘7" [ref=e47] [cursor=pointer]:
+          - generic [ref=e48]: Find available domain names
+          - generic [ref=e49]: ⌘7
+        - button "Schedule LinkedIn posts ⌘8" [ref=e50] [cursor=pointer]:
+          - generic [ref=e51]: Schedule LinkedIn posts
+          - generic [ref=e52]: ⌘8
+        - button "Research Newton prospects ⌘9" [ref=e53] [cursor=pointer]:
+          - generic [ref=e54]: Research Newton prospects
+          - generic [ref=e55]: ⌘9
+        - button "Open Zoho Mail login 1w" [ref=e56] [cursor=pointer]:
+          - generic [ref=e57]: Open Zoho Mail login
+          - generic [ref=e58]: 1w
+      - button "Settings" [ref=e61] [cursor=pointer]:
+        - generic [ref=e62]:
+          - img [ref=e63]
+          - text: Settings
+        - img [ref=e66]
+    - main [ref=e69]:
+      - generic [ref=e70]:
+        - generic [ref=e71]: Draft this week's growth report and compare it to last w…
+        - button "Toggle outputs" [ref=e120] [cursor=pointer]:
+          - img [ref=e121]
+      - generic [ref=e72]:
+        - generic [ref=e124]:
+          - generic [ref=e126]: Draft this week's growth report and compare it to last week
+          - generic [ref=e127]:
+            - button "Searched workspace knowledge · 2 sources" [ref=e128] [cursor=pointer]:
+              - img [ref=e129]
+              - text: Searched workspace knowledge · 2 sources
+            - generic [ref=e133]:
+              - paragraph [ref=e134]: Orders are up 12% week-over-week (11,230 → 12,380). Net revenue after refunds grew 9%, with the gap driven by a refund-rate uptick in the Lagos zone.
+              - paragraph [ref=e135]: What changed
+              - list [ref=e136]:
+                - listitem [ref=e137]: New-customer orders rose 18%, led by the referral channel.
+                - listitem [ref=e138]: Refunds climbed from 3.1% → 4.0%, concentrated in delayed deliveries.
+                - listitem [ref=e139]:
+                  - text: Delivery SLA slipped 2 points; see the linked ops note
+                  - 'generic "Blocked URL: undefined" [ref=e140]': 2 [blocked]
+                  - text: .
+              - paragraph [ref=e141]: Suggested next steps
+              - list [ref=e142]:
+                - listitem [ref=e143]: Investigate Lagos delivery delays with the ops team.
+                - listitem [ref=e144]: Hold the referral push — it's converting well.
+              - paragraph [ref=e145]: Click the chart's expand icon or a source below to open it on the right.
+            - generic [ref=e146]:
+              - button "Open in panel" [ref=e147] [cursor=pointer]:
+                - img [ref=e148]
+                - text: Open in panel
+              - application [ref=e155]:
+                - generic [ref=e181]:
+                  - generic [ref=e182]:
+                    - generic [ref=e280]: W1
+                    - generic [ref=e282]: W2
+                    - generic [ref=e284]: W3
+                    - generic [ref=e286]: W4
+                    - generic [ref=e288]: W5
+                    - generic [ref=e290]: W6
+                  - generic [ref=e195]:
+                    - generic [ref=e197]: "0"
+                    - generic [ref=e199]: "3500"
+                    - generic [ref=e201]: "7000"
+                    - generic [ref=e203]: "10500"
+                    - generic [ref=e205]: "14000"
+            - generic [ref=e206]:
+              - button "Q2-launch-brief.pdf a database Open" [ref=e207] [cursor=pointer]:
+                - img [ref=e209]
+                - generic [ref=e212]:
+                  - generic [ref=e213]: Q2-launch-brief.pdf
+                  - generic [ref=e214]: a database
+                - generic [ref=e215]:
+                  - text: Open
+                  - img [ref=e216]
+              - button "ops-weekly-2026-06.md Files Open" [active] [ref=e218] [cursor=pointer]:
+                - img [ref=e220]
+                - generic [ref=e223]:
+                  - generic [ref=e224]: ops-weekly-2026-06.md
+                  - generic [ref=e225]: Files
+                - generic [ref=e226]:
+                  - text: Open
+                  - img [ref=e227]
+            - generic [ref=e229]:
+              - button "Copy" [ref=e230] [cursor=pointer]:
+                - img [ref=e231]
+                - text: Copy
+              - button "Good answer" [ref=e234] [cursor=pointer]:
+                - img [ref=e235]
+                - text: Good answer
+              - button "Bad answer" [ref=e237] [cursor=pointer]:
+                - img [ref=e238]
+                - text: Bad answer
+        - generic [ref=e240]:
+          - textbox "Ask a follow-up…" [ref=e241]
+          - generic [ref=e242]:
+            - generic [ref=e243]:
+              - img [ref=e244]
+              - text: All sources
+            - button "Auto" [ref=e249] [cursor=pointer]:
+              - text: Auto
+              - img [ref=e250]
+            - button "Dictate" [ref=e252] [cursor=pointer]:
+              - img [ref=e253]
+              - text: Dictate
+            - button "Send" [ref=e256]:
+              - img [ref=e257]
+    - generic "Drag to resize" [ref=e291]
+    - generic [ref=e293]:
+      - generic [ref=e294]:
+        - img [ref=e295]
+        - generic [ref=e298]:
+          - generic [ref=e299]:
+            - generic [ref=e300]:
+              - generic [ref=e301]: 500Chow
+              - img [ref=e302]
+            - generic [ref=e304]:
+              - generic [ref=e305]: Sources
+              - img [ref=e306]
+            - generic [ref=e308]: ops-weekly-2026-06.md
+          - generic [ref=e309]: Document · MD
+        - button "Open" [ref=e311] [cursor=pointer]:
+          - text: Open
+          - img [ref=e312]
+        - button "Download" [ref=e314] [cursor=pointer]:
+          - img [ref=e315]
+          - text: Download
+        - button "Toggle full page" [ref=e318] [cursor=pointer]:
+          - img [ref=e319]
+          - text: Full page
+        - button "Close preview" [ref=e324] [cursor=pointer]:
+          - img [ref=e325]
+          - text: Close
+      - generic [ref=e331]:
+        - heading "Chat-First Agentic Interface Feature Roadmap" [level=1] [ref=e332]
+        - paragraph [ref=e333]: "Date: 2026-06-15 Status: Product and technical planning document Context: 500Claw is moving from app-destination navigation to a Codex-like agentic workspace interface. The primary surface becomes chat, with @ mentions for tools/resources, right-side canvases for artifacts, and Mastra-powered agents/workflows behind the scenes."
+        - heading "1. Product Direction" [level=2] [ref=e334]
+        - paragraph [ref=e335]: The application should feel closer to Codex than to a traditional dashboard with many separate apps.
+        - paragraph [ref=e336]: "The user should think: \"I ask the company agent to do the work.\" Then the interface helps them summon context, choose resources, inspect generated work, approve actions, and review automations."
+        - paragraph [ref=e337]: "The new mental model:"
+        - list [ref=e338]:
+          - listitem [ref=e339]: Chat is the operating surface.
+          - listitem [ref=e340]: "@ mentions summon capabilities and context."
+          - listitem [ref=e341]: Canvases show generated artifacts and workflow visuals.
+          - listitem [ref=e342]: Automations are created from conversations and visualized as workflows.
+          - listitem [ref=e343]: "Memory is scoped: personal, team, company, project, and source."
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e115] [cursor=pointer]:
+    - img [ref=e116]
+  - alert [ref=e119]
+  - generic [ref=e259]: "0"

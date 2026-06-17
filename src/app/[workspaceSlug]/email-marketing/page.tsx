@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useWorkspace } from "@/lib/workspace/context";
 import { EmailOnboarding } from "@/components/emails/email-onboarding";
+import { PageLoading } from "@/components/ui/loading-spinner";
 
 export default function EmailMarketingPage() {
   const router = useRouter();
@@ -32,11 +33,7 @@ export default function EmailMarketingPage() {
   }, [workspace.id, workspace.slug, router]);
 
   if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
-      </div>
-    );
+    return <PageLoading />;
   }
 
   if (needsOnboarding) {

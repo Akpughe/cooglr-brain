@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { Pencil, Trash2 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { MarkdownRenderer } from "./markdown-renderer";
 import { AttachmentPreview } from "./attachment-preview";
 import { usePresenceContext } from "@/lib/messages/presence-context";
@@ -28,10 +29,12 @@ export function MessageItem({ message, isOwn, onEdit, onDelete }: MessageItemPro
 
   const time = new Date(message.createdAt).toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
 
+  const isOptimistic = message.id.startsWith("optimistic-");
+
   return (
-    <div className="group flex gap-3 px-4 py-1.5 hover:bg-muted/50 transition-colors">
+    <div className={cn("group flex gap-3 px-4 py-1.5 hover:bg-muted/50 transition-colors", isOptimistic && "opacity-60")}>
       <div className="relative shrink-0 mt-0.5">
-        <div className="w-8 h-8 rounded-full bg-foreground text-background flex items-center justify-center text-xs font-bold">
+        <div className="size-8 rounded-full bg-foreground text-background flex items-center justify-center text-xs font-bold">
           {message.senderAvatar ? (
             <img src={message.senderAvatar} alt="" className="w-full h-full rounded-full object-cover" />
           ) : (
@@ -39,7 +42,7 @@ export function MessageItem({ message, isOwn, onEdit, onDelete }: MessageItemPro
           )}
         </div>
         {isOnline(message.senderId) && (
-          <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full bg-green-500 border-2 border-background" />
+          <div className="absolute -bottom-0.5 -right-0.5 size-3 rounded-full bg-success border-2 border-background" />
         )}
       </div>
 
@@ -59,7 +62,7 @@ export function MessageItem({ message, isOwn, onEdit, onDelete }: MessageItemPro
                 if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSaveEdit(); }
                 if (e.key === "Escape") setEditing(false);
               }}
-              className="w-full p-2 text-sm border border-border rounded-lg bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring"
+              className="w-full p-2 text-sm border border-border rounded-md bg-background resize-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background outline-none"
               rows={2}
               autoFocus
             />
@@ -82,15 +85,17 @@ export function MessageItem({ message, isOwn, onEdit, onDelete }: MessageItemPro
         <div className="opacity-0 group-hover:opacity-100 transition-opacity flex items-start gap-1 shrink-0 mt-1">
           <button
             onClick={() => { setEditContent(message.content); setEditing(true); }}
-            className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Edit message"
+            className="size-7 rounded-md flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
           >
-            <Pencil className="w-3.5 h-3.5" />
+            <Pencil className="size-3.5" />
           </button>
           <button
             onClick={() => onDelete(message.id)}
-            className="w-7 h-7 rounded-md flex items-center justify-center hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
+            aria-label="Delete message"
+            className="size-7 rounded-md flex items-center justify-center hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors"
           >
-            <Trash2 className="w-3.5 h-3.5" />
+            <Trash2 className="size-3.5" />
           </button>
         </div>
       )}

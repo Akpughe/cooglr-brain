@@ -61,7 +61,7 @@ export function EmailComposer({ onSent }: Props) {
             <Button type="submit" disabled={sending}>{sending ? "Sending..." : "Send Email"}</Button>
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
-          {success && <p className="text-sm text-green-600">{success}</p>}
+          {success && <p className="text-sm text-success">{success}</p>}
         </form>
       </CardContent>
     </Card>

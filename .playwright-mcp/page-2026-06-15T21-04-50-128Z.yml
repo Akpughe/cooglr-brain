@@ -1,0 +1,71 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]: DEV PREVIEW · scripted (no DB)
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - link "5 500Chow" [ref=e6] [cursor=pointer]:
+        - /url: /500chow
+        - generic [ref=e7]: "5"
+        - generic [ref=e8]: 500Chow
+        - img [ref=e9]
+      - generic [ref=e12]:
+        - button "New chat" [ref=e13]:
+          - img [ref=e15]
+          - generic [ref=e18]: New chat
+        - button "Search" [ref=e19]:
+          - img [ref=e21]
+          - generic [ref=e24]: Search
+        - button "Automations" [ref=e25]:
+          - img [ref=e27]
+          - generic [ref=e31]: Automations
+        - button "Sources" [ref=e32]:
+          - img [ref=e34]
+          - generic [ref=e38]: Sources
+      - generic [ref=e39]:
+        - generic [ref=e40]: Chats
+        - generic [ref=e41]:
+          - button "Weekly growth report 6h" [ref=e42]:
+            - img [ref=e43]
+            - generic [ref=e45]: Weekly growth report
+            - generic [ref=e46]: 6h
+          - button "Why did delivery SLA drop? 1d" [ref=e47]:
+            - img [ref=e48]
+            - generic [ref=e50]: Why did delivery SLA drop?
+            - generic [ref=e51]: 1d
+          - button "Draft launch summary from Q2 brief 3d" [ref=e52]:
+            - img [ref=e53]
+            - generic [ref=e55]: Draft launch summary from Q2 brief
+            - generic [ref=e56]: 3d
+      - generic [ref=e57]:
+        - link "Settings" [ref=e58] [cursor=pointer]:
+          - /url: /500chow/settings
+          - img [ref=e60]
+          - generic [ref=e63]: Settings
+        - button "D Davak" [ref=e65]:
+          - generic [ref=e66]: D
+          - generic [ref=e67]: Davak
+    - main [ref=e68]:
+      - generic [ref=e69]:
+        - img [ref=e70]
+        - generic [ref=e74]: Draft this week's growth report from our data and compare it to …
+        - generic [ref=e144]: Agent working·
+        - button "Toggle canvas" [ref=e75]:
+          - img [ref=e76]
+      - generic [ref=e148]: Draft this week's growth report from our data and compare it to last week.
+      - generic [ref=e151]:
+        - textbox "Reply, or ask for the next thing…" [ref=e152]
+        - generic [ref=e153]:
+          - button "Add context" [ref=e154]:
+            - img [ref=e155]
+          - generic [ref=e156]:
+            - img [ref=e157]
+            - text: Approve for me
+          - button "Auto" [ref=e161]:
+            - text: Auto
+            - img [ref=e163]
+          - button "Stop" [ref=e165]:
+            - img [ref=e166]
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e140] [cursor=pointer]:
+    - img [ref=e141]
+  - alert [ref=e134]

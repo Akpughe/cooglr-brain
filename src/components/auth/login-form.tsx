@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 
 export function LoginForm() {
   const [loading, setLoading] = useState(false);
@@ -30,23 +31,42 @@ export function LoginForm() {
   }
 
   return (
-    <div className="space-y-4">
+    <div>
       <button
+        type="button"
         onClick={signInWithGoogle}
         disabled={loading}
-        className="w-full h-12 rounded-xl border border-border bg-card text-sm font-medium text-foreground flex items-center justify-center gap-3 hover:bg-muted/50 active:scale-[0.98] transition-all disabled:opacity-50 shadow-sm"
+        aria-busy={loading}
+        style={{
+          width: "100%",
+          height: 46,
+          borderRadius: 12,
+          border: "1px solid var(--line)",
+          background: "var(--bg)",
+          color: "var(--ink)",
+          fontSize: 14,
+          fontWeight: 500,
+          fontFamily: "var(--font-body)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: 10,
+          cursor: loading ? "default" : "pointer",
+          opacity: loading ? 0.6 : 1,
+          boxShadow: "var(--shadow-card)",
+          transition: "background 0.12s ease",
+        }}
+        onMouseEnter={(e) => { if (!loading) e.currentTarget.style.background = "var(--hover-soft)"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = "var(--bg)"; }}
       >
         {loading ? (
-          <span className="flex items-center gap-2">
-            <svg className="animate-spin h-4 w-4" viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="opacity-25" />
-              <path d="M4 12a8 8 0 018-8" stroke="currentColor" strokeWidth="3" strokeLinecap="round" className="opacity-75" />
-            </svg>
-            Signing in...
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <LoadingSpinner size="sm" aria-hidden="true" />
+            Signing in…
           </span>
         ) : (
           <>
-            <svg width="18" height="18" viewBox="0 0 24 24">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
               <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4" />
               <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853" />
               <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
@@ -58,7 +78,19 @@ export function LoginForm() {
       </button>
 
       {(error || authError) && (
-        <div className="text-[12px] text-center py-2 px-3 rounded-lg bg-destructive/10 text-destructive animate-in fade-in duration-200">
+        <div
+          role="alert"
+          className="rise"
+          style={{
+            marginTop: 12,
+            fontSize: 12.5,
+            textAlign: "center",
+            padding: "8px 12px",
+            borderRadius: 10,
+            background: "rgba(208,52,44,.08)",
+            color: "var(--red)",
+          }}
+        >
           {error || "Authentication failed. Please try again."}
         </div>
       )}

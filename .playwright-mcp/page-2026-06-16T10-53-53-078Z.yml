@@ -1,0 +1,268 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Folders" [ref=e6]
+    - button "Plugins" [ref=e7]
+    - button "Settings" [ref=e8]
+  - generic [ref=e9]:
+    - complementary [ref=e10]:
+      - button "Expand sidebar" [ref=e147] [cursor=pointer]:
+        - img [ref=e148]
+      - button "New chat" [ref=e150] [cursor=pointer]:
+        - img [ref=e151]
+      - button "Search" [ref=e154] [cursor=pointer]:
+        - img [ref=e155]
+      - button "Plugins" [ref=e158] [cursor=pointer]:
+        - img [ref=e159]
+      - button "Folders" [ref=e162] [cursor=pointer]:
+        - img [ref=e163]
+      - button "Account" [ref=e166] [cursor=pointer]:
+        - generic [ref=e167]: D
+    - main [ref=e74]:
+      - generic [ref=e76]: Draft this week's growth report and compare it to last w…
+      - generic [ref=e77]:
+        - generic [ref=e273]:
+          - generic [ref=e275]: Draft this week's growth report and compare it to last week
+          - generic [ref=e276]:
+            - button "Searched workspace knowledge · 2 sources" [ref=e277] [cursor=pointer]:
+              - img [ref=e278]
+              - text: Searched workspace knowledge · 2 sources
+            - generic [ref=e282]:
+              - paragraph [ref=e283]: Orders are up 12% week-over-week (11,230 → 12,380). Net revenue after refunds grew 9%, with the gap driven by a refund-rate uptick in the Lagos zone.
+              - paragraph [ref=e284]: What changed
+              - list [ref=e285]:
+                - listitem [ref=e286]: New-customer orders rose 18%, led by the referral channel.
+                - listitem [ref=e287]: Refunds climbed from 3.1% → 4.0%, concentrated in delayed deliveries.
+                - listitem [ref=e288]:
+                  - text: Delivery SLA slipped 2 points; see the linked ops note
+                  - 'generic "Blocked URL: undefined" [ref=e289]': 2 [blocked]
+                  - text: .
+              - paragraph [ref=e290]: Suggested next steps
+              - list [ref=e291]:
+                - listitem [ref=e292]: Investigate Lagos delivery delays with the ops team.
+                - listitem [ref=e293]: Hold the referral push — it's converting well.
+              - paragraph [ref=e294]: Click the chart's expand icon or a source below to open it on the right.
+            - generic [ref=e295]:
+              - button "Open in panel" [active] [ref=e296] [cursor=pointer]:
+                - img [ref=e297]
+                - text: Open in panel
+              - generic [ref=e305]:
+                - img:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: "2024"
+                        - generic:
+                          - generic: "2025"
+                        - generic:
+                          - generic: "2026"
+                      - generic:
+                        - generic:
+                          - generic: "0"
+                        - generic:
+                          - generic: 100k
+                        - generic:
+                          - generic: 200k
+                - img:
+                  - generic:
+                    - generic [ref=e322]:
+                      - generic [ref=e324]: North America
+                      - generic [ref=e331]: Europe
+                      - generic [ref=e338]: Asia-Pacific
+                      - generic [ref=e345]: LATAM
+                    - generic:
+                      - generic: Revenue by region
+                    - generic:
+                      - generic: USD
+                - img
+            - generic [ref=e351]:
+              - generic [ref=e352]:
+                - img [ref=e354]
+                - generic [ref=e356]: nuton_cash_flow_projection.csv
+                - generic [ref=e357]: (all 3 rows)
+                - button "Download" [ref=e358] [cursor=pointer]:
+                  - img [ref=e359]
+                  - text: Download
+              - table [ref=e363]:
+                - rowgroup [ref=e364]:
+                  - row "Year Paid_Users ARPU_USD Revenue_USD Total_Costs_USD Cash_Flow_USD" [ref=e365]:
+                    - columnheader "Year" [ref=e366]
+                    - columnheader "Paid_Users" [ref=e367]
+                    - columnheader "ARPU_USD" [ref=e368]
+                    - columnheader "Revenue_USD" [ref=e369]
+                    - columnheader "Total_Costs_USD" [ref=e370]
+                    - columnheader "Cash_Flow_USD" [ref=e371]
+                - rowgroup [ref=e372]:
+                  - row "2024 1,200 96 115,200 180,000 -64,800" [ref=e373]:
+                    - cell "2024" [ref=e374]
+                    - cell "1,200" [ref=e375]
+                    - cell "96" [ref=e376]
+                    - cell "115,200" [ref=e377]
+                    - cell "180,000" [ref=e378]
+                    - cell "-64,800" [ref=e379]
+                  - row "2025 4,200 102 428,400 320,000 108,400" [ref=e380]:
+                    - cell "2025" [ref=e381]
+                    - cell "4,200" [ref=e382]
+                    - cell "102" [ref=e383]
+                    - cell "428,400" [ref=e384]
+                    - cell "320,000" [ref=e385]
+                    - cell "108,400" [ref=e386]
+                  - row "2026 11,000 110 1,210,000 540,000 670,000" [ref=e387]:
+                    - cell "2026" [ref=e388]
+                    - cell "11,000" [ref=e389]
+                    - cell "110" [ref=e390]
+                    - cell "1,210,000" [ref=e391]
+                    - cell "540,000" [ref=e392]
+                    - cell "670,000" [ref=e393]
+            - generic [ref=e394]:
+              - button "Q2-launch-brief.pdf a database Open" [ref=e395] [cursor=pointer]:
+                - img [ref=e397]
+                - generic [ref=e400]:
+                  - generic [ref=e401]: Q2-launch-brief.pdf
+                  - generic [ref=e402]: a database
+                - generic [ref=e403]:
+                  - text: Open
+                  - img [ref=e404]
+              - button "ops-weekly-2026-06.md Files Open" [ref=e406] [cursor=pointer]:
+                - img [ref=e408]
+                - generic [ref=e411]:
+                  - generic [ref=e412]: ops-weekly-2026-06.md
+                  - generic [ref=e413]: Files
+                - generic [ref=e414]:
+                  - text: Open
+                  - img [ref=e415]
+            - generic [ref=e417]:
+              - button "Copy" [ref=e418] [cursor=pointer]:
+                - img [ref=e419]
+                - text: Copy
+              - button "Good answer" [ref=e422] [cursor=pointer]:
+                - img [ref=e423]
+                - text: Good answer
+              - button "Bad answer" [ref=e425] [cursor=pointer]:
+                - img [ref=e426]
+                - text: Bad answer
+        - generic [ref=e428]:
+          - textbox "Ask a follow-up…" [ref=e429]
+          - generic [ref=e430]:
+            - button "Add files" [ref=e431] [cursor=pointer]:
+              - img [ref=e432]
+              - text: Add files
+            - generic [ref=e433]:
+              - img [ref=e434]
+              - text: All sources
+            - button "Auto" [ref=e439] [cursor=pointer]:
+              - text: Auto
+              - img [ref=e440]
+            - button "Dictate" [ref=e442] [cursor=pointer]:
+              - img [ref=e443]
+              - text: Dictate
+            - button "Send" [ref=e446]:
+              - img [ref=e447]
+    - generic "Drag to resize" [ref=e451]
+    - generic [ref=e453]:
+      - generic [ref=e454]:
+        - img [ref=e455]
+        - generic [ref=e457]:
+          - generic [ref=e458]:
+            - generic [ref=e459]:
+              - generic [ref=e460]: 500Chow
+              - img [ref=e461]
+            - generic [ref=e463]:
+              - generic [ref=e464]: Outputs
+              - img [ref=e465]
+            - generic [ref=e467]: Revenue by region
+          - generic [ref=e468]: Chart
+        - button "Download" [ref=e469] [cursor=pointer]:
+          - img [ref=e470]
+          - text: Download
+        - button "Toggle full page" [ref=e473] [cursor=pointer]:
+          - img [ref=e474]
+          - text: Full page
+        - button "Close panel" [ref=e479] [cursor=pointer]:
+          - img [ref=e480]
+          - text: Close panel
+      - generic [ref=e483]:
+        - generic [ref=e488]:
+          - img:
+            - generic:
+              - generic:
+                - generic:
+                  - generic:
+                    - generic: "2024"
+                  - generic:
+                    - generic: "2025"
+                  - generic:
+                    - generic: "2026"
+                - generic:
+                  - generic:
+                    - generic: "0"
+                  - generic:
+                    - generic: 50k
+                  - generic:
+                    - generic: 100k
+                  - generic:
+                    - generic: 150k
+                  - generic:
+                    - generic: 200k
+                  - generic:
+                    - generic: 250k
+          - img:
+            - generic:
+              - generic [ref=e505]:
+                - generic [ref=e507]: North America
+                - generic [ref=e514]: Europe
+                - generic [ref=e521]: Asia-Pacific
+                - generic [ref=e528]: LATAM
+              - generic:
+                - generic: Revenue by region
+              - generic:
+                - generic: USD
+          - img
+        - generic [ref=e534]:
+          - generic [ref=e535]:
+            - img [ref=e537]
+            - generic [ref=e539]: nuton_cash_flow_projection.csv
+            - generic [ref=e540]: (all 3 rows)
+            - button "Download" [ref=e541] [cursor=pointer]:
+              - img [ref=e542]
+              - text: Download
+          - table [ref=e546]:
+            - rowgroup [ref=e547]:
+              - row "Year Paid_Users ARPU_USD Revenue_USD Total_Costs_USD Cash_Flow_USD" [ref=e548]:
+                - columnheader "Year" [ref=e549]
+                - columnheader "Paid_Users" [ref=e550]
+                - columnheader "ARPU_USD" [ref=e551]
+                - columnheader "Revenue_USD" [ref=e552]
+                - columnheader "Total_Costs_USD" [ref=e553]
+                - columnheader "Cash_Flow_USD" [ref=e554]
+            - rowgroup [ref=e555]:
+              - row "2024 1,200 96 115,200 180,000 -64,800" [ref=e556]:
+                - cell "2024" [ref=e557]
+                - cell "1,200" [ref=e558]
+                - cell "96" [ref=e559]
+                - cell "115,200" [ref=e560]
+                - cell "180,000" [ref=e561]
+                - cell "-64,800" [ref=e562]
+              - row "2025 4,200 102 428,400 320,000 108,400" [ref=e563]:
+                - cell "2025" [ref=e564]
+                - cell "4,200" [ref=e565]
+                - cell "102" [ref=e566]
+                - cell "428,400" [ref=e567]
+                - cell "320,000" [ref=e568]
+                - cell "108,400" [ref=e569]
+              - row "2026 11,000 110 1,210,000 540,000 670,000" [ref=e570]:
+                - cell "2026" [ref=e571]
+                - cell "11,000" [ref=e572]
+                - cell "110" [ref=e573]
+                - cell "1,210,000" [ref=e574]
+                - cell "540,000" [ref=e575]
+                - cell "670,000" [ref=e576]
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e143] [cursor=pointer]:
+    - img [ref=e144]
+  - alert [ref=e168]
+  - img [ref=e449]

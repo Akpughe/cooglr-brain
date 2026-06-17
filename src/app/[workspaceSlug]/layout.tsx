@@ -2,9 +2,7 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { redirect, notFound } from "next/navigation";
 import { WorkspaceProvider } from "@/lib/workspace/context";
 import { ShellThemeProvider } from "@/components/shell/theme-provider";
-import { IconRail } from "@/components/shell/icon-rail";
-import { AppSidebar } from "@/components/shell/app-sidebar";
-import { AppRouteGuard } from "@/components/shell/app-route-guard";
+import { WorkspaceChrome } from "@/components/shell/workspace-chrome";
 import { PresenceProvider } from "@/lib/messages/presence-context";
 
 export default async function WorkspaceLayout({
@@ -112,13 +110,7 @@ export default async function WorkspaceLayout({
     <WorkspaceProvider value={contextValue}>
       <PresenceProvider>
         <ShellThemeProvider themeId={workspace.theme || "default"}>
-          <div className="flex h-screen bg-background">
-            <IconRail />
-            <AppSidebar />
-            <main className="flex-1 flex flex-col overflow-hidden">
-              <AppRouteGuard>{children}</AppRouteGuard>
-            </main>
-          </div>
+          <WorkspaceChrome>{children}</WorkspaceChrome>
         </ShellThemeProvider>
       </PresenceProvider>
     </WorkspaceProvider>

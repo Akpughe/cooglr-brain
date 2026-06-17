@@ -1,0 +1,1175 @@
+/* ————— Recally design system · "Codex-grade" (approved variant D) —————
+   Inter + Lucide · neutral grays · floating white canvas on a gray base.
+   Radii scale: composer 20 / bubble 18 / card 16 / row 12 / button 10. */
+
+.agent-shell-root {
+  --bg: #ffffff;
+  --base: #f4f4f4; /* window base + sidebar */
+  --line: #e6e6e6;
+  --line-soft: #eeeeee;
+  --hover: #eaeaea;
+  --hover-soft: #f0f0f0;
+  --active: #e3e3e3;
+  --ink: #171717;
+  --ink-2: #5d5d5d;
+  --ink-3: #a3a3a3;
+  --blue: #0a85ff;
+  --blue-bg: #eaf4ff;
+  --green: #1fa453;
+  --red: #d0342c;
+
+  /* source colors */
+  --c-clip: #1fa453;
+  --c-web: #0a85ff;
+  --c-file: #e8762c;
+  --c-meet: #8b5cc9;
+
+  --font-body: var(--font-inter), -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono: var(--font-spline-mono), ui-monospace, monospace;
+
+  --shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.045);
+  --shadow-pop: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 16px 44px -10px rgba(0, 0, 0, 0.22);
+  --shadow-composer: 0 1px 2px rgba(0, 0, 0, 0.04), 0 12px 32px -8px rgba(0, 0, 0, 0.08);
+  --shadow-composer-focus: 0 1px 2px rgba(0, 0, 0, 0.05), 0 16px 40px -8px rgba(0, 0, 0, 0.12);
+
+  --r-composer: 20px;
+  --r-bubble: 18px;
+  --r-card: 16px;
+  --r-row: 12px;
+  --r-btn: 10px;
+
+  font-family: var(--font-body);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  font-feature-settings: "cv05", "cv11";
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.agent-shell-root p, .agent-shell-root h1, .agent-shell-root h2, .agent-shell-root h3, .agent-shell-root h4, .agent-shell-root textarea, .agent-shell-root input, .agent-shell-root pre, .agent-shell-root .selectable {
+  user-select: text;
+  cursor: auto;
+}
+
+.agent-shell-root h1, .agent-shell-root h2, .agent-shell-root h3, .agent-shell-root h4 {
+  font-weight: 600;
+  letter-spacing: -0.018em;
+}
+
+.agent-shell-root ::selection {
+  background: #bbddff;
+}
+
+.agent-shell-root .tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* the whole window sits on the gray base (kept name for legacy views) */
+.agent-shell-root .paper-bg {
+  background: var(--base);
+}
+
+/* floating white canvas panel */
+.agent-shell-root .canvas-panel {
+  background: var(--bg);
+  border-radius: 14px;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+/* ————— icons (lucide-react) ————— */
+.agent-shell-root .lucide {
+  width: 16px;
+  height: 16px;
+  stroke-width: 1.75;
+  flex-shrink: 0;
+}
+/* onboarding row icons (lucide, sized via wrapper) */
+.agent-shell-root .lucide-wrap svg {
+  width: 18px;
+  height: 18px;
+  stroke-width: 1.75;
+}
+
+/* ————— shared atoms ————— */
+
+.agent-shell-root .btn {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  border: none;
+  border-radius: var(--r-btn);
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 0.12s ease, transform 0.12s ease, box-shadow 0.12s ease;
+  background: transparent;
+  color: var(--ink);
+}
+.agent-shell-root .btn:active {
+  transform: scale(0.98);
+}
+.agent-shell-root .btn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+}
+.agent-shell-root .btn-primary {
+  background: var(--ink);
+  color: #fff;
+}
+.agent-shell-root .btn-primary:hover {
+  background: #000;
+}
+.agent-shell-root .btn-outline {
+  background: var(--bg);
+  box-shadow: var(--shadow-card);
+}
+.agent-shell-root .btn-outline:hover {
+  background: #f7f7f7;
+}
+
+/* ————— account menu (sidebar footer popover) ————— */
+.agent-shell-root .account-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  height: 36px;
+  padding: 0 9px;
+  border: none;
+  background: transparent;
+  border-radius: 9px;
+  font-family: var(--font-body);
+  font-size: 13.5px;
+  font-weight: 450;
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.1s ease;
+}
+.agent-shell-root .account-row:hover {
+  background: var(--hover);
+}
+.agent-shell-root .account-row .lucide {
+  width: 17px;
+  height: 17px;
+}
+@keyframes rcAccountPop {
+  from {
+    opacity: 0;
+    transform: translateY(4px) scale(0.99);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+.agent-shell-root .btn-ghost {
+  color: var(--ink-2);
+}
+.agent-shell-root .btn-ghost:hover {
+  background: var(--hover-soft);
+}
+.agent-shell-root .btn-danger {
+  background: #fdf1f0;
+  color: #a32a23;
+}
+.agent-shell-root .btn-danger:hover {
+  background: #fbe5e3;
+}
+
+.agent-shell-root .iconbtn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink-2);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.1s;
+  flex-shrink: 0;
+}
+.agent-shell-root .iconbtn:hover {
+  background: var(--hover-soft);
+}
+
+/* filter pills (timeline) */
+.agent-shell-root .filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 13px;
+  border-radius: 999px;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  background: var(--bg);
+  box-shadow: var(--shadow-card);
+  border: none;
+  cursor: pointer;
+  transition: all 0.12s;
+  font-family: var(--font-body);
+}
+.agent-shell-root .filter:hover {
+  background: #f7f7f7;
+}
+.agent-shell-root .filter.sel {
+  background: var(--ink);
+  color: #fff;
+  box-shadow: none;
+}
+
+/* legacy chip (quick-ask suggestions etc.) */
+.agent-shell-root .chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  font-weight: 500;
+  padding: 5px 12px;
+  border-radius: 999px;
+  border: none;
+  background: var(--bg);
+  box-shadow: var(--shadow-card);
+  color: var(--ink-2);
+  cursor: pointer;
+  transition: all 0.12s ease;
+  font-family: var(--font-body);
+}
+.agent-shell-root .chip:hover {
+  background: #f7f7f7;
+  color: var(--ink);
+}
+.agent-shell-root .chip.active {
+  background: var(--ink);
+  color: #fff;
+  box-shadow: none;
+}
+.agent-shell-root .chip:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* segmented toggle (scratchpad transforms/formatting switch) */
+.agent-shell-root .seg {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 26px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+.agent-shell-root .seg:hover {
+  color: var(--ink-2);
+}
+.agent-shell-root .seg[data-on="true"] {
+  background: var(--bg);
+  color: var(--ink);
+  box-shadow: var(--shadow-card);
+}
+
+/* ———— scratchpad rail ———— */
+.agent-shell-root .notes-rail {
+  width: 244px;
+  flex-shrink: 0;
+  border-right: 1px solid var(--line-soft);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.agent-shell-root .notes-rail-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px 0;
+}
+.agent-shell-root .notes-new {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 12px 0;
+  padding: 9px 12px;
+  border: 1px solid var(--line-soft);
+  border-radius: 10px;
+  background: var(--bg);
+  box-shadow: var(--shadow-card);
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+.agent-shell-root .notes-new:hover {
+  background: var(--hover-soft);
+}
+.agent-shell-root .note-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 10px;
+  border-radius: 9px;
+  cursor: pointer;
+  position: relative;
+  transition: background 0.1s ease;
+}
+.agent-shell-root .note-row:hover {
+  background: var(--hover-soft);
+}
+.agent-shell-root .note-row.active {
+  background: var(--hover-soft);
+}
+.agent-shell-root .note-row-main {
+  flex: 1;
+  min-width: 0;
+}
+.agent-shell-root .note-row-title {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--ink);
+}
+.agent-shell-root .note-row-title span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.agent-shell-root .note-row-time {
+  font-size: 11.5px;
+  color: var(--ink-3);
+  margin-top: 1px;
+}
+.agent-shell-root .note-row-actions {
+  display: none;
+  align-items: center;
+  gap: 2px;
+  flex-shrink: 0;
+}
+.agent-shell-root .note-row:hover .note-row-actions {
+  display: flex;
+}
+.agent-shell-root .notes-rail-foot {
+  border-top: 1px solid var(--line-soft);
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.agent-shell-root .note-tool {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 13px;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 0.12s ease;
+}
+.agent-shell-root .note-tool:hover {
+  background: var(--hover-soft);
+  color: var(--ink);
+}
+.agent-shell-root .note-tool.active {
+  background: var(--hover-soft);
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.agent-shell-root .dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.agent-shell-root .src-clipboard { background: var(--c-clip); }
+.agent-shell-root .src-browser { background: var(--c-web); }
+.agent-shell-root .src-file { background: var(--c-file); }
+.agent-shell-root .src-meeting { background: var(--c-meet); }
+
+/* icon tiles per source */
+.agent-shell-root .fic {
+  width: 32px;
+  height: 32px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: #f4f4f4;
+  color: var(--ink-2);
+}
+.agent-shell-root .fic .lucide {
+  width: 15px;
+  height: 15px;
+}
+.agent-shell-root .fic-clipboard { background: #e9f7ee; color: #1fa453; }
+.agent-shell-root .fic-browser { background: #eaf4ff; color: #0a85ff; }
+.agent-shell-root .fic-file { background: #fff3e8; color: #e8762c; }
+.agent-shell-root .fic-meeting { background: #f3edff; color: #8b5cc9; }
+
+.agent-shell-root .card {
+  background: var(--bg);
+  border-radius: var(--r-card);
+  box-shadow: var(--shadow-card);
+}
+
+/* streamed markdown (Streamdown) — match the design system */
+.agent-shell-root .answer-md {
+  font-size: 14px;
+  line-height: 1.72;
+}
+/* Tables: a clean card with a quiet header and hairline row separators — no
+   heavy grid. The wrapper owns the border, radius, and horizontal scroll. */
+.agent-shell-root .answer-md .md-table-wrap {
+  margin: 16px 0;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--bg);
+}
+.agent-shell-root .answer-md :where(table) {
+  width: 100%;
+  font-size: 13px;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+.agent-shell-root .answer-md :where(thead) {
+  background: #fbfbfb;
+}
+.agent-shell-root .answer-md :where(th) {
+  font-weight: 600;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  text-align: left;
+  white-space: nowrap;
+  padding: 10px 16px;
+  border: none !important;
+  border-bottom: 1px solid var(--line) !important;
+}
+.agent-shell-root .answer-md :where(td) {
+  padding: 9px 16px;
+  color: var(--ink);
+  vertical-align: top;
+  border: none !important;
+  border-top: 1px solid var(--line-soft) !important;
+}
+.agent-shell-root .answer-md :where(tbody tr:first-child td) {
+  border-top: none !important;
+}
+.agent-shell-root .answer-md :where(tbody tr:hover td) {
+  background: #fafafa;
+}
+/* first column reads as the row's label */
+.agent-shell-root .answer-md :where(tbody td:first-child) {
+  font-weight: 500;
+  color: var(--ink);
+}
+.agent-shell-root .answer-md :where(code):not(pre code) {
+  background: #f4f4f4;
+  border-radius: 5px;
+  padding: 1px 5px;
+  font-size: 0.9em;
+  font-family: var(--font-mono);
+}
+.agent-shell-root .answer-md :where(pre) {
+  border-radius: var(--r-row);
+  font-size: 12px;
+}
+.agent-shell-root .answer-md :where(h1, h2, h3, h4) {
+  letter-spacing: -0.015em;
+}
+.agent-shell-root .answer-md :where(hr) {
+  border-color: var(--line-soft);
+}
+
+/* clickable file paths the model writes inline */
+.agent-shell-root .path-link {
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  color: var(--blue);
+  background: #eaf4ff;
+  border: none;
+  border-radius: 5px;
+  padding: 1px 6px;
+  cursor: pointer;
+  word-break: break-all;
+  text-align: left;
+  transition: background 0.1s;
+}
+.agent-shell-root .path-link:hover { background: #d9ecff; }
+
+/* citation chips inside answers */
+.agent-shell-root .cite {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  margin: 0 1px;
+  border-radius: 6px;
+  background: #f0f0f0;
+  color: var(--ink-2);
+  font-size: 10.5px;
+  font-weight: 600;
+  vertical-align: 2px;
+  cursor: pointer;
+  border: none;
+  transition: all 0.12s;
+  font-family: var(--font-body);
+}
+.agent-shell-root .cite:hover {
+  background: var(--blue);
+  color: #fff;
+}
+
+/* status badges */
+.agent-shell-root .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 10px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 500;
+  flex-shrink: 0;
+}
+.agent-shell-root .badge .lucide { width: 12px; height: 12px; }
+.agent-shell-root .badge-done { background: #e9f7ee; color: #157f3d; }
+.agent-shell-root .badge-proc { background: #fff7e0; color: #9a6b00; }
+.agent-shell-root .badge-fail { background: #fdf1f0; color: #a32a23; }
+
+/* ————— composer ————— */
+.agent-shell-root .composer {
+  background: var(--bg);
+  border: 1px solid #e3e3e3;
+  border-radius: var(--r-composer);
+  box-shadow: var(--shadow-composer);
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  text-align: left;
+}
+.agent-shell-root .composer:focus-within {
+  border-color: #cccccc;
+  box-shadow: var(--shadow-composer-focus);
+}
+.agent-shell-root .composer textarea {
+  display: block;
+  width: 100%;
+  border: none;
+  outline: none;
+  resize: none;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--ink);
+  background: transparent;
+  padding: 14px 18px 4px;
+  max-height: 160px;
+}
+.agent-shell-root .composer textarea::placeholder {
+  color: var(--ink-3);
+}
+.agent-shell-root .composer .c-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 10px 10px 12px;
+}
+.agent-shell-root .composer .send {
+  width: 30px;
+  height: 30px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--hover);
+  color: var(--ink-3);
+  border: none;
+  transition: all 0.15s ease;
+  cursor: default;
+  flex-shrink: 0;
+}
+.agent-shell-root .composer .send .lucide {
+  width: 15px;
+  height: 15px;
+  stroke-width: 2.2;
+}
+.agent-shell-root .composer .send.ready {
+  background: var(--ink);
+  color: #fff;
+  cursor: pointer;
+}
+.agent-shell-root .composer .send.ready:hover {
+  transform: scale(1.06);
+}
+.agent-shell-root .scope-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 9px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--blue);
+  background: transparent;
+  border: none;
+  cursor: default;
+  font-family: var(--font-body);
+}
+.agent-shell-root .scope-chip .lucide { width: 15px; height: 15px; }
+
+/* ————— sidebar ————— */
+.agent-shell-root .nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 450;
+  color: var(--ink);
+  cursor: pointer;
+  transition: background 0.1s;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+}
+.agent-shell-root .nav-item:hover { background: var(--hover); }
+.agent-shell-root .nav-item.active { background: var(--active); }
+.agent-shell-root .nav-item .lucide { color: var(--ink-2); }
+
+.agent-shell-root .recent-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  font-weight: 450;
+  color: var(--ink);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.1s;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+}
+.agent-shell-root .recent-item:hover { background: var(--hover); }
+.agent-shell-root .recent-item.active { background: var(--active); }
+.agent-shell-root .recent-item .q { overflow: hidden; text-overflow: ellipsis; flex: 1; }
+.agent-shell-root .recent-item .t { font-size: 12px; color: var(--ink-3); flex-shrink: 0; font-variant-numeric: tabular-nums; }
+.agent-shell-root .recent-item .x {
+  display: none;
+  color: var(--ink-3);
+  flex-shrink: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 5px;
+  line-height: 0;
+}
+.agent-shell-root .recent-item:hover .t { display: none; }
+.agent-shell-root .recent-item:hover .x { display: block; }
+.agent-shell-root .recent-item .x:hover { color: var(--ink); background: rgba(0,0,0,0.07); }
+
+/* ————— rows (timeline / sources) ————— */
+.agent-shell-root .lrow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  cursor: pointer;
+  transition: background 0.1s;
+  width: 100%;
+  border: none;
+  background: transparent;
+  text-align: left;
+  font-family: var(--font-body);
+}
+.agent-shell-root .lrow:hover { background: #fafafa; }
+.agent-shell-root .lrow + .lrow { border-top: 1px solid var(--line-soft); }
+.agent-shell-root .lrow.hl { background: var(--blue-bg); }
+
+.agent-shell-root .showmore-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 10px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  border-top: 1px solid var(--line-soft);
+  transition: background 0.1s;
+  font-family: var(--font-body);
+}
+.agent-shell-root .showmore-row:hover {
+  background: #fafafa;
+}
+
+/* tooltips */
+.agent-shell-root .tip {
+  position: relative;
+}
+.agent-shell-root .tip::after {
+  content: attr(data-tip);
+  position: absolute;
+  bottom: calc(100% + 7px);
+  left: 50%;
+  transform: translateX(-50%) scale(0.96);
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 4px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.12s ease;
+  z-index: 20;
+}
+.agent-shell-root .tip:hover::after {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+
+/* ————— motion ————— */
+@keyframes rcRise {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.agent-shell-root .rise {
+  animation: rcRise 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes rcBreathe {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.35); opacity: 0.55; }
+}
+.agent-shell-root .recording-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 999px;
+  background: var(--red);
+  animation: rcBreathe 1.6s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes rcThinking {
+  0% { content: "·"; }
+  33% { content: "··"; }
+  66% { content: "···"; }
+}
+.agent-shell-root .thinking::after {
+  content: "·";
+  animation: rcThinking 1s steps(1) infinite;
+}
+
+@keyframes rcSpin { to { transform: rotate(360deg); } }
+.agent-shell-root .spin { animation: rcSpin 1.2s linear infinite; }
+
+/* scrollbars */
+.agent-shell-root ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+.agent-shell-root ::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.14);
+  border-radius: 99px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.agent-shell-root ::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+.agent-shell-root ::-webkit-scrollbar-track { background: transparent; }
+
+/* toggle switch — iOS blue */
+.agent-shell-root .toggle {
+  position: relative;
+  width: 42px;
+  height: 25px;
+  border-radius: 99px;
+  background: #d9d9de;
+  cursor: pointer;
+  transition: background 0.18s ease;
+  border: none;
+  flex-shrink: 0;
+}
+.agent-shell-root .toggle::after {
+  content: "";
+  position: absolute;
+  top: 2.5px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 99px;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25), 0 0 1px rgba(0, 0, 0, 0.15);
+  transition: left 0.18s cubic-bezier(0.3, 0.9, 0.4, 1.1), width 0.1s;
+}
+.agent-shell-root .toggle.on { background: var(--blue); }
+.agent-shell-root .toggle.on::after { left: 19px; }
+.agent-shell-root .toggle:active::after { width: 23px; }
+.agent-shell-root .toggle.on:active::after { left: 16px; }
+
+.agent-shell-root input[type="text"],
+.agent-shell-root input[type="password"] {
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: var(--r-btn);
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.agent-shell-root input[type="text"]:focus,
+.agent-shell-root input[type="password"]:focus {
+  border-color: #b9b9b9;
+}
+
+.agent-shell-root kbd.k {
+  font-family: var(--font-body);
+  font-size: 12px;
+  color: var(--ink-2);
+  box-shadow: var(--shadow-card);
+  border-radius: 7px;
+  padding: 4px 9px;
+  background: var(--bg);
+}
+
+/* ————— search palette ————— */
+.agent-shell-root .palette-veil {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.22);
+  z-index: 50;
+  animation: rcFade 0.14s ease;
+}
+@keyframes rcFade { from { opacity: 0; } to { opacity: 1; } }
+.agent-shell-root .palette {
+  position: fixed;
+  top: 24%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(580px, 90vw);
+  background: var(--bg);
+  border-radius: 14px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.06), 0 24px 70px -12px rgba(0, 0, 0, 0.3);
+  z-index: 51;
+  overflow: hidden;
+  animation: rcPop 0.14s ease;
+}
+@keyframes rcPop {
+  from { opacity: 0; transform: translateX(-50%) scale(0.98); }
+  to { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+.agent-shell-root .palette input {
+  width: 100%;
+  border: none !important;
+  outline: none;
+  font: inherit;
+  font-size: 15px;
+  padding: 16px 18px 12px;
+  background: transparent;
+  border-radius: 0;
+}
+.agent-shell-root .prow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 9px;
+  font-size: 13.5px;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-family: var(--font-body);
+  color: var(--ink);
+}
+.agent-shell-root .prow.sel { background: #f2f2f2; }
+.agent-shell-root .prow .q { flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.agent-shell-root .prow .kbd {
+  font-size: 11px;
+  color: var(--ink-3);
+  background: #f0f0f0;
+  border-radius: 5px;
+  padding: 2px 6px;
+  flex-shrink: 0;
+}
+
+/* No focus/hover ring or border on shell icon buttons — the app's global
+   focus ring otherwise paints a faint border on these. */
+.agent-shell-root .iconbtn,
+.agent-shell-root .iconbtn:hover,
+.agent-shell-root .iconbtn:focus,
+.agent-shell-root .iconbtn:focus-visible {
+  border: none;
+  outline: none;
+  box-shadow: none;
+}
+
+/* Centered modal entrance — preserves the translate(-50%,-50%) centering so the
+   pop animation can't knock it off-center (unlike the generic .rise). */
+@keyframes rcModalPop {
+  from { opacity: 0; transform: translate(-50%, -48%) scale(0.985); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+.agent-shell-root .rc-modal { animation: rcModalPop 0.16s ease; }
+
+/* Animated clock for the Automations empty state. */
+@keyframes rcClockMinute { to { transform: rotate(360deg); } }
+@keyframes rcClockHour { to { transform: rotate(360deg); } }
+.agent-shell-root .rc-clock-min {
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+  animation: rcClockMinute 8s linear infinite;
+}
+.agent-shell-root .rc-clock-hour {
+  transform-box: view-box;
+  transform-origin: 50px 50px;
+  animation: rcClockHour 96s linear infinite;
+}
+
+/* New-chat empty-state suggestion list — vertical rows with hairline dividers. */
+.agent-shell-root .suggest-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 12px 12px;
+  background: transparent;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-body);
+  color: var(--ink-2);
+  transition: background 0.12s ease;
+}
+.agent-shell-root .suggest-row:hover { background: var(--hover-soft); }
+.agent-shell-root .suggest-icon {
+  width: 22px;
+  height: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.agent-shell-root .suggest-text {
+  flex: 1;
+  min-width: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+.agent-shell-root .suggest-text strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+/* Width-animated sidebar rail — collapse/expand glides; the expanded and
+   collapsed (icon-only) layers crossfade so the narrow icons stay aligned. */
+.agent-shell-root .rail {
+  transition: width 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+  position: relative;
+  flex-shrink: 0;
+}
+.agent-shell-root .rail-pane {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  transition: opacity 0.15s ease;
+}
+.agent-shell-root .rail-mini {
+  align-items: center;
+  padding-top: 12px;
+}
+.agent-shell-root .rail-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--ink-2);
+  transition: background 0.12s ease, color 0.12s ease;
+}
+.agent-shell-root .rail-icon:hover {
+  background: var(--hover-soft);
+  color: var(--ink);
+}
+.agent-shell-root .rail-icon.active {
+  background: var(--hover-soft);
+  color: var(--ink);
+}
+.agent-shell-root .rail-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 12px 6px;
+  min-height: 34px;
+}
+.agent-shell-root .rail-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+/* Auth / onboarding split layout. The wrap must be a flex container so the
+   showcase stretches to the full viewport height (not just its content). */
+.agent-shell-root .auth-showcase-wrap {
+  display: flex;
+  align-self: stretch;
+}
+/* Hide the showcase panel on narrow screens. */
+@media (max-width: 900px) {
+  .agent-shell-root .auth-showcase-wrap,
+  .agent-shell-root .auth-showcase { display: none !important; }
+}
+
+/* ============================================================
+   Accessibility: visible focus rings + reduced-motion support
+   ============================================================ */
+.agent-shell-root :where(button, a, input, textarea, select, [role="option"], [role="radio"], [tabindex]):focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 7px;
+}
+.agent-shell-root .sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0 0 0 0);
+  white-space: nowrap; border: 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .agent-shell-root *,
+  .agent-shell-root *::before,
+  .agent-shell-root *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================
+   Responsive: mobile top bar + off-canvas sidebar drawer
+   ============================================================ */
+.agent-shell-root .mobile-bar { display: none; }
+.agent-shell-root .rail-scrim { display: none; }
+.agent-shell-root .shell-content { flex: 1; min-width: 0; display: flex; }
+
+@media (max-width: 768px) {
+  .agent-shell-root .mobile-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    height: 48px;
+    z-index: 60;
+    padding: 0 10px;
+    background: var(--bg);
+    border-bottom: 1px solid var(--line);
+  }
+  .agent-shell-root .shell-content { padding-top: 48px; }
+
+  /* Rail becomes an off-canvas drawer */
+  .agent-shell-root .rail {
+    position: fixed;
+    top: 0; left: 0; bottom: 0;
+    z-index: 80;
+    width: 280px !important;
+    background: var(--base);
+    transform: translateX(-100%);
+    transition: transform 0.24s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.18);
+  }
+  .agent-shell-root.nav-open .rail { transform: translateX(0); }
+  /* Always show the expanded pane in the drawer; never the icon-only one */
+  .agent-shell-root .rail-pane:not(.rail-mini) {
+    width: 100% !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  .agent-shell-root .rail-mini { display: none !important; }
+
+  .agent-shell-root .rail-scrim {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 70;
+    background: rgba(0, 0, 0, 0.32);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .agent-shell-root.nav-open .rail-scrim { opacity: 1; pointer-events: auto; }
+
+  /* Reclaim space: full-bleed canvas + tighter surface padding */
+  .agent-shell-root .canvas-panel { margin: 0 !important; border-radius: 0 !important; }
+  .agent-shell-root .pane { padding-left: 18px !important; padding-right: 18px !important; }
+}
+
+@media (max-width: 480px) {
+  .agent-shell-root .pane { padding-left: 14px !important; padding-right: 14px !important; }
+}
+
+/* Inline spinner for per-file indexing status. */
+@keyframes rcSpin { to { transform: rotate(360deg); } }
+.agent-shell-root .rc-spin { animation: rcSpin 0.8s linear infinite; }

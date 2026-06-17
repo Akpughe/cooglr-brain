@@ -28,11 +28,11 @@ interface ProviderOption { id: string; name: string; display_name: string | null
 
 const STATUS_META: Record<string, { label: string; dot: string; bg: string }> = {
   draft: { label: "Draft", dot: "bg-muted-foreground/40", bg: "bg-muted text-muted-foreground" },
-  scheduled: { label: "Scheduled", dot: "bg-blue-500", bg: "bg-blue-500/10 text-blue-600 dark:text-blue-400" },
-  sending: { label: "Sending", dot: "bg-amber-500 animate-pulse", bg: "bg-amber-500/10 text-amber-600 dark:text-amber-400" },
-  sent: { label: "Sent", dot: "bg-emerald-500", bg: "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" },
-  paused: { label: "Paused", dot: "bg-red-500", bg: "bg-red-500/10 text-red-600 dark:text-red-400" },
-  failed: { label: "Failed", dot: "bg-red-500", bg: "bg-red-500/10 text-red-600 dark:text-red-400" },
+  scheduled: { label: "Scheduled", dot: "bg-info", bg: "bg-info/10 text-info" },
+  sending: { label: "Sending", dot: "bg-warning animate-pulse", bg: "bg-warning/10 text-warning" },
+  sent: { label: "Sent", dot: "bg-success", bg: "bg-success/10 text-success" },
+  paused: { label: "Paused", dot: "bg-destructive", bg: "bg-destructive/10 text-destructive" },
+  failed: { label: "Failed", dot: "bg-destructive", bg: "bg-destructive/10 text-destructive" },
 };
 
 const FILTER_TABS = ["All", "Drafts", "Scheduled", "Sent"];
@@ -152,7 +152,7 @@ export function CampaignsView({ workspaceId }: { workspaceId: string }) {
                         <StatBox label="Delivered" value={delivered} color="text-blue-600 dark:text-blue-400" />
                         <StatBox label="Opened" value={opened} color="text-emerald-600 dark:text-emerald-400" />
                         <StatBox label="Clicked" value={clicked} color="text-violet-600 dark:text-violet-400" />
-                        <StatBox label="Bounced" value={bounced} color={bounced > 0 ? "text-red-600 dark:text-red-400" : undefined} />
+                        <StatBox label="Bounced" value={bounced} color={bounced > 0 ? "text-destructive" : undefined} />
                       </div>
 
                       {/* Detail rows */}

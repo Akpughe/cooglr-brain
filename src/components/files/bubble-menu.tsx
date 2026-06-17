@@ -21,7 +21,7 @@ function BubbleButton({ active, onClick, children, title }: { active?: boolean; 
       title={title}
       className={cn(
         "p-1.5 rounded transition-colors",
-        active ? "bg-white/15 text-white" : "text-white/70 hover:text-white hover:bg-white/10"
+        active ? "bg-foreground/15 text-white" : "text-foreground/70 hover:text-foreground hover:bg-foreground/10"
       )}
     >
       {children}
@@ -102,7 +102,7 @@ export function EditorBubbleMenu({ editor, containerRef }: Props) {
   return (
     <div
       ref={menuRef}
-      className="absolute z-50 flex items-center gap-0.5 bg-[#1e1e2e] border border-white/10 rounded-lg px-1.5 py-1 shadow-2xl"
+      className="absolute z-50 flex items-center gap-0.5 bg-[#1e1e2e] border border-foreground/10 rounded-lg px-1.5 py-1 shadow-2xl"
       style={{
         top: pos.top,
         left: pos.left,
@@ -117,53 +117,53 @@ export function EditorBubbleMenu({ editor, containerRef }: Props) {
             onChange={(e) => setLinkUrl(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") handleSetLink(); if (e.key === "Escape") { setShowLinkInput(false); setLinkUrl(""); } }}
             placeholder="Paste link..."
-            className="bg-transparent text-sm outline-none w-48 text-white placeholder:text-white/30"
+            className="bg-transparent text-sm outline-none w-48 text-white placeholder:text-foreground/30"
             autoFocus
           />
-          <button onMouseDown={(e) => { e.preventDefault(); handleSetLink(); }} className="text-xs text-indigo-400 hover:text-indigo-300 px-1.5 py-0.5 rounded bg-white/5">
+          <button onMouseDown={(e) => { e.preventDefault(); handleSetLink(); }} className="text-xs text-indigo-400 hover:text-indigo-300 px-1.5 py-0.5 rounded bg-foreground/5">
             Add
           </button>
-          <button onMouseDown={(e) => { e.preventDefault(); setShowLinkInput(false); setLinkUrl(""); }} className="text-xs text-white/40 hover:text-white/60 px-1">
+          <button onMouseDown={(e) => { e.preventDefault(); setShowLinkInput(false); setLinkUrl(""); }} className="text-xs text-foreground/40 hover:text-foreground/60 px-1">
             &times;
           </button>
         </div>
       ) : (
         <>
           <BubbleButton active={editor.isActive("bold")} onClick={() => editor.chain().focus().toggleBold().run()} title="Bold">
-            <Bold className="w-3.5 h-3.5" />
+            <Bold className="size-3.5" />
           </BubbleButton>
           <BubbleButton active={editor.isActive("italic")} onClick={() => editor.chain().focus().toggleItalic().run()} title="Italic">
-            <Italic className="w-3.5 h-3.5" />
+            <Italic className="size-3.5" />
           </BubbleButton>
           <BubbleButton active={editor.isActive("underline")} onClick={() => editor.chain().focus().toggleUnderline().run()} title="Underline">
-            <Underline className="w-3.5 h-3.5" />
+            <Underline className="size-3.5" />
           </BubbleButton>
           <BubbleButton active={editor.isActive("strike")} onClick={() => editor.chain().focus().toggleStrike().run()} title="Strikethrough">
-            <Strikethrough className="w-3.5 h-3.5" />
+            <Strikethrough className="size-3.5" />
           </BubbleButton>
           <BubbleButton active={editor.isActive("code")} onClick={() => editor.chain().focus().toggleCode().run()} title="Inline code">
-            <Code className="w-3.5 h-3.5" />
+            <Code className="size-3.5" />
           </BubbleButton>
 
-          <div className="w-px h-4 bg-white/10 mx-0.5" />
+          <div className="w-px h-4 bg-foreground/10 mx-0.5" />
 
           <BubbleButton active={editor.isActive("heading", { level: 1 })} onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} title="Heading 1">
-            <Heading1 className="w-3.5 h-3.5" />
+            <Heading1 className="size-3.5" />
           </BubbleButton>
           <BubbleButton active={editor.isActive("heading", { level: 2 })} onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} title="Heading 2">
-            <Heading2 className="w-3.5 h-3.5" />
+            <Heading2 className="size-3.5" />
           </BubbleButton>
           <BubbleButton active={editor.isActive("heading", { level: 3 })} onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} title="Heading 3">
-            <Heading3 className="w-3.5 h-3.5" />
+            <Heading3 className="size-3.5" />
           </BubbleButton>
 
-          <div className="w-px h-4 bg-white/10 mx-0.5" />
+          <div className="w-px h-4 bg-foreground/10 mx-0.5" />
 
           <BubbleButton active={editor.isActive("link")} onClick={handleLinkClick} title={editor.isActive("link") ? "Remove link" : "Add link"}>
-            <Link className="w-3.5 h-3.5" />
+            <Link className="size-3.5" />
           </BubbleButton>
           <BubbleButton active={editor.isActive("blockquote")} onClick={() => editor.chain().focus().toggleBlockquote().run()} title="Quote">
-            <Quote className="w-3.5 h-3.5" />
+            <Quote className="size-3.5" />
           </BubbleButton>
         </>
       )}

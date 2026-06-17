@@ -14,9 +14,9 @@ interface Props {
 
 function getIcon(type: string) {
   switch (type) {
-    case "folder": return <Folder className="w-4 h-4 text-yellow-400/70" />;
-    case "page": return <FileText className="w-4 h-4 text-blue-400/70" />;
-    case "file": return <File className="w-4 h-4 text-gray-400/70" />;
+    case "folder": return <Folder className="size-4 text-yellow-400/70" />;
+    case "page": return <FileText className="size-4 text-blue-400/70" />;
+    case "file": return <File className="size-4 text-gray-400/70" />;
   }
 }
 
@@ -66,25 +66,25 @@ export function FolderView({ folder, children, onCreatePage, onUpload }: Props) 
             onClick={() => onCreatePage(folder.id)}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 transition-colors"
           >
-            <FilePlus className="w-3.5 h-3.5" /> New page
+            <FilePlus className="size-3.5" /> New page
           </button>
           <button
             onClick={() => onUpload(folder.id)}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] bg-white/5 hover:bg-white/10 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] bg-foreground/5 hover:bg-foreground/10 transition-colors"
           >
-            <Upload className="w-3.5 h-3.5" /> Upload
+            <Upload className="size-3.5" /> Upload
           </button>
         </div>
 
         {sorted.length === 0 ? (
           <div className="text-center py-16">
-            <Folder className="w-12 h-12 text-muted-foreground/30 mx-auto mb-3" />
+            <Folder className="size-12 text-muted-foreground/30 mx-auto mb-3" />
             <p className="text-muted-foreground">This folder is empty</p>
             <p className="text-sm text-muted-foreground/60 mt-1">Create a page or upload a file to get started</p>
           </div>
         ) : (
-          <div className="border border-white/[0.06] rounded-lg overflow-hidden">
-            <div className="grid grid-cols-[1fr_120px_120px_100px] px-4 py-2 bg-white/[0.02] text-[11px] uppercase tracking-wider text-muted-foreground/50 border-b border-white/[0.06]">
+          <div className="border border-foreground/[0.06] rounded-lg overflow-hidden">
+            <div className="grid grid-cols-[1fr_120px_120px_100px] px-4 py-2 bg-foreground/[0.02] text-[11px] uppercase tracking-wider text-muted-foreground/50 border-b border-foreground/[0.06]">
               <span>Name</span>
               <span>Type</span>
               <span>Modified</span>
@@ -93,7 +93,7 @@ export function FolderView({ folder, children, onCreatePage, onUpload }: Props) 
             {sorted.map((child) => (
               <div
                 key={child.id}
-                className="grid grid-cols-[1fr_120px_120px_100px] px-4 py-2.5 border-b border-white/[0.03] cursor-pointer hover:bg-white/[0.03] transition-colors items-center"
+                className="grid grid-cols-[1fr_120px_120px_100px] px-4 py-2.5 border-b border-foreground/[0.03] cursor-pointer hover:bg-foreground/[0.03] transition-colors items-center"
                 onClick={() => router.push(`/${workspace.slug}/files/${child.id}`)}
               >
                 <span className="flex items-center gap-2 text-[13px]">

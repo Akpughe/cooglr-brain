@@ -176,7 +176,7 @@ export function FullReport({
               <p className="text-2xl font-bold">{metric.value}</p>
               <p className="text-xs text-muted-foreground mt-1">{metric.label}</p>
               {metric.change && (
-                <p className={`text-xs mt-1 font-medium ${metric.change.startsWith("+") ? "text-green-600" : metric.change.startsWith("-") ? "text-red-600" : "text-muted-foreground"}`}>
+                <p className={`text-xs mt-1 font-medium ${metric.change.startsWith("+") ? "text-success" : metric.change.startsWith("-") ? "text-destructive" : "text-muted-foreground"}`}>
                   {metric.change}
                 </p>
               )}

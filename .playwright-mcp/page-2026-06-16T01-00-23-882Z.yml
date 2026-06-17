@@ -1,0 +1,192 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Plugins" [ref=e6]
+    - button "Automations" [ref=e7]
+    - button "Settings" [ref=e8]
+  - generic [ref=e9]:
+    - complementary [ref=e10]:
+      - navigation [ref=e11]:
+        - button "New chat" [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+          - text: New chat
+        - button "Search" [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+          - text: Search
+        - button "Plugins" [ref=e20] [cursor=pointer]:
+          - img [ref=e21]
+          - text: Plugins
+        - button "Automations" [ref=e24] [cursor=pointer]:
+          - img [ref=e25]
+          - text: Automations
+      - generic [ref=e28]:
+        - generic [ref=e29]: Chats
+        - button "Draft this week's growth report ⌘1" [ref=e30] [cursor=pointer]:
+          - generic [ref=e31]: Draft this week's growth report
+          - generic [ref=e32]: ⌘1
+        - button "Create Instagram carousel concepts ⌘2" [ref=e33] [cursor=pointer]:
+          - generic [ref=e34]: Create Instagram carousel concepts
+          - generic [ref=e35]: ⌘2
+        - button "Create mind map designs ⌘3" [ref=e36] [cursor=pointer]:
+          - generic [ref=e37]: Create mind map designs
+          - generic [ref=e38]: ⌘3
+        - button "Plan screen-recording workflow ⌘4" [ref=e39] [cursor=pointer]:
+          - generic [ref=e40]: Plan screen-recording workflow
+          - generic [ref=e41]: ⌘4
+        - button "Find markdown files from 3 days ⌘5" [ref=e42] [cursor=pointer]:
+          - generic [ref=e43]: Find markdown files from 3 days
+          - generic [ref=e44]: ⌘5
+        - button "Create teen presentation ⌘6" [ref=e45] [cursor=pointer]:
+          - generic [ref=e46]: Create teen presentation
+          - generic [ref=e47]: ⌘6
+        - button "Find available domain names ⌘7" [ref=e48] [cursor=pointer]:
+          - generic [ref=e49]: Find available domain names
+          - generic [ref=e50]: ⌘7
+        - button "Schedule LinkedIn posts ⌘8" [ref=e51] [cursor=pointer]:
+          - generic [ref=e52]: Schedule LinkedIn posts
+          - generic [ref=e53]: ⌘8
+        - button "Research Newton prospects ⌘9" [ref=e54] [cursor=pointer]:
+          - generic [ref=e55]: Research Newton prospects
+          - generic [ref=e56]: ⌘9
+        - button "Open Zoho Mail login 1w" [ref=e57] [cursor=pointer]:
+          - generic [ref=e58]: Open Zoho Mail login
+          - generic [ref=e59]: 1w
+      - button "Settings" [ref=e62] [cursor=pointer]:
+        - generic [ref=e63]:
+          - img [ref=e64]
+          - text: Settings
+        - img [ref=e67]
+    - main [ref=e123]:
+      - generic [ref=e165]:
+        - generic [ref=e166]:
+          - button "Back" [ref=e167] [cursor=pointer]:
+            - img [ref=e168]
+          - generic [ref=e170]: Daily tech & AI brief
+          - generic [ref=e171]: Active
+          - generic [ref=e172]:
+            - button "overview" [ref=e173] [cursor=pointer]:
+              - img [ref=e174]
+              - text: overview
+            - button "canvas" [active] [ref=e177] [cursor=pointer]:
+              - img [ref=e178]
+              - text: canvas
+          - button "Pause" [ref=e183] [cursor=pointer]:
+            - img [ref=e184]
+            - text: Pause
+          - button "More" [ref=e187] [cursor=pointer]:
+            - img [ref=e188]
+        - generic [ref=e232]:
+          - generic:
+            - img:
+              - generic:
+                - generic:
+                  - generic: "Yes"
+              - generic:
+                - generic:
+                  - generic: "No"
+            - generic [ref=e233]:
+              - generic [ref=e234]:
+                - img [ref=e235]
+                - text: Trigger
+              - generic [ref=e239]:
+                - img [ref=e241]
+                - generic [ref=e244]:
+                  - generic [ref=e245]: Schedule
+                  - generic [ref=e246]: Daily · 9:00 AM
+                - button "Node menu" [ref=e247] [cursor=pointer]:
+                  - img [ref=e248]
+              - button "Add step" [ref=e253] [cursor=pointer]:
+                - img [ref=e254]
+            - generic [ref=e255]:
+              - generic [ref=e256]:
+                - img [ref=e257]
+                - text: Action
+              - generic [ref=e261]:
+                - img [ref=e263]
+                - generic [ref=e266]:
+                  - generic [ref=e267]: Search the web
+                  - generic [ref=e268]: X / Twitter · Product Hunt
+                - button "Node menu" [ref=e269] [cursor=pointer]:
+                  - img [ref=e270]
+              - button "Add step" [ref=e275] [cursor=pointer]:
+                - img [ref=e276]
+            - generic [ref=e277]:
+              - generic [ref=e278]:
+                - img [ref=e279]
+                - text: Action
+              - generic [ref=e283]:
+                - img [ref=e285]
+                - generic [ref=e287]:
+                  - generic [ref=e288]: Summarize findings
+                  - generic [ref=e289]: Claude
+                - button "Node menu" [ref=e290] [cursor=pointer]:
+                  - img [ref=e291]
+              - button "Add step" [ref=e296] [cursor=pointer]:
+                - img [ref=e297]
+            - generic [ref=e310]:
+              - generic [ref=e311]:
+                - img [ref=e312]
+                - text: Decision
+              - generic [ref=e318]:
+                - img [ref=e320]
+                - generic [ref=e326]: Anything important?
+                - button "Node menu" [ref=e327] [cursor=pointer]:
+                  - img [ref=e328]
+              - button "Add step" [ref=e333] [cursor=pointer]:
+                - img [ref=e334]
+            - generic [ref=e335]:
+              - generic [ref=e336]:
+                - img [ref=e337]
+                - text: Action
+              - generic [ref=e341]:
+                - img [ref=e343]
+                - generic [ref=e345]:
+                  - generic [ref=e346]: Draft brief
+                  - generic [ref=e347]: Claude
+                - button "Node menu" [ref=e348] [cursor=pointer]:
+                  - img [ref=e349]
+              - button "Add step" [ref=e354] [cursor=pointer]:
+                - img [ref=e355]
+            - generic [ref=e356]:
+              - generic [ref=e357]:
+                - img [ref=e358]
+                - text: Output
+              - generic [ref=e362]:
+                - img [ref=e364]
+                - generic [ref=e373]:
+                  - generic [ref=e374]: Send to Slack
+                  - generic [ref=e375]: "#tech-daily"
+                - button "Node menu" [ref=e376] [cursor=pointer]:
+                  - img [ref=e377]
+              - button "Add step" [ref=e382] [cursor=pointer]:
+                - img [ref=e383]
+            - generic [ref=e384]:
+              - generic [ref=e385]:
+                - img [ref=e386]
+                - text: Output
+              - generic [ref=e390]:
+                - img [ref=e392]
+                - generic [ref=e395]:
+                  - generic [ref=e396]: Save to report
+                  - generic [ref=e397]: Archive · no alert
+                - button "Node menu" [ref=e398] [cursor=pointer]:
+                  - img [ref=e399]
+              - button "Add step" [ref=e404] [cursor=pointer]:
+                - img [ref=e405]
+          - generic [ref=e298]:
+            - button "Zoom out" [ref=e299] [cursor=pointer]:
+              - img [ref=e300]
+            - generic [ref=e301]: 86%
+            - button "Zoom in" [ref=e302] [cursor=pointer]:
+              - img [ref=e303]
+            - button "Fit" [ref=e305] [cursor=pointer]
+          - button "Run" [ref=e307] [cursor=pointer]:
+            - img [ref=e308]
+            - text: Run
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e118] [cursor=pointer]:
+    - img [ref=e119]
+  - alert [ref=e122]

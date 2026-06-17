@@ -1,0 +1,121 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Folders" [ref=e6]
+    - button "Plugins" [ref=e7]
+    - button "Settings" [ref=e8]
+  - generic [ref=e9]:
+    - complementary [ref=e10]:
+      - button "Collapse sidebar" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - text: Collapse sidebar
+      - navigation [ref=e16]:
+        - button "New chat" [ref=e17] [cursor=pointer]:
+          - img [ref=e18]
+          - text: New chat
+        - button "Search" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+          - text: Search
+        - button "Plugins" [ref=e25] [cursor=pointer]:
+          - img [ref=e26]
+          - text: Plugins
+        - button "Folders" [ref=e29] [cursor=pointer]:
+          - img [ref=e30]
+          - text: Folders
+      - generic [ref=e32]:
+        - generic [ref=e33]: Chats
+        - button "Draft this week's growth report ⌘1" [ref=e34] [cursor=pointer]:
+          - generic [ref=e35]: Draft this week's growth report
+          - generic [ref=e36]: ⌘1
+        - button "Create Instagram carousel concepts ⌘2" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: Create Instagram carousel concepts
+          - generic [ref=e39]: ⌘2
+        - button "Create mind map designs ⌘3" [ref=e40] [cursor=pointer]:
+          - generic [ref=e41]: Create mind map designs
+          - generic [ref=e42]: ⌘3
+        - button "Plan screen-recording workflow ⌘4" [ref=e43] [cursor=pointer]:
+          - generic [ref=e44]: Plan screen-recording workflow
+          - generic [ref=e45]: ⌘4
+        - button "Find markdown files from 3 days ⌘5" [ref=e46] [cursor=pointer]:
+          - generic [ref=e47]: Find markdown files from 3 days
+          - generic [ref=e48]: ⌘5
+        - button "Create teen presentation ⌘6" [ref=e49] [cursor=pointer]:
+          - generic [ref=e50]: Create teen presentation
+          - generic [ref=e51]: ⌘6
+        - button "Find available domain names ⌘7" [ref=e52] [cursor=pointer]:
+          - generic [ref=e53]: Find available domain names
+          - generic [ref=e54]: ⌘7
+        - button "Schedule LinkedIn posts ⌘8" [ref=e55] [cursor=pointer]:
+          - generic [ref=e56]: Schedule LinkedIn posts
+          - generic [ref=e57]: ⌘8
+        - button "Research Newton prospects ⌘9" [ref=e58] [cursor=pointer]:
+          - generic [ref=e59]: Research Newton prospects
+          - generic [ref=e60]: ⌘9
+        - button "Open Zoho Mail login 1w" [ref=e61] [cursor=pointer]:
+          - generic [ref=e62]: Open Zoho Mail login
+          - generic [ref=e63]: 1w
+      - button "Settings" [ref=e66] [cursor=pointer]:
+        - generic [ref=e67]:
+          - img [ref=e68]
+          - text: Settings
+        - img [ref=e71]
+    - main [ref=e74]:
+      - generic [ref=e76]: New chat
+      - generic [ref=e77]:
+        - heading "What should we work on?" [level=1] [ref=e78]
+        - generic [ref=e80]:
+          - textbox "Ask your workspace anything" [ref=e81]
+          - generic [ref=e82]:
+            - button "Add files" [ref=e83] [cursor=pointer]:
+              - img [ref=e84]
+              - text: Add files
+            - generic [ref=e85]:
+              - img [ref=e86]
+              - text: All sources
+            - button "Auto" [ref=e91] [cursor=pointer]:
+              - text: Auto
+              - img [ref=e92]
+            - button "Dictate" [ref=e94] [cursor=pointer]:
+              - img [ref=e95]
+              - text: Dictate
+            - button "Send" [ref=e98]:
+              - img [ref=e99]
+        - generic [ref=e101]:
+          - button "Google Meet List my action points from my Google Meet" [ref=e102] [cursor=pointer]:
+            - img "Google Meet" [ref=e104]
+            - generic [ref=e105]:
+              - text: List my action points from my
+              - strong [ref=e106]: Google Meet
+          - button "Browse the web and write a newsletter" [ref=e107] [cursor=pointer]:
+            - img [ref=e109]
+            - generic [ref=e112]:
+              - text: Browse the
+              - strong [ref=e113]: web
+              - text: and write a newsletter
+          - button "Create a financial analysis and plot data in graphs" [ref=e114] [cursor=pointer]:
+            - img [ref=e116]
+            - generic [ref=e118]:
+              - text: Create a financial analysis and plot data in
+              - strong [ref=e119]: graphs
+          - button "Notion Analyze our Notion documentation" [ref=e120] [cursor=pointer]:
+            - img "Notion" [ref=e122]
+            - generic [ref=e123]:
+              - text: Analyze our
+              - strong [ref=e124]: Notion
+              - text: documentation
+          - button "Microsoft Teams Summarize my Teams meetings from yesterday" [ref=e125] [cursor=pointer]:
+            - img "Microsoft Teams" [ref=e127]
+            - generic [ref=e128]:
+              - text: Summarize my
+              - strong [ref=e129]: Teams
+              - text: meetings from yesterday
+          - button "Connect your apps for better answers" [ref=e130] [cursor=pointer]:
+            - img [ref=e132]
+            - generic [ref=e135]: Connect your apps for better answers
+            - img [ref=e136]
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e143] [cursor=pointer]:
+    - img [ref=e144]

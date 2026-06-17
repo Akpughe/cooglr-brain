@@ -99,16 +99,16 @@ export function RepoList() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search repositories..."
-                className="w-full h-9 pl-9 pr-3 text-[13px] rounded-lg border border-border bg-card focus:outline-none focus:border-primary/30 transition-colors placeholder:text-muted-foreground/40"
+                className="w-full h-8 pl-9 pr-3 text-[13px] rounded-md border border-border bg-card focus-visible:ring-2 focus-visible:ring-ring/50 outline-none focus:border-primary/30 transition-colors placeholder:text-muted-foreground/40"
               />
             </div>
-            <div className="flex items-center rounded-lg border border-border bg-card overflow-hidden">
+            <div className="flex items-center rounded-md border border-border bg-card overflow-hidden">
               {(["updated", "name", "stars"] as const).map((s) => (
                 <button
                   key={s}
                   onClick={() => setSortBy(s)}
                   className={cn(
-                    "h-9 px-3 text-[12px] transition-colors duration-100",
+                    "h-8 px-3 text-[12px] transition-colors duration-100",
                     sortBy === s
                       ? "bg-accent text-foreground font-medium"
                       : "text-muted-foreground hover:text-foreground"
@@ -123,8 +123,8 @@ export function RepoList() {
 
         {/* Error state */}
         {error && (
-          <div className="rounded-2xl border border-border bg-card py-16 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-destructive/10 flex items-center justify-center mx-auto mb-4">
+          <div className="rounded-lg border border-border bg-card py-16 text-center">
+            <div className="size-12 rounded-lg bg-destructive/10 flex items-center justify-center mx-auto mb-4">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-destructive">
                 <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
               </svg>
@@ -139,10 +139,10 @@ export function RepoList() {
 
         {/* Loading skeleton */}
         {loading && (
-          <div className="rounded-2xl border border-border bg-card overflow-hidden">
+          <div className="rounded-lg border border-border bg-card overflow-hidden">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div key={i} className="flex items-center gap-4 px-5 py-4 border-b border-border last:border-0">
-                <div className="w-8 h-8 rounded-lg skeleton shrink-0" />
+                <div className="size-8 rounded-lg skeleton shrink-0" />
                 <div className="flex-1 space-y-2">
                   <div className="h-3.5 skeleton" style={{ width: `${30 + i * 8}%` }} />
                   <div className="h-2.5 skeleton" style={{ width: `${50 + i * 5}%` }} />
@@ -155,7 +155,7 @@ export function RepoList() {
 
         {/* Repo list */}
         {!loading && !error && filtered.length > 0 && (
-          <div className="rounded-2xl border border-border bg-card overflow-hidden shadow-surface">
+          <div className="rounded-lg border border-border bg-card overflow-hidden shadow-surface">
             {filtered.map((repo, i) => (
               <a
                 key={repo.id}
@@ -166,7 +166,7 @@ export function RepoList() {
                 )}
               >
                 {/* Repo icon */}
-                <div className="w-9 h-9 rounded-lg bg-muted/50 flex items-center justify-center shrink-0 group-hover:bg-primary/8 transition-colors duration-150">
+                <div className="size-9 rounded-lg bg-muted/50 flex items-center justify-center shrink-0 group-hover:bg-primary/8 transition-colors duration-150">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground/60 group-hover:text-primary transition-colors duration-150">
                     <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/>
                     <path d="M9 18c-4.51 2-5-2-7-2"/>
@@ -196,7 +196,7 @@ export function RepoList() {
                   {repo.language && (
                     <div className="flex items-center gap-1.5">
                       <span className={cn(
-                        "w-2 h-2 rounded-full",
+                        "size-2 rounded-full",
                         LANG_COLORS[repo.language] || "bg-muted-foreground/40"
                       )} />
                       <span className="text-[11px] text-muted-foreground">{repo.language}</span>
@@ -234,15 +234,15 @@ export function RepoList() {
 
         {/* Empty search */}
         {!loading && !error && filtered.length === 0 && repos.length > 0 && (
-          <div className="rounded-2xl border border-border bg-card py-16 text-center">
+          <div className="rounded-lg border border-border bg-card py-16 text-center">
             <p className="text-sm text-muted-foreground">No repositories matching &ldquo;{search}&rdquo;</p>
           </div>
         )}
 
         {/* Empty state */}
         {!loading && !error && repos.length === 0 && (
-          <div className="rounded-2xl border border-border bg-card py-16 text-center">
-            <div className="w-12 h-12 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
+          <div className="rounded-lg border border-border bg-card py-16 text-center">
+            <div className="size-12 rounded-lg bg-muted flex items-center justify-center mx-auto mb-4">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-muted-foreground/50">
                 <path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65S8.93 17.38 9 18v4"/>
               </svg>

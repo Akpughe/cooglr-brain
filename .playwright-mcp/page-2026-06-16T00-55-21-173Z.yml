@@ -1,0 +1,117 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Plugins" [ref=e6]
+    - button "Automations" [ref=e7]
+    - button "Settings" [ref=e8]
+  - generic [ref=e9]:
+    - complementary [ref=e10]:
+      - navigation [ref=e11]:
+        - button "New chat" [ref=e12] [cursor=pointer]:
+          - img [ref=e13]
+          - text: New chat
+        - button "Search" [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+          - text: Search
+        - button "Plugins" [ref=e20] [cursor=pointer]:
+          - img [ref=e21]
+          - text: Plugins
+        - button "Automations" [ref=e24] [cursor=pointer]:
+          - img [ref=e25]
+          - text: Automations
+      - generic [ref=e28]:
+        - generic [ref=e29]: Chats
+        - button "Draft this week's growth report ⌘1" [ref=e30] [cursor=pointer]:
+          - generic [ref=e31]: Draft this week's growth report
+          - generic [ref=e32]: ⌘1
+        - button "Create Instagram carousel concepts ⌘2" [ref=e33] [cursor=pointer]:
+          - generic [ref=e34]: Create Instagram carousel concepts
+          - generic [ref=e35]: ⌘2
+        - button "Create mind map designs ⌘3" [ref=e36] [cursor=pointer]:
+          - generic [ref=e37]: Create mind map designs
+          - generic [ref=e38]: ⌘3
+        - button "Plan screen-recording workflow ⌘4" [ref=e39] [cursor=pointer]:
+          - generic [ref=e40]: Plan screen-recording workflow
+          - generic [ref=e41]: ⌘4
+        - button "Find markdown files from 3 days ⌘5" [ref=e42] [cursor=pointer]:
+          - generic [ref=e43]: Find markdown files from 3 days
+          - generic [ref=e44]: ⌘5
+        - button "Create teen presentation ⌘6" [ref=e45] [cursor=pointer]:
+          - generic [ref=e46]: Create teen presentation
+          - generic [ref=e47]: ⌘6
+        - button "Find available domain names ⌘7" [ref=e48] [cursor=pointer]:
+          - generic [ref=e49]: Find available domain names
+          - generic [ref=e50]: ⌘7
+        - button "Schedule LinkedIn posts ⌘8" [ref=e51] [cursor=pointer]:
+          - generic [ref=e52]: Schedule LinkedIn posts
+          - generic [ref=e53]: ⌘8
+        - button "Research Newton prospects ⌘9" [ref=e54] [cursor=pointer]:
+          - generic [ref=e55]: Research Newton prospects
+          - generic [ref=e56]: ⌘9
+        - button "Open Zoho Mail login 1w" [ref=e57] [cursor=pointer]:
+          - generic [ref=e58]: Open Zoho Mail login
+          - generic [ref=e59]: 1w
+      - button "Settings" [ref=e62] [cursor=pointer]:
+        - generic [ref=e63]:
+          - img [ref=e64]
+          - text: Settings
+        - img [ref=e67]
+    - main [ref=e123]:
+      - generic [ref=e165]:
+        - generic [ref=e166]:
+          - button "Back" [ref=e167] [cursor=pointer]:
+            - img [ref=e168]
+          - generic [ref=e170]: Daily tech & AI brief
+          - generic [ref=e171]: Active
+          - generic [ref=e172]:
+            - button "overview" [ref=e173] [cursor=pointer]:
+              - img [ref=e174]
+              - text: overview
+            - button "canvas" [ref=e177] [cursor=pointer]:
+              - img [ref=e178]
+              - text: canvas
+          - button "Pause" [ref=e183] [cursor=pointer]:
+            - img [ref=e184]
+            - text: Pause
+          - button "More" [ref=e187] [cursor=pointer]:
+            - img [ref=e188]
+        - generic [ref=e192]:
+          - generic [ref=e194]:
+            - generic [ref=e195]: What this does
+            - generic [ref=e196]: "Every morning, scour the web (X/Twitter, Product Hunt, YC) for top tech and AI news — launches, model updates, and notable builders — then summarize and post to #growth on Slack."
+            - generic [ref=e197]:
+              - text: Runs
+              - strong [ref=e198]: daily at 9:00 AM
+              - text: . Select a run on the right to see its results, or run it now.
+          - generic [ref=e199]:
+            - generic [ref=e200]:
+              - generic [ref=e201]: Schedule
+              - generic [ref=e202]:
+                - img [ref=e203]
+                - text: Daily at 9:00 AM
+              - button "Run now" [ref=e206] [cursor=pointer]:
+                - img [ref=e207]
+                - text: Run now
+            - generic [ref=e209]:
+              - generic [ref=e210]: Runs
+              - button "Jun 15, 10:54 PM 2m 22s" [ref=e211] [cursor=pointer]:
+                - generic [ref=e213]:
+                  - generic [ref=e214]: Jun 15, 10:54 PM
+                  - generic [ref=e215]: 2m 22s
+                - img [ref=e216]
+              - button "Jun 14, 10:54 PM 2m 18s" [ref=e219] [cursor=pointer]:
+                - generic [ref=e221]:
+                  - generic [ref=e222]: Jun 14, 10:54 PM
+                  - generic [ref=e223]: 2m 18s
+                - img [ref=e224]
+              - button "Jun 13, 10:54 PM failed" [ref=e227] [cursor=pointer]:
+                - generic [ref=e229]:
+                  - generic [ref=e230]: Jun 13, 10:54 PM
+                  - generic [ref=e231]: failed
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e118] [cursor=pointer]:
+    - img [ref=e119]
+  - alert [ref=e122]

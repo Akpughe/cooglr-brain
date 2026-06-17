@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useWorkspace } from "@/lib/workspace/context";
 import { ReportBuilder } from "@/components/reports/report-builder";
 import { ReportsOnboarding } from "@/components/reports/reports-onboarding";
+import { PageLoading } from "@/components/ui/loading-spinner";
 
 export default function ReportsPage() {
   const { workspace } = useWorkspace();
@@ -28,11 +29,7 @@ export default function ReportsPage() {
   useEffect(() => { checkConnections(); }, [workspace.id]);
 
   if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
-      </div>
-    );
+    return <PageLoading />;
   }
 
   if (needsOnboarding) {

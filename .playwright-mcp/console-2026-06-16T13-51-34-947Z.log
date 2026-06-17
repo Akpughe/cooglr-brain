@@ -1,0 +1,129 @@
+[     157ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     215ms] [LOG] [Fast Refresh] done in 160ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     299ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[     324ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   71479ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[   71493ms] [LOG] [Fast Refresh] done in 118ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  100142ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  100153ms] [LOG] [Fast Refresh] done in 110ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  101226ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  101227ms] [LOG] [Fast Refresh] done in 101ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  140447ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  140588ms] [LOG] [Fast Refresh] done in 185ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  147173ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  147210ms] [LOG] [Fast Refresh] done in 139ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  173954ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  174138ms] [LOG] [Fast Refresh] done in 171ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  180026ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  180054ms] [LOG] [Fast Refresh] done in 52ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  185741ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  185780ms] [LOG] [Fast Refresh] done in 68ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  191911ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  191940ms] [LOG] [Fast Refresh] done in 57ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[  550259ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1272060ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1272160ms] [LOG] [Fast Refresh] done in 202ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1359610ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1359838ms] [LOG] [Fast Refresh] done in 213ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1389399ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1389415ms] [LOG] [Fast Refresh] done in 120ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1398083ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1398136ms] [ERROR] %o
+
+%s ReferenceError: menuRef is not defined
+    at AgentThreadRail (http://localhost:3000/_next/static/chunks/src_010_~e6._.js?id=%255Bproject%255D%252Fsrc%252Fcomponents%252Fagent-shell%252Fagent-thread-rail.tsx+%255Bapp-client%255D+%2528ecmascript%2529:544:26)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:15037:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:4620:24)
+    at updateFunctionComponent (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6081:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6691:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9449:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9433:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9098:47)
+    at performSyncWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10263:9)
+    at flushSyncWorkAcrossRoots_impl (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10179:316)
+    at flushSyncWork$1 (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9230:86)
+    at Object.scheduleRefresh (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:299:13)
+    at http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:391:33
+    at Set.forEach (<anonymous>)
+    at Object.performReactRefresh (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:384:38)
+    at applyUpdate (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:878:31)
+    at http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:886:13 The above error occurred in the <AgentThreadRail> component. It was handled by the <ErrorBoundaryHandler> error boundary. @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_client_0fhqo1d._.js:1998
+[ 1398149ms] [ERROR] Global error: ReferenceError: menuRef is not defined
+    at AgentThreadRail (http://localhost:3000/_next/static/chunks/src_010_~e6._.js?id=%255Bproject%255D%252Fsrc%252Fcomponents%252Fagent-shell%252Fagent-thread-rail.tsx+%255Bapp-client%255D+%2528ecmascript%2529:544:26)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:15037:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:4620:24)
+    at updateFunctionComponent (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6081:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6691:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9449:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9433:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9098:47)
+    at performSyncWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10263:9)
+    at flushSyncWorkAcrossRoots_impl (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10179:316)
+    at flushSyncWork$1 (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9230:86)
+    at Object.scheduleRefresh (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:299:13)
+    at http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:391:33
+    at Set.forEach (<anonymous>)
+    at Object.performReactRefresh (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:384:38)
+    at applyUpdate (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:878:31)
+    at http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:886:13 @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 1398150ms] [ERROR] Global error: ReferenceError: menuRef is not defined
+    at AgentThreadRail (http://localhost:3000/_next/static/chunks/src_010_~e6._.js?id=%255Bproject%255D%252Fsrc%252Fcomponents%252Fagent-shell%252Fagent-thread-rail.tsx+%255Bapp-client%255D+%2528ecmascript%2529:544:26)
+    at Object.react_stack_bottom_frame (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:15037:24)
+    at renderWithHooks (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:4620:24)
+    at updateFunctionComponent (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6081:21)
+    at beginWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:6691:24)
+    at runWithFiberInDEV (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:965:74)
+    at performUnitOfWork (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9555:97)
+    at workLoopSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9449:40)
+    at renderRootSync (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9433:13)
+    at performWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9098:47)
+    at performSyncWorkOnRoot (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10263:9)
+    at flushSyncWorkAcrossRoots_impl (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:10179:316)
+    at flushSyncWork$1 (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:9230:86)
+    at Object.scheduleRefresh (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_react-dom_058-ah~._.js:299:13)
+    at http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:391:33
+    at Set.forEach (<anonymous>)
+    at Object.performReactRefresh (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:384:38)
+    at applyUpdate (http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:878:31)
+    at http://localhost:3000/_next/static/chunks/node_modules_next_dist_compiled_0rpq4pf._.js:886:13 @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:3272
+[ 1398179ms] [LOG] [Fast Refresh] done in 102ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1398304ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1398355ms] [LOG] [Fast Refresh] done in 152ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1458672ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1458756ms] [LOG] [Fast Refresh] done in 116ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1568820ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1568836ms] [LOG] [Fast Refresh] done in 119ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1645635ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1645702ms] [LOG] [Fast Refresh] done in 151ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1651254ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1651275ms] [LOG] [Fast Refresh] done in 59ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1658101ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1658127ms] [LOG] [Fast Refresh] done in 59ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1679462ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1679481ms] [LOG] [Fast Refresh] done in 65ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1688627ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1688650ms] [LOG] [Fast Refresh] done in 65ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1693766ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1693774ms] [LOG] [Fast Refresh] done in 89ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1712143ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1712170ms] [LOG] [Fast Refresh] done in 87ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1731210ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1731236ms] [LOG] [Fast Refresh] done in 92ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1737231ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1737309ms] [LOG] [Fast Refresh] done in 65ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1744185ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1744208ms] [LOG] [Fast Refresh] done in 81ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1761841ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1762185ms] [LOG] [Fast Refresh] done in 378ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1762587ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1762697ms] [LOG] [Fast Refresh] done in 212ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1763062ms] [INFO] %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1763116ms] [LOG] [HMR] connected @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1763318ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1763356ms] [LOG] [Fast Refresh] done in 142ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1768396ms] [LOG] [Fast Refresh] rebuilding @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431
+[ 1768422ms] [LOG] [Fast Refresh] done in 109ms @ http://localhost:3000/_next/static/chunks/node_modules_next_dist_115brz8._.js:2431

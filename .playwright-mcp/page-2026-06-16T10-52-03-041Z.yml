@@ -1,0 +1,119 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Folders" [ref=e6]
+    - button "Plugins" [ref=e7]
+    - button "Settings" [active] [ref=e8]
+  - generic [ref=e9]:
+    - complementary [ref=e10]:
+      - button "Collapse sidebar" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - text: Collapse sidebar
+      - navigation [ref=e16]:
+        - button "New chat" [ref=e17] [cursor=pointer]:
+          - img [ref=e18]
+          - text: New chat
+        - button "Search" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+          - text: Search
+        - button "Plugins" [ref=e25] [cursor=pointer]:
+          - img [ref=e26]
+          - text: Plugins
+        - button "Folders" [ref=e29] [cursor=pointer]:
+          - img [ref=e30]
+          - text: Folders
+      - generic [ref=e32]:
+        - generic [ref=e33]: Chats
+        - button "Draft this week's growth report ⌘1" [ref=e34] [cursor=pointer]:
+          - generic [ref=e35]: Draft this week's growth report
+          - generic [ref=e36]: ⌘1
+        - button "Create Instagram carousel concepts ⌘2" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: Create Instagram carousel concepts
+          - generic [ref=e39]: ⌘2
+        - button "Create mind map designs ⌘3" [ref=e40] [cursor=pointer]:
+          - generic [ref=e41]: Create mind map designs
+          - generic [ref=e42]: ⌘3
+        - button "Plan screen-recording workflow ⌘4" [ref=e43] [cursor=pointer]:
+          - generic [ref=e44]: Plan screen-recording workflow
+          - generic [ref=e45]: ⌘4
+        - button "Find markdown files from 3 days ⌘5" [ref=e46] [cursor=pointer]:
+          - generic [ref=e47]: Find markdown files from 3 days
+          - generic [ref=e48]: ⌘5
+        - button "Create teen presentation ⌘6" [ref=e49] [cursor=pointer]:
+          - generic [ref=e50]: Create teen presentation
+          - generic [ref=e51]: ⌘6
+        - button "Find available domain names ⌘7" [ref=e52] [cursor=pointer]:
+          - generic [ref=e53]: Find available domain names
+          - generic [ref=e54]: ⌘7
+        - button "Schedule LinkedIn posts ⌘8" [ref=e55] [cursor=pointer]:
+          - generic [ref=e56]: Schedule LinkedIn posts
+          - generic [ref=e57]: ⌘8
+        - button "Research Newton prospects ⌘9" [ref=e58] [cursor=pointer]:
+          - generic [ref=e59]: Research Newton prospects
+          - generic [ref=e60]: ⌘9
+        - button "Open Zoho Mail login 1w" [ref=e61] [cursor=pointer]:
+          - generic [ref=e62]: Open Zoho Mail login
+          - generic [ref=e63]: 1w
+      - button "Settings" [ref=e66] [cursor=pointer]:
+        - generic [ref=e67]:
+          - img [ref=e68]
+          - text: Settings
+        - img [ref=e71]
+    - main [ref=e330]:
+      - generic [ref=e411]:
+        - generic [ref=e413]:
+          - heading "Settings" [level=1] [ref=e414]
+          - generic [ref=e415]: Manage your workspace
+        - generic [ref=e416]:
+          - button "General" [ref=e417] [cursor=pointer]
+          - button "Members" [ref=e418] [cursor=pointer]
+          - button "Integrations" [ref=e419] [cursor=pointer]
+          - button "Meetings" [ref=e420] [cursor=pointer]
+        - generic [ref=e421]:
+          - generic [ref=e422]: Workspace
+          - generic [ref=e423]:
+            - generic [ref=e424]: Workspace logo
+            - generic [ref=e425]: Recommended size is 256 × 256px
+            - button "5 500Chow" [ref=e426] [cursor=pointer]:
+              - generic [ref=e427]: "5"
+              - generic [ref=e428]: 500Chow
+              - img [ref=e429]
+          - generic [ref=e431]:
+            - generic [ref=e432]: Workspace name
+            - generic [ref=e433]: The name of your company or organization
+            - textbox [ref=e434]: 500Chow
+          - generic [ref=e435]:
+            - generic [ref=e436]: Start screen agents
+            - generic [ref=e437]: Add agents that all users of this workspace should have available on the start screen
+            - generic [ref=e438]:
+              - img
+              - textbox "Search agents" [ref=e439]
+            - generic [ref=e440]:
+              - generic [ref=e441]:
+                - img [ref=e443]
+                - generic [ref=e446]:
+                  - generic [ref=e447]: All
+                  - generic [ref=e448]: Personalized page for each user
+                - generic [ref=e449]: Start page
+              - generic [ref=e450]:
+                - img [ref=e452]
+                - generic [ref=e456]: Sales agent
+            - generic [ref=e457]: Only agents made available to all users can be selected
+          - generic [ref=e458]:
+            - generic [ref=e459]: "\"All\" persona"
+            - generic [ref=e460]: Set the name and instructions for the general agent for all users in this workspace
+            - generic [ref=e461]:
+              - generic [ref=e462]: Name
+              - textbox [ref=e463]: All
+            - generic [ref=e464]:
+              - generic [ref=e465]: Instructions
+              - textbox "Instructions, like \"Answer all questions in Spanish\", or \"Always follow our tone of voice guideline\"" [ref=e466]
+          - button "Save changes" [ref=e468] [cursor=pointer]
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e143] [cursor=pointer]:
+    - img [ref=e144]
+  - alert [ref=e147]
+  - img [ref=e328]

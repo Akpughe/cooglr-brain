@@ -87,7 +87,7 @@ export function TaskExpandedView({
             onClick={onClose}
             className="flex items-center gap-1 hover:text-foreground transition-colors"
           >
-            <ChevronLeft className="w-4 h-4" />
+            <ChevronLeft className="size-4" />
             <span>{projectName}</span>
           </button>
           <span className="text-muted-foreground/40">/</span>
@@ -98,15 +98,17 @@ export function TaskExpandedView({
           <button
             onClick={onCollapse}
             title="Collapse to sidebar"
-            className="w-7 h-7 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label="Collapse to sidebar"
+            className="size-7 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
-            <Minimize2 className="w-3.5 h-3.5" />
+            <Minimize2 className="size-3.5" />
           </button>
           <button
             onClick={onClose}
-            className="w-7 h-7 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            aria-label="Close task"
+            className="size-7 rounded flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
           >
-            <X className="w-4 h-4" />
+            <X className="size-4" />
           </button>
         </div>
       </div>
@@ -119,7 +121,7 @@ export function TaskExpandedView({
             {/* Type icon */}
             <div className="mb-4">
               <span className={`inline-flex items-center gap-1.5 text-xs px-2 py-1 rounded-md ${taskTypeConf.color} bg-muted`}>
-                <TypeIcon className="w-3.5 h-3.5" />
+                <TypeIcon className="size-3.5" />
                 {taskTypeConf.label}
               </span>
             </div>
@@ -140,7 +142,7 @@ export function TaskExpandedView({
               {/* Status chip */}
               {currentCol && (
                 <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted text-xs">
-                  <ColIcon className={`w-3.5 h-3.5 ${colIcon?.color || ""}`} />
+                  <ColIcon className={`size-3.5 ${colIcon?.color || ""}`} />
                   {currentCol.name}
                 </span>
               )}
@@ -154,7 +156,7 @@ export function TaskExpandedView({
               {/* Assignee chip */}
               {task.assigneeName && (
                 <span className="inline-flex items-center gap-1.5 px-2 py-1 rounded-md bg-muted text-xs">
-                  <span className="w-4 h-4 rounded-full bg-foreground/10 flex items-center justify-center text-[8px] font-semibold text-foreground/60">
+                  <span className="size-4 rounded-full bg-foreground/10 flex items-center justify-center text-[8px] font-semibold text-foreground/60">
                     {task.assigneeName[0]?.toUpperCase()}
                   </span>
                   {task.assigneeName}
@@ -164,7 +166,7 @@ export function TaskExpandedView({
               {/* Due date chip */}
               {task.dueDate && (
                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-md bg-muted text-xs">
-                  <CalendarDays className="w-3 h-3" />
+                  <CalendarDays className="size-3" />
                   {new Date(task.dueDate).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" })}
                 </span>
               )}
@@ -191,7 +193,7 @@ export function TaskExpandedView({
                   debouncedUpdate("description", e.target.value);
                 }}
                 placeholder="Add a description..."
-                className="w-full min-h-[200px] px-4 py-3 border border-border rounded-lg text-sm bg-transparent resize-y focus:outline-none focus:ring-1 focus:ring-ring placeholder:text-muted-foreground/40 leading-relaxed"
+                className="w-full min-h-[200px] px-4 py-3 border border-border rounded-lg text-sm bg-transparent resize-y focus-visible:ring-2 focus-visible:ring-ring/50 outline-none placeholder:text-muted-foreground/40 leading-relaxed"
               />
             </div>
 
@@ -199,15 +201,15 @@ export function TaskExpandedView({
             <div className="border-t border-border pt-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-medium flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-muted-foreground" />
+                  <MessageSquare className="size-4 text-muted-foreground" />
                   Activity
                 </h3>
               </div>
 
               {/* Created info */}
               <div className="flex items-start gap-3 mb-4">
-                <div className="w-6 h-6 rounded-full bg-muted flex items-center justify-center mt-0.5">
-                  <Circle className="w-3 h-3 text-muted-foreground" />
+                <div className="size-6 rounded-full bg-muted flex items-center justify-center mt-0.5">
+                  <Circle className="size-3 text-muted-foreground" />
                 </div>
                 <div>
                   <p className="text-sm">Task created</p>
@@ -227,7 +229,7 @@ export function TaskExpandedView({
         {/* Right: properties sidebar */}
         <div className="w-[280px] min-w-[280px] border-l border-border overflow-y-auto">
           <div className="p-4">
-            <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-3">Properties</p>
+            <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Properties</p>
 
             <div className="space-y-1">
               {/* Status */}
@@ -243,7 +245,7 @@ export function TaskExpandedView({
                     const SIcon = si.icon;
                     return (
                       <span className="flex items-center gap-1.5">
-                        <SIcon className={`w-3.5 h-3.5 ${si.color}`} />
+                        <SIcon className={`size-3.5 ${si.color}`} />
                         <span>{col.name}</span>
                       </span>
                     );
@@ -253,7 +255,7 @@ export function TaskExpandedView({
                     const SIcon = si.icon;
                     return (
                       <span className="flex items-center gap-2">
-                        <SIcon className={`w-3.5 h-3.5 ${si.color}`} />
+                        <SIcon className={`size-3.5 ${si.color}`} />
                         {opt.label}
                       </span>
                     );
@@ -303,7 +305,7 @@ export function TaskExpandedView({
                     const name = m?.fullName || m?.email || "Unknown";
                     return (
                       <span className="flex items-center gap-1.5">
-                        <span className="w-4 h-4 rounded-full bg-foreground/10 flex items-center justify-center text-[8px] font-semibold text-foreground/60 shrink-0">
+                        <span className="size-4 rounded-full bg-foreground/10 flex items-center justify-center text-[8px] font-semibold text-foreground/60 shrink-0">
                           {name[0]?.toUpperCase()}
                         </span>
                         <span>{name}</span>
@@ -325,7 +327,7 @@ export function TaskExpandedView({
                     const TIcon = t.icon;
                     return (
                       <span className={`flex items-center gap-1.5 ${t.color}`}>
-                        <TIcon className="w-3.5 h-3.5" />
+                        <TIcon className="size-3.5" />
                         <span>{t.label}</span>
                       </span>
                     );
@@ -336,7 +338,7 @@ export function TaskExpandedView({
                     const TIcon = t.icon;
                     return (
                       <span className={`flex items-center gap-2 ${t.color}`}>
-                        <TIcon className="w-3.5 h-3.5" />
+                        <TIcon className="size-3.5" />
                         {opt.label}
                       </span>
                     );
@@ -350,7 +352,7 @@ export function TaskExpandedView({
                   type="date"
                   value={task.dueDate || ""}
                   onChange={(e) => handleImmediateUpdate("dueDate", e.target.value || null)}
-                  className="px-2 py-1 -ml-2 rounded-md text-sm bg-transparent hover:bg-muted transition-colors focus:outline-none focus:bg-muted w-full"
+                  className="px-2 py-1 -ml-2 rounded-md text-sm bg-transparent hover:bg-muted transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 outline-none focus:bg-muted w-full"
                 />
               </PropertyRow>
 
@@ -361,7 +363,7 @@ export function TaskExpandedView({
                   value={task.githubRepo || ""}
                   onChange={(e) => debouncedUpdate("githubRepo", e.target.value || null)}
                   placeholder="owner/repo"
-                  className="px-2 py-1 -ml-2 rounded-md text-sm bg-transparent hover:bg-muted transition-colors focus:outline-none focus:bg-muted placeholder:text-muted-foreground/40 w-full"
+                  className="px-2 py-1 -ml-2 rounded-md text-sm bg-transparent hover:bg-muted transition-colors focus-visible:ring-2 focus-visible:ring-ring/50 outline-none focus:bg-muted placeholder:text-muted-foreground/40 w-full"
                 />
               </PropertyRow>
             </div>
@@ -369,7 +371,7 @@ export function TaskExpandedView({
             {/* Labels section */}
             {task.labels.length > 0 && (
               <div className="mt-4 pt-4 border-t border-border">
-                <p className="text-[11px] font-medium text-muted-foreground uppercase tracking-wider mb-2">Labels</p>
+                <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Labels</p>
                 <div className="flex flex-wrap gap-1.5">
                   {task.labels.map((label, i) => (
                     <span

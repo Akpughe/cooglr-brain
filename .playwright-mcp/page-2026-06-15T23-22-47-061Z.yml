@@ -1,0 +1,94 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Plugins" [ref=e6]
+    - button "Settings" [ref=e7]
+  - generic [ref=e8]:
+    - complementary [ref=e9]:
+      - navigation [ref=e10]:
+        - button "New chat" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+          - text: New chat
+        - button "Search" [ref=e15] [cursor=pointer]:
+          - img [ref=e16]
+          - text: Search
+        - button "Plugins" [ref=e19] [cursor=pointer]:
+          - img [ref=e20]
+          - text: Plugins
+        - button "Automations" [ref=e23] [cursor=pointer]:
+          - img [ref=e24]
+          - text: Automations
+      - generic [ref=e27]:
+        - generic [ref=e28]: Chats
+        - button "Draft this week's growth report ⌘1" [ref=e29] [cursor=pointer]:
+          - generic [ref=e30]: Draft this week's growth report
+          - generic [ref=e31]: ⌘1
+        - button "Create Instagram carousel concepts ⌘2" [ref=e32] [cursor=pointer]:
+          - generic [ref=e33]: Create Instagram carousel concepts
+          - generic [ref=e34]: ⌘2
+        - button "Create mind map designs ⌘3" [ref=e35] [cursor=pointer]:
+          - generic [ref=e36]: Create mind map designs
+          - generic [ref=e37]: ⌘3
+        - button "Plan screen-recording workflow ⌘4" [ref=e38] [cursor=pointer]:
+          - generic [ref=e39]: Plan screen-recording workflow
+          - generic [ref=e40]: ⌘4
+        - button "Find markdown files from 3 days ⌘5" [ref=e41] [cursor=pointer]:
+          - generic [ref=e42]: Find markdown files from 3 days
+          - generic [ref=e43]: ⌘5
+        - button "Create teen presentation ⌘6" [ref=e44] [cursor=pointer]:
+          - generic [ref=e45]: Create teen presentation
+          - generic [ref=e46]: ⌘6
+        - button "Find available domain names ⌘7" [ref=e47] [cursor=pointer]:
+          - generic [ref=e48]: Find available domain names
+          - generic [ref=e49]: ⌘7
+        - button "Schedule LinkedIn posts ⌘8" [ref=e50] [cursor=pointer]:
+          - generic [ref=e51]: Schedule LinkedIn posts
+          - generic [ref=e52]: ⌘8
+        - button "Research Newton prospects ⌘9" [ref=e53] [cursor=pointer]:
+          - generic [ref=e54]: Research Newton prospects
+          - generic [ref=e55]: ⌘9
+        - button "Open Zoho Mail login 1w" [ref=e56] [cursor=pointer]:
+          - generic [ref=e57]: Open Zoho Mail login
+          - generic [ref=e58]: 1w
+      - button "Settings" [ref=e61] [cursor=pointer]:
+        - generic [ref=e62]:
+          - img [ref=e63]
+          - text: Settings
+        - img [ref=e66]
+    - main [ref=e69]:
+      - generic [ref=e71]: New chat
+      - generic [ref=e72]:
+        - heading "What should we work on?" [level=1] [ref=e73]
+        - generic [ref=e75]:
+          - textbox "Ask your workspace anything" [ref=e76]
+          - generic [ref=e77]:
+            - generic [ref=e78]:
+              - img [ref=e79]
+              - text: All sources
+            - button "Auto" [ref=e84] [cursor=pointer]:
+              - text: Auto
+              - img [ref=e85]
+            - button "Dictate" [ref=e87] [cursor=pointer]:
+              - img [ref=e88]
+              - text: Dictate
+            - button "Send" [ref=e91]:
+              - img [ref=e92]
+        - generic [ref=e94]:
+          - button "Slack Connect messaging Bring Slack threads and channels into your workspace knowledge." [ref=e95] [cursor=pointer]:
+            - img "Slack" [ref=e97]
+            - generic [ref=e98]: Connect messaging
+            - generic [ref=e99]: Bring Slack threads and channels into your workspace knowledge.
+          - button "GitHub Connect GitHub Index repositories, issues and pull requests for grounded answers." [ref=e100] [cursor=pointer]:
+            - img "GitHub" [ref=e102]
+            - generic [ref=e103]: Connect GitHub
+            - generic [ref=e104]: Index repositories, issues and pull requests for grounded answers.
+          - button "Google Drive Connect Drive Search every document Drive has shared with your team." [ref=e105] [cursor=pointer]:
+            - img "Google Drive" [ref=e107]
+            - generic [ref=e108]: Connect Drive
+            - generic [ref=e109]: Search every document Drive has shared with your team.
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e115] [cursor=pointer]:
+    - img [ref=e116]

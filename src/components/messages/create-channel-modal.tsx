@@ -4,6 +4,7 @@ import { useState } from "react";
 import { X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useWorkspace } from "@/lib/workspace/context";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 import type { Channel } from "@/lib/messages/types";
 
 interface CreateChannelModalProps {
@@ -40,13 +41,15 @@ export function CreateChannelModal({ workspaceId, onClose, onCreate }: CreateCha
 
   const slugified = name.toLowerCase().replace(/[^a-z0-9-]/g, "-").replace(/^-|-$/g, "");
 
+  const trapRef = useFocusTrap<HTMLDivElement>();
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-popover rounded-2xl shadow-xl w-full max-w-md border border-border p-6">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-label="Create channel">
+      <div className="absolute inset-0 bg-black/40" onClick={onClose} />
+      <div ref={trapRef} className="relative bg-popover rounded-lg shadow-surface-lg w-full max-w-md border border-border p-6">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold">Create channel</h2>
-          <button onClick={onClose} className="text-muted-foreground hover:text-foreground"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} aria-label="Close" className="text-muted-foreground hover:text-foreground"><X className="size-5" /></button>
         </div>
         <div className="space-y-4">
           <div>
@@ -54,18 +57,18 @@ export function CreateChannelModal({ workspaceId, onClose, onCreate }: CreateCha
             <div className="mt-1 relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm">#</span>
               <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. design"
-                className="w-full h-10 pl-7 pr-3 border border-border rounded-lg text-sm bg-background focus:outline-none focus:ring-2 focus:ring-ring" autoFocus />
+                className="w-full h-8 pl-7 pr-3 border border-border rounded-md text-sm bg-background focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background outline-none" autoFocus />
             </div>
             {slugified && slugified !== name && <p className="text-xs text-muted-foreground mt-1">Will be created as #{slugified}</p>}
           </div>
           <div>
             <label className="text-sm font-medium">Description <span className="text-muted-foreground font-normal">(optional)</span></label>
             <textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="What's this channel about?"
-              className="w-full mt-1 h-20 px-3 py-2 border border-border rounded-lg text-sm bg-background resize-none focus:outline-none focus:ring-2 focus:ring-ring" />
+              className="w-full mt-1 h-20 px-3 py-2 border border-border rounded-md text-sm bg-background resize-none focus-visible:ring-2 focus-visible:ring-ring/50 focus-visible:ring-offset-2 focus-visible:ring-offset-background outline-none" />
           </div>
           {error && <p className="text-sm text-destructive">{error}</p>}
           <button onClick={handleCreate} disabled={!name.trim() || creating}
-            className="w-full h-10 bg-foreground text-background rounded-lg text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity">
+            className="w-full h-9 bg-foreground text-background rounded-md text-sm font-medium hover:opacity-90 disabled:opacity-50 transition-opacity">
             {creating ? "Creating..." : "Create Channel"}
           </button>
         </div>

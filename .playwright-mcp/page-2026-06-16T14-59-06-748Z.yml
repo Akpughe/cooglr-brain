@@ -1,0 +1,121 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Folders" [ref=e6]
+    - button "Plugins" [ref=e7]
+    - button "Settings" [active] [ref=e8]
+    - button "Profile" [ref=e9]
+  - generic [ref=e10]:
+    - complementary [ref=e11]:
+      - generic [ref=e12]:
+        - generic [ref=e13]:
+          - generic [ref=e14]: 500Chow
+          - button "Collapse sidebar" [ref=e15] [cursor=pointer]:
+            - img [ref=e16]
+        - navigation [ref=e19]:
+          - button "New chat" [ref=e20] [cursor=pointer]:
+            - img [ref=e21]
+            - text: New chat
+          - button "Search" [ref=e24] [cursor=pointer]:
+            - img [ref=e25]
+            - text: Search
+          - button "Plugins" [ref=e28] [cursor=pointer]:
+            - img [ref=e29]
+            - text: Plugins
+          - button "Folders" [ref=e32] [cursor=pointer]:
+            - img [ref=e33]
+            - text: Folders
+        - generic [ref=e35]:
+          - generic [ref=e36]: Chats
+          - button "Draft this week's growth report ⌘1" [ref=e37] [cursor=pointer]:
+            - generic [ref=e38]: Draft this week's growth report
+            - generic [ref=e39]: ⌘1
+          - button "Create Instagram carousel concepts ⌘2" [ref=e40] [cursor=pointer]:
+            - generic [ref=e41]: Create Instagram carousel concepts
+            - generic [ref=e42]: ⌘2
+          - button "Create mind map designs ⌘3" [ref=e43] [cursor=pointer]:
+            - generic [ref=e44]: Create mind map designs
+            - generic [ref=e45]: ⌘3
+          - button "Plan screen-recording workflow ⌘4" [ref=e46] [cursor=pointer]:
+            - generic [ref=e47]: Plan screen-recording workflow
+            - generic [ref=e48]: ⌘4
+          - button "Find markdown files from 3 days ⌘5" [ref=e49] [cursor=pointer]:
+            - generic [ref=e50]: Find markdown files from 3 days
+            - generic [ref=e51]: ⌘5
+          - button "Create teen presentation ⌘6" [ref=e52] [cursor=pointer]:
+            - generic [ref=e53]: Create teen presentation
+            - generic [ref=e54]: ⌘6
+          - button "Find available domain names ⌘7" [ref=e55] [cursor=pointer]:
+            - generic [ref=e56]: Find available domain names
+            - generic [ref=e57]: ⌘7
+          - button "Schedule LinkedIn posts ⌘8" [ref=e58] [cursor=pointer]:
+            - generic [ref=e59]: Schedule LinkedIn posts
+            - generic [ref=e60]: ⌘8
+          - button "Research Newton prospects ⌘9" [ref=e61] [cursor=pointer]:
+            - generic [ref=e62]: Research Newton prospects
+            - generic [ref=e63]: ⌘9
+          - button "Open Zoho Mail login 1w" [ref=e64] [cursor=pointer]:
+            - generic [ref=e65]: Open Zoho Mail login
+            - generic [ref=e66]: 1w
+        - button "Settings" [ref=e69] [cursor=pointer]:
+          - generic [ref=e70]:
+            - img [ref=e71]
+            - text: Settings
+          - img [ref=e74]
+      - generic:
+        - button "Expand sidebar":
+          - img
+        - button "New chat":
+          - img
+        - button "Search":
+          - img
+        - button "Plugins":
+          - img
+        - button "Folders":
+          - img
+        - generic:
+          - button "Account":
+            - generic: D
+    - main [ref=e151]:
+      - generic [ref=e306]:
+        - generic [ref=e307]:
+          - generic [ref=e308]:
+            - heading "Settings" [level=1] [ref=e309]
+            - generic [ref=e310]: Manage your workspace
+          - button "Invite" [ref=e311] [cursor=pointer]:
+            - img [ref=e312]
+            - text: Invite
+        - generic [ref=e315]:
+          - button "General" [ref=e316] [cursor=pointer]
+          - button "Members" [ref=e317] [cursor=pointer]
+          - button "Integrations" [ref=e318] [cursor=pointer]
+          - button "Meetings" [ref=e319] [cursor=pointer]
+        - generic [ref=e320]:
+          - generic [ref=e321]: Workspace
+          - generic [ref=e322]:
+            - generic [ref=e323]: Workspace logo
+            - generic [ref=e324]: Recommended size is 256 × 256px
+            - button "500Chow" [ref=e325] [cursor=pointer]:
+              - generic [ref=e326]: 500Chow
+              - img [ref=e327]
+          - generic [ref=e329]:
+            - generic [ref=e330]: Workspace name
+            - generic [ref=e331]: The name of your company or organization
+            - textbox [ref=e332]: 500Chow
+          - generic [ref=e333]:
+            - generic [ref=e334]: "\"All\" persona"
+            - generic [ref=e335]: Set the name and instructions for the general agent for all users in this workspace
+            - generic [ref=e336]:
+              - generic [ref=e337]: Name
+              - textbox [ref=e338]: All
+            - generic [ref=e339]:
+              - generic [ref=e340]: Instructions
+              - textbox "Instructions, like \"Answer all questions in Spanish\", or \"Always follow our tone of voice guideline\"" [ref=e341]
+          - button "Save changes" [ref=e343] [cursor=pointer]
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e147] [cursor=pointer]:
+    - img [ref=e148]
+  - alert [ref=e206]

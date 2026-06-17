@@ -9,6 +9,8 @@ import { FilePreview } from "@/components/files/file-preview";
 import { Lock, Globe, Check } from "lucide-react";
 import type { FileNode } from "@/lib/files/types";
 import { toast } from "sonner";
+import { PageLoading } from "@/components/ui/loading-spinner";
+import { ErrorState } from "@/components/ui/error-state";
 
 export default function FileDetailPage() {
   const params = useParams<{ fileId: string }>();
@@ -145,18 +147,15 @@ export default function FileDetailPage() {
   }, []);
 
   if (loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center">
-        <div className="w-6 h-6 border-2 border-white/20 border-t-white/60 rounded-full animate-spin" />
-      </div>
-    );
+    return <PageLoading />;
   }
 
   if (!file) {
     return (
-      <div className="flex-1 flex items-center justify-center">
-        <p className="text-muted-foreground">File not found</p>
-      </div>
+      <ErrorState
+        title="File not found"
+        description="This file may have been moved or deleted."
+      />
     );
   }
 
@@ -165,31 +164,32 @@ export default function FileDetailPage() {
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
       {/* Meta bar */}
-      <div className="flex items-center gap-3 px-6 py-2 border-b border-white/[0.06] text-[12px] text-muted-foreground/60 shrink-0">
-        <span>Created by <strong className="text-muted-foreground/80">{creatorName}</strong></span>
+      <div className="flex shrink-0 items-center gap-3 border-b border-border px-6 py-2 text-xs text-muted-foreground">
+        <span>Created by <strong className="text-foreground/80">{creatorName}</strong></span>
         <span>·</span>
         <span>Edited {timeAgo(file.updatedAt)}</span>
 
         {/* Save status indicator */}
         {saveStatus === "saving" && (
-          <span className="text-muted-foreground/40 flex items-center gap-1">
-            <span className="w-1.5 h-1.5 rounded-full bg-yellow-400/60 animate-pulse" />
+          <span className="flex items-center gap-1 text-muted-foreground">
+            <span className="size-1.5 animate-pulse rounded-full bg-warning/60" />
             Saving...
           </span>
         )}
         {saveStatus === "saved" && (
-          <span className="text-green-400/60 flex items-center gap-1">
-            <Check className="w-3 h-3" />
+          <span className="flex items-center gap-1 text-success">
+            <Check className="size-3" />
             Saved
           </span>
         )}
 
         <div className="ml-auto flex items-center gap-2">
           <button
+            aria-label={file.isPrivate ? "Make public" : "Make private"}
             onClick={() => handleUpdate({ isPrivate: !file.isPrivate })}
-            className="flex items-center gap-1 px-2 py-0.5 rounded bg-white/5 hover:bg-white/10 transition-colors"
+            className="flex items-center gap-1 rounded-md bg-muted px-2 py-0.5 transition-colors hover:bg-muted/80"
           >
-            {file.isPrivate ? <Lock className="w-3 h-3" /> : <Globe className="w-3 h-3" />}
+            {file.isPrivate ? <Lock className="size-3" /> : <Globe className="size-3" />}
             {file.isPrivate ? "Private" : "Public"}
           </button>
         </div>

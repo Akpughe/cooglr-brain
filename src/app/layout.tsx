@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Inter, Spline_Sans_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
+import "./agent-shell.css";
 import "streamdown/styles.css";
 
 const geistSans = Geist({
@@ -13,6 +14,10 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
+
+// Recally-ported agent shell uses Inter + Spline Sans Mono.
+const inter = Inter({ variable: "--font-inter", subsets: ["latin"] });
+const splineMono = Spline_Sans_Mono({ variable: "--font-spline-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -27,7 +32,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${splineMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
         {children}

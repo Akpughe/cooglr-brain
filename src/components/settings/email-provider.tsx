@@ -15,7 +15,7 @@ interface Provider {
   created_at: string;
 }
 
-const INPUT = "w-full h-9 px-3 rounded-lg border border-border bg-background text-[13px] focus:outline-none focus:border-primary/30 transition-colors placeholder:text-muted-foreground/40";
+const INPUT = "w-full h-8 px-3 rounded-md border border-border bg-background text-[13px] focus-visible:ring-2 focus-visible:ring-ring/50 outline-none focus:border-primary/30 transition-colors placeholder:text-muted-foreground/40";
 
 const PROVIDERS = [
   { value: "resend", label: "Resend", description: "Modern email API with React Email support" },
@@ -127,7 +127,7 @@ export function EmailProviderSettings({ workspaceId }: { workspaceId: string }) 
   }
 
   return (
-    <div className="rounded-2xl border border-border bg-card shadow-surface">
+    <div className="rounded-lg border border-border bg-card shadow-surface">
       <div className="px-5 py-4 border-b border-border flex items-center justify-between">
         <div>
           <h3 className="text-[15px] font-medium text-foreground">Email Provider</h3>
@@ -188,7 +188,7 @@ export function EmailProviderSettings({ workspaceId }: { workspaceId: string }) 
             <div className="flex items-center justify-between px-4 py-3 hover:bg-muted/20 transition-colors">
               <div className="flex items-center gap-3">
                 <div className={cn(
-                  "w-9 h-9 rounded-lg flex items-center justify-center text-[11px] font-bold border",
+                  "size-9 rounded-lg flex items-center justify-center text-[11px] font-bold border",
                   p.status === "active" ? "bg-primary/10 text-primary border-primary/20" : "bg-muted text-muted-foreground border-border"
                 )}>
                   {p.name === "resend" ? "RS" : p.name === "ses" ? "SES" : "SG"}

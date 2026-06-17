@@ -1,0 +1,214 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [active] [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Folders" [ref=e6]
+    - button "Plugins" [ref=e7]
+    - button "Settings" [ref=e8]
+  - generic [ref=e9]:
+    - complementary [ref=e10]:
+      - button "Collapse sidebar" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - text: Collapse sidebar
+      - navigation [ref=e16]:
+        - button "New chat" [ref=e17] [cursor=pointer]:
+          - img [ref=e18]
+          - text: New chat
+        - button "Search" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+          - text: Search
+        - button "Plugins" [ref=e25] [cursor=pointer]:
+          - img [ref=e26]
+          - text: Plugins
+        - button "Folders" [ref=e29] [cursor=pointer]:
+          - img [ref=e30]
+          - text: Folders
+      - generic [ref=e32]:
+        - generic [ref=e33]: Chats
+        - button "Draft this week's growth report ⌘1" [ref=e34] [cursor=pointer]:
+          - generic [ref=e35]: Draft this week's growth report
+          - generic [ref=e36]: ⌘1
+        - button "Create Instagram carousel concepts ⌘2" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: Create Instagram carousel concepts
+          - generic [ref=e39]: ⌘2
+        - button "Create mind map designs ⌘3" [ref=e40] [cursor=pointer]:
+          - generic [ref=e41]: Create mind map designs
+          - generic [ref=e42]: ⌘3
+        - button "Plan screen-recording workflow ⌘4" [ref=e43] [cursor=pointer]:
+          - generic [ref=e44]: Plan screen-recording workflow
+          - generic [ref=e45]: ⌘4
+        - button "Find markdown files from 3 days ⌘5" [ref=e46] [cursor=pointer]:
+          - generic [ref=e47]: Find markdown files from 3 days
+          - generic [ref=e48]: ⌘5
+        - button "Create teen presentation ⌘6" [ref=e49] [cursor=pointer]:
+          - generic [ref=e50]: Create teen presentation
+          - generic [ref=e51]: ⌘6
+        - button "Find available domain names ⌘7" [ref=e52] [cursor=pointer]:
+          - generic [ref=e53]: Find available domain names
+          - generic [ref=e54]: ⌘7
+        - button "Schedule LinkedIn posts ⌘8" [ref=e55] [cursor=pointer]:
+          - generic [ref=e56]: Schedule LinkedIn posts
+          - generic [ref=e57]: ⌘8
+        - button "Research Newton prospects ⌘9" [ref=e58] [cursor=pointer]:
+          - generic [ref=e59]: Research Newton prospects
+          - generic [ref=e60]: ⌘9
+        - button "Open Zoho Mail login 1w" [ref=e61] [cursor=pointer]:
+          - generic [ref=e62]: Open Zoho Mail login
+          - generic [ref=e63]: 1w
+      - button "Settings" [ref=e66] [cursor=pointer]:
+        - generic [ref=e67]:
+          - img [ref=e68]
+          - text: Settings
+        - img [ref=e71]
+    - main [ref=e74]:
+      - generic [ref=e75]:
+        - generic [ref=e76]: Draft this week's growth report and compare it to last w…
+        - button "Open panel" [ref=e148] [cursor=pointer]:
+          - img [ref=e149]
+          - text: Open panel
+      - generic [ref=e77]:
+        - generic [ref=e152]:
+          - generic [ref=e154]: Draft this week's growth report and compare it to last week
+          - generic [ref=e155]:
+            - button "Searched workspace knowledge · 2 sources" [ref=e156] [cursor=pointer]:
+              - img [ref=e157]
+              - text: Searched workspace knowledge · 2 sources
+            - generic [ref=e161]:
+              - paragraph [ref=e162]: Orders are up 12% week-over-week (11,230 → 12,380). Net revenue after refunds grew 9%, with the gap driven by a refund-rate uptick in the Lagos zone.
+              - paragraph [ref=e163]: What changed
+              - list [ref=e164]:
+                - listitem [ref=e165]: New-customer orders rose 18%, led by the referral channel.
+                - listitem [ref=e166]: Refunds climbed from 3.1% → 4.0%, concentrated in delayed deliveries.
+                - listitem [ref=e167]:
+                  - text: Delivery SLA slipped 2 points; see the linked ops note
+                  - 'generic "Blocked URL: undefined" [ref=e168]': 2 [blocked]
+                  - text: .
+              - paragraph [ref=e169]: Suggested next steps
+              - list [ref=e170]:
+                - listitem [ref=e171]: Investigate Lagos delivery delays with the ops team.
+                - listitem [ref=e172]: Hold the referral push — it's converting well.
+              - paragraph [ref=e173]: Click the chart's expand icon or a source below to open it on the right.
+            - generic [ref=e174]:
+              - button "Open in panel" [ref=e175] [cursor=pointer]:
+                - img [ref=e176]
+                - text: Open in panel
+              - generic [ref=e184]:
+                - img:
+                  - generic:
+                    - generic:
+                      - generic:
+                        - generic:
+                          - generic: "2024"
+                        - generic:
+                          - generic: "2025"
+                        - generic:
+                          - generic: "2026"
+                      - generic:
+                        - generic:
+                          - generic: "0"
+                        - generic:
+                          - generic: 100k
+                        - generic:
+                          - generic: 200k
+                - img:
+                  - generic:
+                    - generic [ref=e201]:
+                      - generic [ref=e203]: North America
+                      - generic [ref=e210]: Europe
+                      - generic [ref=e217]: Asia-Pacific
+                      - generic [ref=e224]: LATAM
+                    - generic:
+                      - generic: Revenue by region
+                    - generic:
+                      - generic: USD
+                - img
+            - generic [ref=e230]:
+              - generic [ref=e231]:
+                - img [ref=e233]
+                - generic [ref=e235]: nuton_cash_flow_projection.csv
+                - generic [ref=e236]: (all 3 rows)
+                - button "Download" [ref=e237] [cursor=pointer]:
+                  - img [ref=e238]
+                  - text: Download
+              - table [ref=e242]:
+                - rowgroup [ref=e243]:
+                  - row "Year Paid_Users ARPU_USD Revenue_USD Total_Costs_USD Cash_Flow_USD" [ref=e244]:
+                    - columnheader "Year" [ref=e245]
+                    - columnheader "Paid_Users" [ref=e246]
+                    - columnheader "ARPU_USD" [ref=e247]
+                    - columnheader "Revenue_USD" [ref=e248]
+                    - columnheader "Total_Costs_USD" [ref=e249]
+                    - columnheader "Cash_Flow_USD" [ref=e250]
+                - rowgroup [ref=e251]:
+                  - row "2,024 1,200 96 115,200 180,000 -64,800" [ref=e252]:
+                    - cell "2,024" [ref=e253]
+                    - cell "1,200" [ref=e254]
+                    - cell "96" [ref=e255]
+                    - cell "115,200" [ref=e256]
+                    - cell "180,000" [ref=e257]
+                    - cell "-64,800" [ref=e258]
+                  - row "2,025 4,200 102 428,400 320,000 108,400" [ref=e259]:
+                    - cell "2,025" [ref=e260]
+                    - cell "4,200" [ref=e261]
+                    - cell "102" [ref=e262]
+                    - cell "428,400" [ref=e263]
+                    - cell "320,000" [ref=e264]
+                    - cell "108,400" [ref=e265]
+                  - row "2,026 11,000 110 1,210,000 540,000 670,000" [ref=e266]:
+                    - cell "2,026" [ref=e267]
+                    - cell "11,000" [ref=e268]
+                    - cell "110" [ref=e269]
+                    - cell "1,210,000" [ref=e270]
+                    - cell "540,000" [ref=e271]
+                    - cell "670,000" [ref=e272]
+            - generic [ref=e273]:
+              - button "Q2-launch-brief.pdf a database Open" [ref=e274] [cursor=pointer]:
+                - img [ref=e276]
+                - generic [ref=e279]:
+                  - generic [ref=e280]: Q2-launch-brief.pdf
+                  - generic [ref=e281]: a database
+                - generic [ref=e282]:
+                  - text: Open
+                  - img [ref=e283]
+              - button "ops-weekly-2026-06.md Files Open" [ref=e285] [cursor=pointer]:
+                - img [ref=e287]
+                - generic [ref=e290]:
+                  - generic [ref=e291]: ops-weekly-2026-06.md
+                  - generic [ref=e292]: Files
+                - generic [ref=e293]:
+                  - text: Open
+                  - img [ref=e294]
+            - generic [ref=e296]:
+              - button "Copy" [ref=e297] [cursor=pointer]:
+                - img [ref=e298]
+                - text: Copy
+              - button "Good answer" [ref=e301] [cursor=pointer]:
+                - img [ref=e302]
+                - text: Good answer
+              - button "Bad answer" [ref=e304] [cursor=pointer]:
+                - img [ref=e305]
+                - text: Bad answer
+        - generic [ref=e307]:
+          - textbox "Ask a follow-up…" [ref=e308]
+          - generic [ref=e309]:
+            - button "Add files" [ref=e310] [cursor=pointer]:
+              - img [ref=e311]
+              - text: Add files
+            - generic [ref=e312]:
+              - img [ref=e313]
+              - text: All sources
+            - button "Auto" [ref=e318] [cursor=pointer]:
+              - text: Auto
+              - img [ref=e319]
+            - button "Dictate" [ref=e321] [cursor=pointer]:
+              - img [ref=e322]
+              - text: Dictate
+            - button "Send" [ref=e325]:
+              - img [ref=e326]
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e143] [cursor=pointer]:
+    - img [ref=e144]
+  - alert [ref=e147]
+  - img [ref=e328]

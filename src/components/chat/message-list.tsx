@@ -24,7 +24,7 @@ export function MessageList({
       <div className="max-w-[720px] mx-auto px-6 py-8 space-y-5">
         {!historyLoaded && (
           <div className="flex flex-col items-center justify-center py-28 gap-3">
-            <div className="w-5 h-5 rounded-full border-[1.5px] border-primary border-t-transparent animate-spin" />
+            <div className="size-5 rounded-full border-[1.5px] border-primary border-t-transparent animate-spin" />
             <p className="text-[13px] text-muted-foreground/60">Loading...</p>
           </div>
         )}
@@ -32,7 +32,7 @@ export function MessageList({
         {historyLoaded && messages.length === 0 && (
           <div className="flex flex-col items-center justify-center py-28 text-center">
             <div className="relative mb-6">
-              <div className="w-16 h-16 rounded-[20px] bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
+              <div className="size-16 rounded-[20px] bg-gradient-to-br from-primary/10 to-primary/5 flex items-center justify-center">
                 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" className="text-primary">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
                 </svg>

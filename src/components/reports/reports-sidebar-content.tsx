@@ -52,16 +52,17 @@ export function ReportsSidebarContent() {
     <>
       <div className="mb-3">
         <div className="flex items-center justify-between px-3 py-1.5">
-          <span className="text-[11px] font-medium uppercase tracking-wider" style={{ color: "var(--sidebar-text-muted)" }}>
+          <span className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: "var(--sidebar-text-muted)" }}>
             Sessions
           </span>
           <button
             onClick={handleNewSession}
-            className="w-5 h-5 rounded flex items-center justify-center transition-colors"
+            className="size-5 rounded flex items-center justify-center transition-colors"
             style={{ color: "var(--sidebar-text-muted)" }}
             title="New report session"
+            aria-label="New report session"
           >
-            <Plus className="w-3.5 h-3.5" />
+            <Plus className="size-3.5" />
           </button>
         </div>
         <div className="space-y-px">
@@ -82,7 +83,7 @@ export function ReportsSidebarContent() {
                   maxWidth: "calc(100% - 16px)",
                 }}
               >
-                <BarChart3 className="w-3.5 h-3.5 shrink-0 opacity-50" />
+                <BarChart3 className="size-3.5 shrink-0 opacity-50" />
                 <span className="truncate">{session.name || "New Report"}</span>
               </button>
             );

@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useWorkspace } from "@/lib/workspace/context";
 import { X, UserPlus, Trash2 } from "lucide-react";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 import type { FileShare } from "@/lib/files/types";
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 
 export function ShareModal({ fileId, onClose }: Props) {
   const { members, currentUserId } = useWorkspace();
+  const trapRef = useFocusTrap<HTMLDivElement>();
   const [shares, setShares] = useState<FileShare[]>([]);
   const [selectedUserId, setSelectedUserId] = useState("");
   const [permission, setPermission] = useState<"view" | "edit">("view");
@@ -47,13 +49,13 @@ export function ShareModal({ fileId, onClose }: Props) {
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="bg-[#1a1a2e] border border-white/10 rounded-xl w-[420px] shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog" aria-modal="true" aria-label="Share file">
+      <div ref={trapRef} className="bg-[#1a1a2e] border border-foreground/10 rounded-xl w-[420px] shadow-2xl">
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-white/[0.06]">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-foreground/[0.06]">
           <h2 className="text-base font-semibold">Share file</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-white">
-            <X className="w-4 h-4" />
+            <X className="size-4" />
           </button>
         </div>
 
@@ -63,7 +65,7 @@ export function ShareModal({ fileId, onClose }: Props) {
             <select
               value={selectedUserId}
               onChange={(e) => setSelectedUserId(e.target.value)}
-              className="flex-1 bg-white/5 border border-white/10 rounded-md px-3 py-2 text-sm outline-none"
+              className="flex-1 bg-foreground/5 border border-foreground/10 rounded-md px-3 py-2 text-sm outline-none"
             >
               <option value="">Select a member...</option>
               {availableMembers.map((m) => (
@@ -73,7 +75,7 @@ export function ShareModal({ fileId, onClose }: Props) {
             <select
               value={permission}
               onChange={(e) => setPermission(e.target.value as "view" | "edit")}
-              className="bg-white/5 border border-white/10 rounded-md px-2 py-2 text-sm outline-none"
+              className="bg-foreground/5 border border-foreground/10 rounded-md px-2 py-2 text-sm outline-none"
             >
               <option value="view">View</option>
               <option value="edit">Edit</option>
@@ -83,7 +85,7 @@ export function ShareModal({ fileId, onClose }: Props) {
               disabled={!selectedUserId}
               className="px-3 py-2 rounded-md bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500/30 disabled:opacity-30 disabled:cursor-not-allowed text-sm transition-colors"
             >
-              <UserPlus className="w-4 h-4" />
+              <UserPlus className="size-4" />
             </button>
           </div>
 
@@ -94,9 +96,9 @@ export function ShareModal({ fileId, onClose }: Props) {
               {shares.map((share) => {
                 const member = members.find((m) => m.userId === share.sharedWith);
                 return (
-                  <div key={share.id} className="flex items-center justify-between py-2 px-2 rounded-md hover:bg-white/5">
+                  <div key={share.id} className="flex items-center justify-between py-2 px-2 rounded-md hover:bg-foreground/5">
                     <div className="flex items-center gap-2">
-                      <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs">
+                      <div className="size-7 rounded-full bg-foreground/10 flex items-center justify-center text-xs">
                         {member?.fullName?.charAt(0) || "?"}
                       </div>
                       <div>
@@ -108,7 +110,7 @@ export function ShareModal({ fileId, onClose }: Props) {
                       onClick={() => handleRevoke(share.sharedWith)}
                       className="text-red-400/50 hover:text-red-400 p-1"
                     >
-                      <Trash2 className="w-3.5 h-3.5" />
+                      <Trash2 className="size-3.5" />
                     </button>
                   </div>
                 );

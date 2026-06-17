@@ -169,7 +169,7 @@ export function CreateTaskModal({
               <select
                 value={columnId}
                 onChange={(e) => setColumnId(e.target.value)}
-                className="w-full h-9 px-3 text-sm bg-muted/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-full h-8 px-3 text-sm bg-muted/50 border border-border rounded-md focus-visible:ring-2 focus-visible:ring-ring/50 outline-none"
               >
                 {columns.map((col) => (
                   <option key={col.id} value={col.id}>{col.name}</option>
@@ -190,13 +190,13 @@ export function CreateTaskModal({
                       type="button"
                       onClick={() => setTaskType(t.value)}
                       title={t.label}
-                      className={`flex-1 h-9 rounded-lg flex items-center justify-center gap-1.5 text-xs font-medium transition-all ${
+                      className={`flex-1 h-8 rounded-md flex items-center justify-center gap-1.5 text-xs font-medium transition-all ${
                         isActive
                           ? `${t.color} bg-foreground/5 ring-1 ring-foreground/15`
                           : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                       }`}
                     >
-                      <Icon className="w-3.5 h-3.5" />
+                      <Icon className="size-3.5" />
                       <span className="hidden sm:inline">{t.label}</span>
                     </button>
                   );
@@ -217,13 +217,13 @@ export function CreateTaskModal({
                       type="button"
                       onClick={() => setPriority(p.value)}
                       title={p.label}
-                      className={`flex-1 h-9 rounded-lg flex items-center justify-center transition-all ${
+                      className={`flex-1 h-8 rounded-md flex items-center justify-center transition-all ${
                         isActive
                           ? `${p.color} ${p.bg} ring-1 ring-foreground/15`
                           : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
+                      <Icon className="size-4" />
                     </button>
                   );
                 })}
@@ -234,11 +234,11 @@ export function CreateTaskModal({
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Assignee</label>
               <div className="relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
                 <select
                   value={assigneeId}
                   onChange={(e) => setAssigneeId(e.target.value)}
-                  className="w-full h-9 pl-8 pr-3 text-sm bg-muted/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring appearance-none"
+                  className="w-full h-8 pl-8 pr-3 text-sm bg-muted/50 border border-border rounded-md focus-visible:ring-2 focus-visible:ring-ring/50 outline-none appearance-none"
                 >
                   <option value="">Unassigned</option>
                   {members.map((m) => (
@@ -254,12 +254,12 @@ export function CreateTaskModal({
             <div className="space-y-1.5">
               <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Due date</label>
               <div className="relative">
-                <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                <CalendarDays className="absolute left-3 top-1/2 -translate-y-1/2 size-3.5 text-muted-foreground" />
                 <input
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full h-9 pl-8 pr-3 text-sm bg-muted/50 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring"
+                  className="w-full h-8 pl-8 pr-3 text-sm bg-muted/50 border border-border rounded-md focus-visible:ring-2 focus-visible:ring-ring/50 outline-none"
                 />
               </div>
             </div>
@@ -268,7 +268,7 @@ export function CreateTaskModal({
           {/* Labels */}
           <div className="space-y-1.5">
             <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-              <Tag className="w-3 h-3" /> Labels
+              <Tag className="size-3" /> Labels
             </label>
             <div className="flex flex-wrap gap-1.5">
               {PRESET_LABELS.map((preset) => {
@@ -289,7 +289,7 @@ export function CreateTaskModal({
                     }}
                   >
                     {preset.name}
-                    {isActive && <X className="w-3 h-3" />}
+                    {isActive && <X className="size-3" />}
                   </button>
                 );
               })}
@@ -300,14 +300,14 @@ export function CreateTaskModal({
             <button
               type="button"
               onClick={() => { onClose(); resetForm(); }}
-              className="h-9 px-4 text-sm rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              className="h-9 px-4 text-sm rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={!title.trim() || submitting}
-              className="h-9 px-5 text-sm font-medium rounded-lg bg-foreground text-background hover:bg-foreground/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+              className="h-9 px-5 text-sm font-medium rounded-md bg-foreground text-background hover:bg-foreground/90 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
               {submitting ? "Creating..." : "Create task"}
             </button>

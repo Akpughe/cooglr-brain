@@ -50,19 +50,19 @@ export function TaskCard({ task, onClick, onDragStart }: TaskCardProps) {
         <span className="text-[11px] text-muted-foreground font-mono">{task.displayId}</span>
         {task.assigneeName ? (
           <div
-            className="w-5 h-5 rounded-full bg-foreground/10 flex items-center justify-center text-[9px] font-semibold text-foreground/60 shrink-0"
+            className="size-5 rounded-full bg-foreground/10 flex items-center justify-center text-[9px] font-semibold text-foreground/60 shrink-0"
             title={task.assigneeName}
           >
             {task.assigneeName[0]?.toUpperCase()}
           </div>
         ) : (
-          <div className="w-5 h-5 rounded-full border border-dashed border-muted-foreground/20 shrink-0 opacity-0 group-hover/card:opacity-100 transition-opacity" />
+          <div className="size-5 rounded-full border border-dashed border-muted-foreground/20 shrink-0 opacity-0 group-hover/card:opacity-100 transition-opacity" />
         )}
       </div>
 
       {/* Row 2: Type icon + Title */}
       <div className="flex items-start gap-1.5 mb-2">
-        <TypeIcon className={`w-4 h-4 shrink-0 mt-0.5 ${typeConf.color}`} />
+        <TypeIcon className={`size-4 shrink-0 mt-0.5 ${typeConf.color}`} />
         <p className="text-[13px] font-medium leading-snug line-clamp-2">{task.title}</p>
       </div>
 
@@ -123,7 +123,7 @@ export function TaskCard({ task, onClick, onDragStart }: TaskCardProps) {
           <span className={`inline-flex items-center gap-1 text-[11px] ${
             overdue ? "text-red-400" : "text-muted-foreground/60"
           }`}>
-            <CalendarDays className="w-3 h-3" />
+            <CalendarDays className="size-3" />
             {new Date(task.dueDate).toLocaleDateString(undefined, { month: "short", day: "numeric" })}
           </span>
         )}

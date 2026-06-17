@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useWorkspace, useIsOwner } from "@/lib/workspace/context";
 import * as LucideIcons from "lucide-react";
 import { X, MessageSquare } from "lucide-react";
+import { useFocusTrap } from "@/hooks/use-focus-trap";
 import type { AppManifest } from "@/lib/apps/types";
 
 interface AppCatalogModalProps {
@@ -15,6 +16,7 @@ export function AppCatalogModal({ onClose }: AppCatalogModalProps) {
   const { workspace, installedApps } = useWorkspace();
   const isOwner = useIsOwner();
   const router = useRouter();
+  const trapRef = useFocusTrap<HTMLDivElement>();
   const [allApps, setAllApps] = useState<AppManifest[]>([]);
   const [installing, setInstalling] = useState<string | null>(null);
 
@@ -46,9 +48,9 @@ export function AppCatalogModal({ onClose }: AppCatalogModalProps) {
   const addOns = allApps.filter((a) => a.category === "add_on");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-label="App catalog">
       <div className="absolute inset-0 bg-black/50" onClick={onClose} />
-      <div className="relative bg-popover rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto border border-border">
+      <div ref={trapRef} className="relative bg-popover rounded-2xl shadow-xl w-full max-w-lg max-h-[80vh] overflow-y-auto border border-border">
         <div className="flex items-center justify-between px-6 py-4 border-b border-border">
           <h2 className="text-lg font-semibold">App Catalog</h2>
           <button onClick={onClose} className="text-muted-foreground hover:text-foreground">

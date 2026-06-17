@@ -1,0 +1,75 @@
+- generic [ref=e1]:
+  - generic [ref=e2]: DEV PREVIEW · scripted
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - button "New chat" [ref=e6]:
+          - img [ref=e8]
+          - generic [ref=e11]: New chat
+        - button "Search" [ref=e12]:
+          - img [ref=e14]
+          - generic [ref=e17]: Search
+        - button "Automations" [ref=e18]:
+          - img [ref=e20]
+          - generic [ref=e24]: Automations
+        - button "Sources" [ref=e25]:
+          - img [ref=e27]
+          - generic [ref=e31]: Sources
+      - generic [ref=e32]:
+        - generic [ref=e33]: Chats
+        - generic [ref=e34]:
+          - button "Weekly growth report 6h" [ref=e35]:
+            - generic [ref=e36]: Weekly growth report
+            - generic [ref=e37]: 6h
+          - button "Why did delivery SLA drop? 1d" [ref=e38]:
+            - generic [ref=e39]: Why did delivery SLA drop?
+            - generic [ref=e40]: 1d
+          - button "Draft launch summary from Q2 brief 3d" [ref=e41]:
+            - generic [ref=e42]: Draft launch summary from Q2 brief
+            - generic [ref=e43]: 3d
+      - button "Settings" [ref=e45]:
+        - img [ref=e46]
+        - generic [ref=e49]: Settings
+    - main [ref=e50]:
+      - generic [ref=e53]: New chat
+      - generic [ref=e289]:
+        - heading "What should we work on?" [level=1] [ref=e290]
+        - generic [ref=e291]:
+          - textbox "Do anything" [active] [ref=e292]
+          - generic [ref=e293]:
+            - button "Add context" [ref=e294]:
+              - img [ref=e295]
+            - button "Approve for me" [ref=e296]:
+              - img [ref=e297]
+              - text: Approve for me
+              - img [ref=e300]
+            - button "Auto" [ref=e303]:
+              - text: Auto
+              - img [ref=e304]
+            - button "Voice input" [ref=e306]:
+              - img [ref=e307]
+            - button "Send" [disabled] [ref=e310]:
+              - img [ref=e311]
+        - button "Work in a project" [ref=e313]:
+          - img [ref=e314]
+          - text: Work in a project
+          - img [ref=e319]
+        - generic [ref=e321]:
+          - button "Connect messaging Catch up on team threads and customer chats" [ref=e322]:
+            - img [ref=e323]
+            - generic [ref=e325]: Connect messaging
+            - generic [ref=e326]: Catch up on team threads and customer chats
+          - button "Connect GitHub Review PRs, code, and CI checks" [ref=e327]:
+            - img [ref=e328]
+            - generic [ref=e332]: Connect GitHub
+            - generic [ref=e333]: Review PRs, code, and CI checks
+          - button "Connect Drive Pull briefs, docs, and reports" [ref=e334]:
+            - img [ref=e335]
+            - generic [ref=e337]: Connect Drive
+            - generic [ref=e338]: Pull briefs, docs, and reports
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e110] [cursor=pointer]:
+    - img [ref=e111]
+  - alert [ref=e114]
+  - generic [ref=e287]: "0"

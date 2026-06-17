@@ -252,23 +252,25 @@ export function FilesSidebarContent() {
           className="flex items-center gap-1 px-2 py-1 rounded text-[12px] transition-colors"
           style={{ color: "var(--sidebar-text-muted)" }}
           title="New page"
+          aria-label="New page"
         >
-          <FilePlus className="w-3.5 h-3.5" />
+          <FilePlus className="size-3.5" />
         </button>
         <button
           onClick={handleUploadClick}
           className="flex items-center gap-1 px-2 py-1 rounded text-[12px] transition-colors"
           style={{ color: "var(--sidebar-text-muted)" }}
           title="Upload file"
+          aria-label="Upload file"
         >
-          <Upload className="w-3.5 h-3.5" />
+          <Upload className="size-3.5" />
         </button>
       </div>
 
       {/* Search */}
       <div className="px-3 mb-2">
         <div className="relative">
-          <Search className="w-3.5 h-3.5 absolute left-2 top-1/2 -translate-y-1/2 opacity-40" style={{ color: "var(--sidebar-text-muted)" }} />
+          <Search className="size-3.5 absolute left-2 top-1/2 -translate-y-1/2 opacity-40" style={{ color: "var(--sidebar-text-muted)" }} />
           <input
             type="text"
             value={search}
@@ -297,7 +299,7 @@ export function FilesSidebarContent() {
       {/* Recently edited */}
       {!search && recentFiles.length > 0 && (
         <div className="border-t pt-2 mt-2" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
-          <div className="px-3 py-1 text-[10px] font-medium uppercase tracking-wider" style={{ color: "var(--sidebar-text-muted)" }}>
+          <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wider" style={{ color: "var(--sidebar-text-muted)" }}>
             Recently edited
           </div>
           {recentFiles.map((node) => (

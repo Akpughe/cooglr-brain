@@ -1,0 +1,127 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - button "Empty" [ref=e3]
+    - button "Chat" [ref=e4]
+    - button "Document" [ref=e5]
+    - button "Folders" [ref=e6]
+    - button "Plugins" [ref=e7]
+    - button "Settings" [ref=e8]
+  - generic [ref=e9]:
+    - complementary [ref=e10]:
+      - button "Collapse sidebar" [ref=e12] [cursor=pointer]:
+        - img [ref=e13]
+        - text: Collapse sidebar
+      - navigation [ref=e16]:
+        - button "New chat" [ref=e17] [cursor=pointer]:
+          - img [ref=e18]
+          - text: New chat
+        - button "Search" [ref=e21] [cursor=pointer]:
+          - img [ref=e22]
+          - text: Search
+        - button "Plugins" [ref=e25] [cursor=pointer]:
+          - img [ref=e26]
+          - text: Plugins
+        - button "Folders" [ref=e29] [cursor=pointer]:
+          - img [ref=e30]
+          - text: Folders
+      - generic [ref=e32]:
+        - generic [ref=e33]: Chats
+        - button "Draft this week's growth report ⌘1" [ref=e34] [cursor=pointer]:
+          - generic [ref=e35]: Draft this week's growth report
+          - generic [ref=e36]: ⌘1
+        - button "Create Instagram carousel concepts ⌘2" [ref=e37] [cursor=pointer]:
+          - generic [ref=e38]: Create Instagram carousel concepts
+          - generic [ref=e39]: ⌘2
+        - button "Create mind map designs ⌘3" [ref=e40] [cursor=pointer]:
+          - generic [ref=e41]: Create mind map designs
+          - generic [ref=e42]: ⌘3
+        - button "Plan screen-recording workflow ⌘4" [ref=e43] [cursor=pointer]:
+          - generic [ref=e44]: Plan screen-recording workflow
+          - generic [ref=e45]: ⌘4
+        - button "Find markdown files from 3 days ⌘5" [ref=e46] [cursor=pointer]:
+          - generic [ref=e47]: Find markdown files from 3 days
+          - generic [ref=e48]: ⌘5
+        - button "Create teen presentation ⌘6" [ref=e49] [cursor=pointer]:
+          - generic [ref=e50]: Create teen presentation
+          - generic [ref=e51]: ⌘6
+        - button "Find available domain names ⌘7" [ref=e52] [cursor=pointer]:
+          - generic [ref=e53]: Find available domain names
+          - generic [ref=e54]: ⌘7
+        - button "Schedule LinkedIn posts ⌘8" [ref=e55] [cursor=pointer]:
+          - generic [ref=e56]: Schedule LinkedIn posts
+          - generic [ref=e57]: ⌘8
+        - button "Research Newton prospects ⌘9" [ref=e58] [cursor=pointer]:
+          - generic [ref=e59]: Research Newton prospects
+          - generic [ref=e60]: ⌘9
+        - button "Open Zoho Mail login 1w" [ref=e61] [cursor=pointer]:
+          - generic [ref=e62]: Open Zoho Mail login
+          - generic [ref=e63]: 1w
+      - button "Settings" [ref=e66] [cursor=pointer]:
+        - generic [ref=e67]:
+          - img [ref=e68]
+          - text: Settings
+        - img [ref=e71]
+    - main [ref=e330]:
+      - generic [ref=e331]:
+        - generic [ref=e332]:
+          - generic [ref=e333]:
+            - generic [ref=e334]:
+              - heading "Folders" [level=1] [ref=e335]
+              - paragraph [ref=e336]: Add and remove folders here, and organize them by dragging and dropping in the sidebar.
+            - button "New folder" [ref=e337] [cursor=pointer]:
+              - img [ref=e338]
+              - text: New folder
+          - generic [ref=e339]:
+            - generic [ref=e340] [cursor=pointer]:
+              - img [ref=e341]
+              - generic [ref=e343]: Nuton
+            - generic [ref=e344] [cursor=pointer]:
+              - img [ref=e345]
+              - generic [ref=e347]: Demo folder
+          - generic [ref=e348]:
+            - generic [ref=e349]: Browse all
+            - generic [ref=e350]:
+              - img
+              - textbox "Search by name, description, or owner" [ref=e351]
+            - generic [ref=e352]:
+              - generic [ref=e353]:
+                - generic [ref=e354]:
+                  - img [ref=e355]
+                  - generic [ref=e357]: Nuton
+                - generic [ref=e358]:
+                  - generic [ref=e359]: You
+                  - button "Remove" [ref=e360] [cursor=pointer]
+              - generic [ref=e361]:
+                - generic [ref=e362]:
+                  - img [ref=e363]
+                  - generic [ref=e365]: Demo folder
+                - generic [ref=e366]:
+                  - generic [ref=e367]: You
+                  - button "Remove" [ref=e368] [cursor=pointer]
+        - generic [ref=e370]:
+          - generic [ref=e371]:
+            - generic [ref=e372]:
+              - generic [ref=e373]: New folder
+              - generic [ref=e374]: Folders let you save content and chats in one place
+            - button "Close" [ref=e375] [cursor=pointer]:
+              - img [ref=e376]
+          - textbox "Folder name" [active] [ref=e379]
+          - generic [ref=e380]:
+            - generic [ref=e381]:
+              - button "Browse" [ref=e382] [cursor=pointer]
+              - button "Upload" [ref=e383] [cursor=pointer]
+            - generic [ref=e385]:
+              - img [ref=e386]
+              - generic [ref=e389]: Nuton Profile.pdf
+          - button "More options" [ref=e390] [cursor=pointer]:
+            - text: More options
+            - img [ref=e391]
+          - generic [ref=e393]:
+            - button "Cancel" [ref=e394] [cursor=pointer]
+            - button "Create" [disabled]
+  - region "Notifications alt+T"
+  - region "Notifications alt+T"
+  - button "Open Next.js Dev Tools" [ref=e143] [cursor=pointer]:
+    - img [ref=e144]
+  - alert [ref=e147]
+  - img [ref=e328]

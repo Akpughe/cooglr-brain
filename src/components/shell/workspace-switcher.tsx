@@ -42,16 +42,18 @@ export function WorkspaceSwitcher({ activeWorkspace }: WorkspaceSwitcherProps) {
     <div className="relative" ref={ref}>
       <button
         onClick={() => setOpen(!open)}
-        className="w-[34px] h-[34px] rounded-[9px] bg-foreground text-background flex items-center justify-center font-bold text-[13px] hover:opacity-90 transition-opacity"
+        aria-label={`Switch workspace (${activeWorkspace.name})`}
+        aria-expanded={open}
+        className="flex size-9 items-center justify-center rounded-lg bg-foreground text-xs font-bold text-background transition-opacity hover:opacity-90"
         title={activeWorkspace.name}
       >
         {initial}
       </button>
 
       {open && (
-        <div className="absolute left-[52px] top-0 z-50 w-[240px] bg-popover border border-border rounded-xl shadow-lg py-1 animate-in fade-in slide-in-from-left-2 duration-150">
+        <div className="absolute left-[52px] top-0 z-50 w-60 animate-in fade-in slide-in-from-left-2 rounded-lg border border-border bg-popover py-1.5 shadow-surface-lg duration-150">
           <div className="px-3 py-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+            <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Workspaces
             </p>
           </div>
