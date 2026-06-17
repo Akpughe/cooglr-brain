@@ -33,20 +33,26 @@ const CONN_TTL_MS = 60_000;
 /** The user's connected toolkits, with a 60s cache and a dev override.
  *  AGENT_FAKE_CONNECTED (non-production only) forces the list so the full
  *  agent→approval→execute loop is testable without a real Composio connection.
+ *  `fresh` skips the cache read (e.g. right after a connect) but still warms it.
  *  Best-effort: returns the last cached value (or []) if Composio errors. */
-export async function resolveConnectedToolkits(userId: string): Promise<string[]> {
+export async function resolveConnectedToolkits(
+  userId: string,
+  opts?: { fresh?: boolean },
+): Promise<string[]> {
   const fake = process.env.AGENT_FAKE_CONNECTED;
   if (fake && process.env.NODE_ENV !== "production") {
     return fake.split(",").map((s) => s.trim().toLowerCase()).filter(Boolean);
   }
-  const hit = connCache.get(userId);
   const now = Date.now();
-  if (hit && now - hit.at < CONN_TTL_MS) return hit.toolkits;
+  if (!opts?.fresh) {
+    const hit = connCache.get(userId);
+    if (hit && now - hit.at < CONN_TTL_MS) return hit.toolkits;
+  }
   try {
     const toolkits = await listConnectedToolkits(userId);
     connCache.set(userId, { at: now, toolkits });
     return toolkits;
   } catch {
-    return hit?.toolkits ?? [];
+    return connCache.get(userId)?.toolkits ?? [];
   }
 }

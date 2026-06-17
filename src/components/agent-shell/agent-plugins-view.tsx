@@ -1,7 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Check } from "lucide-react";
 import { toast } from "sonner";
 
@@ -93,7 +93,9 @@ function ConnectorRow({
       });
       const data = (await res.json().catch(() => ({}))) as { redirectUrl?: string; error?: string };
       if (!res.ok || !data.redirectUrl) throw new Error(data.error || "Connect failed");
-      window.location.href = data.redirectUrl; // hosted consent flow
+      // Open the hosted consent flow in a new tab so the agent stays put; the
+      // status refreshes when the user returns to this tab (focus refetch).
+      window.open(data.redirectUrl, "_blank", "noopener,noreferrer");
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Couldn't start connection");
     }
@@ -170,29 +172,37 @@ export function AgentPluginsView() {
     new Set()
   );
   const [loading, setLoading] = useState(true);
+  const mounted = useRef(true);
+
+  // Fresh fetch (bypasses the 60s cache) so a just-completed connect shows up.
+  const load = useCallback(async () => {
+    try {
+      const res = await fetch("/api/composio/connect?fresh=1");
+      if (!res.ok) throw new Error("not ok");
+      const data = (await res.json()) as { connected?: unknown };
+      const connected = Array.isArray(data.connected)
+        ? data.connected.map((t) => String(t).toLowerCase())
+        : [];
+      if (mounted.current) setConnectedToolkits(new Set(connected));
+    } catch {
+      // Degrade gracefully: show everything as not-connected.
+      if (mounted.current) setConnectedToolkits(new Set());
+    } finally {
+      if (mounted.current) setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    let active = true;
-    (async () => {
-      try {
-        const res = await fetch("/api/composio/connect");
-        if (!res.ok) throw new Error("not ok");
-        const data = (await res.json()) as { connected?: unknown };
-        const connected = Array.isArray(data.connected)
-          ? data.connected.map((t) => String(t).toLowerCase())
-          : [];
-        if (active) setConnectedToolkits(new Set(connected));
-      } catch {
-        // Degrade gracefully: show everything as not-connected.
-        if (active) setConnectedToolkits(new Set());
-      } finally {
-        if (active) setLoading(false);
-      }
-    })();
+    mounted.current = true;
+    load();
+    // Re-check when the user returns from the consent tab.
+    const onFocus = () => load();
+    window.addEventListener("focus", onFocus);
     return () => {
-      active = false;
+      mounted.current = false;
+      window.removeEventListener("focus", onFocus);
     };
-  }, []);
+  }, [load]);
 
   return (
     <div style={{ overflowY: "auto", height: "100%" }}>
