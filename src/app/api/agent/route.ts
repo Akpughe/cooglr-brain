@@ -177,9 +177,14 @@ export async function POST(req: Request) {
 
   const agent = mastra.getAgent("workspaceSupervisor");
 
+  // Mastra defaults to 5 tool steps per turn — too few for agentic work that
+  // reads several sources and THEN drafts/acts (the model can exhaust the budget
+  // gathering context and end with no answer). Give it room to read-then-act.
+  const AGENT_MAX_STEPS = 16;
+
   let agentStream: Awaited<ReturnType<typeof agent.stream>>;
   try {
-    agentStream = await agent.stream(effectiveMessages as never, { requestContext });
+    agentStream = await agent.stream(effectiveMessages as never, { requestContext, maxSteps: AGENT_MAX_STEPS });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (runId) await finishRun({ runId, status: "error", error: msg });
