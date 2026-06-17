@@ -50,13 +50,25 @@ function dryRunEnabled(): boolean {
   return process.env.AGENT_APPROVALS_DRY_RUN === "true";
 }
 
+// Email bodies are sent as plain text — strip Markdown the model may emit so
+// the recipient (and the approval card) never sees literal **, __, #, or
+// [text](url) syntax. Applied via the schema so the preview and the send agree.
+function stripMarkdown(s: string): string {
+  return s
+    .replace(/\*\*(.+?)\*\*/g, "$1") // **bold**
+    .replace(/__(.+?)__/g, "$1") // __bold__
+    .replace(/^\s{0,3}#{1,6}\s+/gm, "") // # headings
+    .replace(/\[([^\]]+)\]\(([^)]+)\)/g, "$1 ($2)") // [text](url)
+    .trim();
+}
+
 // ---------- send_email (Gmail via Composio) ----------
 const sendEmailSchema = z.object({
   to: z
     .union([z.string().email(), z.array(z.string().email()).min(1)])
     .transform((v) => (Array.isArray(v) ? v : [v])),
   subject: z.string().min(1).max(300),
-  body: z.string().min(1),
+  body: z.string().min(1).transform(stripMarkdown),
 });
 type SendEmailPayload = z.infer<typeof sendEmailSchema>;
 
@@ -113,7 +125,7 @@ const sendEmail: ApprovalExecutor<SendEmailPayload> = {
 // ---------- reply (Gmail reply-in-thread via Composio) ----------
 const replyEmailSchema = z.object({
   threadId: z.string().min(1),
-  body: z.string().min(1),
+  body: z.string().min(1).transform(stripMarkdown),
 });
 type ReplyEmailPayload = z.infer<typeof replyEmailSchema>;
 
