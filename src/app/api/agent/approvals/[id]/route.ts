@@ -94,6 +94,12 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json({ error: "decision must be 'approve' or 'decline'" }, { status: 400 });
   }
 
+  // Requester-only: only the user whose run drafted the action may decide it
+  // (it runs from their connection). Membership alone is not enough.
+  if (auth.approval.requested_by !== auth.userId) {
+    return NextResponse.json({ error: "Only the requester can approve this action" }, { status: 403 });
+  }
+
   if (auth.approval.status !== "pending") {
     return NextResponse.json(
       { error: `Already ${auth.approval.status}`, approval: toView(auth.approval) },

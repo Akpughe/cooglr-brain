@@ -4,7 +4,9 @@ import { Agent } from "@mastra/core/agent";
 import { resolveModel } from "../model/registry";
 import { askWorkspaceKnowledge } from "../tools/knowledge-tools";
 import { saveMemory, recallMemory } from "../tools/memory-tools";
-import { requestApproval } from "../tools/approval-tools";
+import { buildActionTools } from "../tools/action-tools";
+import { readConnectedToolkits } from "../context/request-context";
+import { availableActions, toolNameFor } from "@/lib/agent/approvals/executors";
 
 const INSTRUCTIONS = `You are the Workspace Agent — the operating-system agent for this company's workspace. You help leaders and teams understand and run their business.
 
@@ -21,19 +23,38 @@ Memory (remember & recall):
 - Distinction: ask_workspace_knowledge = the workspace's documents/data; recall_memory = the user's personal remembered facts/preferences. Use both when relevant.
 
 Actions & approval (never act silently):
-- For any external or high-impact action — sending an email, and other irreversible/outward-facing actions — you MUST NOT perform or claim to perform it. Draft it, then call request_approval. The action only runs after the user explicitly approves it.
-- For send_email, draft the recipients, subject, and body, then call request_approval with actionType 'send_email' and payload {to, subject, body}. Then tell the user you've drafted the email and it's waiting for their approval — do not say it was sent.
-- Read-only work (answering, summarising, drafting a document in chat) needs no approval. Only gate actions that change something or leave the workspace.
+- For any external or high-impact action — sending an email, and other irreversible/outward-facing actions — you MUST NOT perform or claim to perform it. Call the matching action tool, which DRAFTS the action and queues it for the user's approval. The action only runs after the user explicitly approves it. After calling an action tool, tell the user it's awaiting their approval — never say it was done.
+- Read-only work (answering, summarising, drafting a document in chat) needs no approval. Only gate actions that change something or leave the workspace.`;
+
+const STYLE = `
 
 Style:
 - Be concise and executive: lead with the answer, then the supporting detail.
 - Use tight markdown — short paragraphs, bullets for lists, a small table only when it clarifies.
 - No filler, no hedging, no apologies. State what you know, what you don't, and the next useful action.`;
 
+// Per-run line listing the action tools the user can actually use, derived from
+// their connected toolkits. Keeps the single generic-vs-named concern in check:
+// the model is told exactly which named action tools exist this turn.
+function actionAvailability(connected: string[]): string {
+  const actions = availableActions(connected);
+  if (actions.length === 0) {
+    return `\n\nActions available now: none. If the user asks you to send an email or take another external action, tell them to connect the app in Settings → Apps first — do not attempt it.`;
+  }
+  const lines = actions.map((a) => `- ${toolNameFor(a)} — ${a.label}`).join("\n");
+  return `\n\nAction tools available now (each requires the user's approval before it runs):\n${lines}`;
+}
+
 export const supervisorAgent = new Agent({
   id: "workspace-supervisor",
   name: "Workspace Agent",
-  instructions: INSTRUCTIONS,
   model: resolveModel("deep"),
-  tools: { askWorkspaceKnowledge, saveMemory, recallMemory, requestApproval },
+  instructions: ({ requestContext }) =>
+    INSTRUCTIONS + actionAvailability(readConnectedToolkits(requestContext)) + STYLE,
+  tools: ({ requestContext }) => ({
+    askWorkspaceKnowledge,
+    saveMemory,
+    recallMemory,
+    ...buildActionTools(readConnectedToolkits(requestContext)),
+  }),
 });

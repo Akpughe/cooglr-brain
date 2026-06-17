@@ -14,6 +14,7 @@ import {
   finishRun,
   saveMessage,
 } from "@/lib/agent/runs";
+import { resolveConnectedToolkits } from "@/lib/composio/actions";
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
 import { toAISdkStream } from "@mastra/ai-sdk";
 
@@ -127,6 +128,10 @@ export async function POST(req: Request) {
     }
   }
 
+  // Which toolkits this user has connected (Composio) — gates which action
+  // tools the agent is offered this run. Best-effort + cached; never blocks.
+  const connectedToolkits = await resolveConnectedToolkits(actor.userId);
+
   const traceId = crypto.randomUUID();
   const requestContext = buildRequestContext({
     userId: actor.userId,
@@ -135,6 +140,7 @@ export async function POST(req: Request) {
     role: (membership.role as string) ?? "member",
     traceId,
     focusFileIds: focusIds.length > 0 ? focusIds : undefined,
+    connectedToolkits: connectedToolkits.length > 0 ? connectedToolkits : undefined,
   });
 
   // Best-effort persistence (degrades silently if migration 024 isn't applied yet).

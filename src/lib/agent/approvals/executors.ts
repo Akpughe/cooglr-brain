@@ -29,10 +29,14 @@ export interface ApprovalExecutor<P = unknown> {
   actionType: string;
   /** Friendly label, e.g. "Send email". Surfaced to the UI. */
   label: string;
+  /** Description shown to the model as the generated tool's description. */
+  description: string;
   /** Composio toolkit this action needs connected, e.g. "gmail". null = none. */
   toolkit: string | null;
   defaultRisk: ApprovalRisk;
   schema: z.ZodType<P>;
+  /** Card title derived from the payload; falls back to `label`. */
+  title?: (payload: P) => string;
   /** Display-only preview derived from the validated payload. No secrets. */
   preview: (payload: P) => Record<string, unknown>;
   /** Perform the real side-effect. Throw on failure; the message is surfaced. */
@@ -58,9 +62,15 @@ type SendEmailPayload = z.infer<typeof sendEmailSchema>;
 const sendEmail: ApprovalExecutor<SendEmailPayload> = {
   actionType: "send_email",
   label: "Send email",
+  description:
+    "Send an email from the user's connected Gmail. Provide the recipient(s) in `to`, " +
+    "a `subject`, and the `body` as plain text. This does NOT send immediately — it drafts " +
+    "the email and queues it for the user to approve; after calling it, tell the user the " +
+    "email is awaiting their approval and never claim it was sent.",
   toolkit: "gmail",
   defaultRisk: "high",
   schema: sendEmailSchema,
+  title: (p) => (p.subject ? `Email: ${p.subject}` : "Send email"),
   preview: (p) => ({ to: p.to, subject: p.subject, body: p.body }),
   execute: async (ctx, p) => {
     const sender = ctx.requestedBy || ctx.userId;
@@ -108,4 +118,21 @@ export function getExecutor(actionType: string): ApprovalExecutor | null {
 
 export function listActionTypes(): string[] {
   return Object.keys(EXECUTORS);
+}
+
+export function listExecutors(): ApprovalExecutor[] {
+  return Object.values(EXECUTORS);
+}
+
+/** The model-facing tool name for an action, namespaced by toolkit so the model
+ *  groups related actions: gmail_send_email, github_create_issue, … */
+export function toolNameFor(entry: ApprovalExecutor): string {
+  return entry.toolkit ? `${entry.toolkit}_${entry.actionType}` : entry.actionType;
+}
+
+/** Actions available to a user given their connected toolkits. An action with a
+ *  null toolkit is always available; otherwise its toolkit must be connected. */
+export function availableActions(connectedToolkits: string[]): ApprovalExecutor[] {
+  const connected = new Set(connectedToolkits);
+  return listExecutors().filter((e) => e.toolkit === null || connected.has(e.toolkit));
 }

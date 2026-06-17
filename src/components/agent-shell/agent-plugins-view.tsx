@@ -20,9 +20,9 @@ interface Connector {
   name: string;
   desc: string;
   logo: BrandLogo;
-  /** The real OAuth provider key (from /api/accounts) this connector maps to.
-   *  Undefined means no OAuth flow exists yet (e.g. Slack). */
-  provider?: string;
+  /** The Composio toolkit slug this connector connects (one connection serves
+   *  both reads and the agent's actions). Undefined = no flow yet. */
+  toolkit?: string;
 }
 
 interface Category {
@@ -39,14 +39,14 @@ const CATEGORIES: Category[] = [
         name: "Slack",
         desc: "Threads, channels, and customer chats",
         logo: SlackLogo,
-        // No Slack OAuth provider exists in the registry yet.
+        toolkit: "slack",
       },
       {
         key: "gmail",
         name: "Gmail",
         desc: "Customer email and inbox triage",
         logo: GmailLogo,
-        provider: "google",
+        toolkit: "gmail",
       },
     ],
   },
@@ -58,14 +58,14 @@ const CATEGORIES: Category[] = [
         name: "GitHub",
         desc: "Repos, issues, and pull requests",
         logo: GitHubLogo,
-        provider: "github",
+        toolkit: "github",
       },
       {
         key: "drive",
         name: "Google Drive",
         desc: "Docs, briefs, and reports",
         logo: GoogleDriveLogo,
-        provider: "google",
+        toolkit: "google-drive",
       },
     ],
   },
@@ -80,12 +80,23 @@ function ConnectorRow({
 }) {
   const Logo = connector.logo;
 
-  function onConnect() {
-    if (!connector.provider) {
+  async function onConnect() {
+    if (!connector.toolkit) {
       toast("Connector flow coming soon");
       return;
     }
-    window.location.href = `/api/accounts/connect?provider=${connector.provider}`;
+    try {
+      const res = await fetch("/api/composio/connect", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ toolkit: connector.toolkit }),
+      });
+      const data = (await res.json().catch(() => ({}))) as { redirectUrl?: string; error?: string };
+      if (!res.ok || !data.redirectUrl) throw new Error(data.error || "Connect failed");
+      window.location.href = data.redirectUrl; // hosted consent flow
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Couldn't start connection");
+    }
   }
 
   return (
@@ -155,7 +166,7 @@ function ConnectorRow({
 
 export function AgentPluginsView() {
   useWorkspace(); // ensure rendered within a workspace context
-  const [connectedProviders, setConnectedProviders] = useState<Set<string>>(
+  const [connectedToolkits, setConnectedToolkits] = useState<Set<string>>(
     new Set()
   );
   const [loading, setLoading] = useState(true);
@@ -164,22 +175,16 @@ export function AgentPluginsView() {
     let active = true;
     (async () => {
       try {
-        const res = await fetch("/api/accounts");
+        const res = await fetch("/api/composio/connect");
         if (!res.ok) throw new Error("not ok");
-        const data: unknown = await res.json();
-        const providers = Array.isArray(data)
-          ? data
-              .map((a) =>
-                a && typeof a === "object" && "provider" in a
-                  ? String((a as { provider: unknown }).provider)
-                  : null
-              )
-              .filter((p): p is string => Boolean(p))
+        const data = (await res.json()) as { connected?: unknown };
+        const connected = Array.isArray(data.connected)
+          ? data.connected.map((t) => String(t).toLowerCase())
           : [];
-        if (active) setConnectedProviders(new Set(providers));
+        if (active) setConnectedToolkits(new Set(connected));
       } catch {
         // Degrade gracefully: show everything as not-connected.
-        if (active) setConnectedProviders(new Set());
+        if (active) setConnectedToolkits(new Set());
       } finally {
         if (active) setLoading(false);
       }
@@ -237,8 +242,8 @@ export function AgentPluginsView() {
                   connector={connector}
                   connected={
                     !loading &&
-                    !!connector.provider &&
-                    connectedProviders.has(connector.provider)
+                    !!connector.toolkit &&
+                    connectedToolkits.has(connector.toolkit)
                   }
                 />
               ))}
