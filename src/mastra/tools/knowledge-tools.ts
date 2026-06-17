@@ -32,7 +32,14 @@ export const askWorkspaceKnowledge = createTool({
   outputSchema: z.object({
     source: z.enum(["database", "content"]),
     markdown: z.string(),
-    citations: z.array(z.object({ fileId: z.string(), score: z.number() })),
+    citations: z.array(
+      z.object({
+        fileId: z.string(),
+        score: z.number(),
+        title: z.string().optional(),
+        source: z.string().optional(),
+      }),
+    ),
     sql: z.string().nullable(),
     hasChart: z.boolean(),
     chart: z.any().optional(),
@@ -41,9 +48,9 @@ export const askWorkspaceKnowledge = createTool({
     origins: z.array(z.string()),
   }),
   execute: async ({ question }, context) => {
-    const { workspaceId, userId } = readContext(context);
+    const { workspaceId, userId, focusFileIds } = readContext(context);
     const supabase = await createServiceClient();
-    const ans = await runUnifiedQuery(supabase, { workspaceId, question, userId });
+    const ans = await runUnifiedQuery(supabase, { workspaceId, question, userId, focusFileIds });
 
     const markdown =
       ans.answerMd.length > MAX_MARKDOWN

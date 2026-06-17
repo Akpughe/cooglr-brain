@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   MoreHorizontal,
   Plus,
@@ -12,7 +12,11 @@ import {
   AlertCircle,
 } from "lucide-react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import { useWorkspace } from "@/lib/workspace/context";
+import { useFolderContents, invalidateFiles, type FileNode } from "@/lib/queries";
+import { SkeletonRow } from "@/components/agent-shell/skeleton";
+import { AgentEmptyBlock } from "@/components/agent-shell/agent-empty-block";
 
 interface Folder {
   id: string;
@@ -24,6 +28,7 @@ interface AgentFolderDetailViewProps {
   folder: Folder;
   onRemove?: () => void;
   onBack?: () => void;
+  onOpenFile?: (fileId: string, title: string) => void;
 }
 
 interface ContentItem {
@@ -33,20 +38,6 @@ interface ContentItem {
   date: string;
   accent: boolean;
   indexStatus: string | null; // "indexing" | "done" | null
-}
-
-// Shape returned by GET /api/files (camelCase, no content)
-interface FileNode {
-  id: string;
-  parentId: string | null;
-  type: "page" | "folder" | "file";
-  title: string;
-  icon: string | null;
-  isPrivate: boolean;
-  position: number;
-  createdBy: string;
-  updatedAt: string;
-  indexStatus?: string | null;
 }
 
 function formatDate(iso: string): string {
@@ -90,13 +81,13 @@ function toContentItem(node: FileNode): ContentItem {
 export function AgentFolderDetailView({
   folder,
   onRemove,
+  onOpenFile,
 }: AgentFolderDetailViewProps) {
   const { workspace } = useWorkspace();
+  const qc = useQueryClient();
 
   const [search, setSearch] = useState("");
   const [removeHover, setRemoveHover] = useState(false);
-  const [items, setItems] = useState<ContentItem[]>([]);
-  const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
   // Files we just uploaded that haven't reported "done" yet (drives the spinner
   // immediately, before the server has even started extracting).
@@ -105,27 +96,8 @@ export function AgentFolderDetailView({
 
   const ownerInitial = (folder.owner ?? "D").trim().charAt(0).toUpperCase() || "D";
 
-  const loadItems = useCallback(async () => {
-    try {
-      const r = await fetch(`/api/files?workspaceId=${workspace.id}&parentId=${folder.id}`);
-      if (!r.ok) throw new Error("Failed to load content");
-      const data: { files: FileNode[] } = await r.json();
-      setItems((data.files || []).map(toContentItem));
-    } catch {
-      setItems([]);
-    }
-  }, [workspace.id, folder.id]);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    loadItems().finally(() => {
-      if (!cancelled) setLoading(false);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [loadItems]);
+  const { data, isLoading } = useFolderContents(workspace.id, folder.id);
+  const items: ContentItem[] = (data ?? []).map(toContentItem);
 
   // Drop any pending file from the spinner set once it reaches a terminal state.
   useEffect(() => {
@@ -134,17 +106,19 @@ export function AgentFolderDetailView({
       items.filter((it) => it.indexStatus === "done" || it.indexStatus === "error").map((it) => it.id),
     );
     if ([...pending].some((id) => terminal.has(id))) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- clear spinner once the server reports a terminal index status
       setPending((prev) => new Set([...prev].filter((id) => !terminal.has(id))));
     }
-  }, [items]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [data]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Poll while anything is still indexing so the status resolves on its own.
-  const anyIndexing = pending.size > 0 || items.some((it) => it.indexStatus === "indexing");
+  // Refetch while anything is still indexing so the status resolves on its own.
+  const anyIndexing =
+    pending.size > 0 || (data?.some((f) => f.indexStatus === "indexing") ?? false);
   useEffect(() => {
     if (!anyIndexing) return;
-    const t = setInterval(() => void loadItems(), 3000);
+    const t = setInterval(() => void invalidateFiles(qc, workspace.id, folder.id), 3000);
     return () => clearInterval(t);
-  }, [anyIndexing, loadItems]);
+  }, [anyIndexing, qc, workspace.id, folder.id]);
 
   async function onFilesPicked(e: React.ChangeEvent<HTMLInputElement>) {
     const picked = e.target.files;
@@ -172,7 +146,7 @@ export function AgentFolderDetailView({
     }
     e.target.value = "";
     if (newIds.length) setPending((prev) => new Set([...prev, ...newIds]));
-    await loadItems();
+    await invalidateFiles(qc, workspace.id, folder.id);
     setUploading(false);
     if (ok > 0) toast(`Added ${ok} ${ok === 1 ? "file" : "files"} — indexing into memory…`);
   }
@@ -411,14 +385,26 @@ export function AgentFolderDetailView({
 
         {/* ————— Content list ————— */}
         <div style={{ marginTop: 8 }}>
-          {loading ? (
-            <div style={{ padding: "18px 10px", fontSize: 13.5, color: "var(--ink-3)" }}>
-              Loading content…
-            </div>
+          {isLoading ? (
+            <>
+              {Array.from({ length: 5 }).map((_, i) => (
+                <SkeletonRow key={i} />
+              ))}
+            </>
           ) : filteredItems.length === 0 ? (
-            <div style={{ padding: "18px 10px", fontSize: 13.5, color: "var(--ink-3)" }}>
-              {search.trim() ? `No content matches “${search}”.` : "No content yet"}
-            </div>
+            search.trim() ? (
+              <div style={{ padding: "18px 10px", fontSize: 13.5, color: "var(--ink-3)" }}>
+                No content matches “{search}”.
+              </div>
+            ) : (
+              <AgentEmptyBlock
+                icon={FileText}
+                title="No content yet"
+                hint="Add documents to this folder — they'll be indexed into memory so the agent can reference them."
+                actionLabel={uploading ? "Adding…" : "Add content"}
+                onAction={() => fileInputRef.current?.click()}
+              />
+            )
           ) : (
             filteredItems.map((item, i) => (
               <ContentRow
@@ -426,6 +412,11 @@ export function AgentFolderDetailView({
                 item={item}
                 pending={pending.has(item.id)}
                 last={i === filteredItems.length - 1}
+                onOpen={
+                  item.kind !== "Folder" && onOpenFile
+                    ? () => onOpenFile(item.id, item.title)
+                    : undefined
+                }
               />
             ))
           )}
@@ -474,13 +465,27 @@ function IndexStatus({ status, pending }: { status: string | null; pending: bool
   return null;
 }
 
-function ContentRow({ item, pending, last }: { item: ContentItem; pending: boolean; last: boolean }) {
+function ContentRow({
+  item,
+  pending,
+  last,
+  onOpen,
+}: {
+  item: ContentItem;
+  pending: boolean;
+  last: boolean;
+  onOpen?: () => void;
+}) {
   const [hover, setHover] = useState(false);
 
   return (
     <div
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      onClick={onOpen}
+      role={onOpen ? "button" : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      onKeyDown={onOpen ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } } : undefined}
       style={{
         display: "flex",
         alignItems: "center",
@@ -488,7 +493,7 @@ function ContentRow({ item, pending, last }: { item: ContentItem; pending: boole
         height: 64,
         padding: "0 10px",
         borderRadius: 10,
-        cursor: "pointer",
+        cursor: onOpen ? "pointer" : "default",
         borderBottom: last ? "none" : "1px solid var(--line-soft)",
         background: hover ? "var(--hover-soft)" : "transparent",
         transition: "background 0.12s ease",

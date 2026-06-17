@@ -19,6 +19,13 @@ export async function GET(
 
   if (error) return NextResponse.json({ error: error.message }, { status: 404 });
 
+  // Public URL for the stored object so the client can preview it (the
+  // file-uploads bucket is public). Null for pages / nodes with no object.
+  let url: string | null = null;
+  if (data.storage_path) {
+    url = supabase.storage.from("file-uploads").getPublicUrl(data.storage_path).data.publicUrl;
+  }
+
   return NextResponse.json({
     file: {
       id: data.id,
@@ -37,6 +44,7 @@ export async function GET(
       createdBy: data.created_by,
       updatedAt: data.updated_at,
       createdAt: data.created_at,
+      url,
     },
   });
 }

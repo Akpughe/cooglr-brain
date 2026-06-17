@@ -4,7 +4,7 @@ import { scopes } from "@/lib/memory/scopes";
 
 export interface ContentAnswer {
   answerMd: string;
-  citations: { fileId: string; score: number }[];
+  citations: { fileId: string; score: number; title?: string; source?: string }[];
   chunksUsed: number;
   category?: string | null;
   origins?: string[]; // human labels of where the answer came from (e.g. ["Gmail"])
@@ -43,9 +43,14 @@ export async function pickCategory(question: string, categories: string[]): Prom
 export async function runContentQuery(
   workspaceId: string,
   question: string,
-  opts: { topK?: number; mapOverview?: string; categories?: string[] } = {},
+  opts: { topK?: number; mapOverview?: string; categories?: string[]; focusFileIds?: string[] } = {},
 ): Promise<ContentAnswer> {
-  const topK = opts.topK ?? 8;
+  const focusSet =
+    opts.focusFileIds && opts.focusFileIds.length > 0 ? new Set(opts.focusFileIds) : null;
+  // When pinned to specific docs, retrieve more broadly then filter down — the
+  // service has no per-document filter, so we widen recall to surface the
+  // target doc's chunks before narrowing.
+  const topK = opts.topK ?? (focusSet ? 40 : 8);
   const containerTag = scopes.workspace(workspaceId);
 
   // Never let a memory-service hiccup blank the whole agent turn.
@@ -64,20 +69,25 @@ export async function runContentQuery(
   }
 
   // Flatten document snippets + standalone memory facts into citable excerpts.
-  type Excerpt = { fileId: string; source?: string; text: string };
-  const docExcerpts: Excerpt[] = res.documents.flatMap((d) =>
-    d.snippets.map((s) => ({ fileId: d.reference || d.id, source: d.source, text: s })),
+  type Excerpt = { fileId: string; source?: string; title?: string; text: string };
+  let docExcerpts: Excerpt[] = res.documents.flatMap((d) =>
+    d.snippets.map((s) => ({ fileId: d.reference || d.id, source: d.source, title: d.title, text: s })),
   );
-  const memExcerpts: Excerpt[] = res.memories.map((m, i) => ({
-    fileId: `memory:${i + 1}`,
-    source: "memory",
-    text: m,
-  }));
+  // Hard-pin: keep only excerpts from the referenced document(s), and drop loose
+  // memory facts entirely — a pinned question is answered from those docs alone.
+  const memExcerpts: Excerpt[] = focusSet
+    ? []
+    : res.memories.map((m, i) => ({ fileId: `memory:${i + 1}`, source: "memory", title: "Memory", text: m }));
+  if (focusSet) {
+    docExcerpts = docExcerpts.filter((e) => focusSet.has(e.fileId));
+  }
   const all = [...docExcerpts, ...memExcerpts];
 
   if (all.length === 0) {
     return {
-      answerMd: "I couldn't find anything relevant in this workspace's memory yet.",
+      answerMd: focusSet
+        ? "I couldn't find anything about that in the referenced document(s)."
+        : "I couldn't find anything relevant in this workspace's memory yet.",
       citations: [],
       chunksUsed: 0,
       category: null,
@@ -86,7 +96,9 @@ export async function runContentQuery(
   }
 
   const excerpts = all.map((e, i) => `[#${i + 1} ${e.source ?? "doc"}:${e.fileId}]\n${e.text}`).join("\n\n");
-  const citations = all.map((e) => ({ fileId: e.fileId, score: 1 }));
+  // Kept per-snippet (1:1 with the [#n] markers above) so inline citations map
+  // correctly; the UI dedupes by fileId for the sources list it shows.
+  const citations = all.map((e) => ({ fileId: e.fileId, score: 1, title: e.title, source: e.source }));
   const originsForHit = (() => {
     const o = [...new Set(res.documents.map((d) => originLabel(d.source)))];
     if (memExcerpts.length) o.push("memory");

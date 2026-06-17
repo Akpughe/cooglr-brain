@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 import {
   Plus,
+  Upload,
   FolderClosed,
   Folder as FolderIcon,
   MoreHorizontal,
@@ -11,8 +13,20 @@ import {
   X,
   FileText,
   ChevronDown,
+  Loader2,
+  Check,
+  AlertCircle,
 } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace/context";
+import {
+  useFiles,
+  useCreateFolder,
+  useDeleteFile,
+  invalidateFiles,
+  type FileNode,
+} from "@/lib/queries";
+import { SkeletonCard, SkeletonRow } from "@/components/agent-shell/skeleton";
+import { AgentEmptyBlock } from "@/components/agent-shell/agent-empty-block";
 
 interface Folder {
   id: string;
@@ -20,23 +34,14 @@ interface Folder {
   owner: string;
 }
 
+type BrowseEntry =
+  | { kind: "folder"; id: string; folder: Folder }
+  | { kind: "file"; id: string; file: FileNode; owner: string };
+
 interface UploadedFile {
   id: string;
   name: string;
   file?: File;
-}
-
-// Shape returned by GET /api/files (camelCase, no content)
-interface FileNode {
-  id: string;
-  parentId: string | null;
-  type: "page" | "folder" | "file";
-  title: string;
-  icon: string | null;
-  isPrivate: boolean;
-  position: number;
-  createdBy: string;
-  updatedAt: string;
 }
 
 type Visibility = "invite" | "all";
@@ -44,59 +49,94 @@ type Visibility = "invite" | "all";
 let idSeq = 0;
 const nextId = () => `id-${++idSeq}-${Date.now()}`;
 
-export function AgentFoldersView({ onOpenFolder }: { onOpenFolder?: (folder: Folder) => void } = {}) {
+export function AgentFoldersView({
+  onOpenFolder,
+  onOpenFile,
+}: {
+  onOpenFolder?: (folder: Folder) => void;
+  onOpenFile?: (fileId: string, title: string) => void;
+} = {}) {
   const { workspace, members } = useWorkspace();
+  const qc = useQueryClient();
 
-  const [folders, setFolders] = useState<Folder[]>([]);
-  const [loading, setLoading] = useState(true);
   const [query, setQuery] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [pending, setPending] = useState<Set<string>>(new Set());
+  const rootFileInputRef = useRef<HTMLInputElement>(null);
 
   const resolveOwner = (createdBy: string) =>
     members.find((m) => m.userId === createdBy)?.fullName ?? "—";
 
+  // All root-level nodes — folders AND loose uploaded files. Loose files were
+  // previously filtered out entirely, which made uploads to the workspace root
+  // invisible. We now surface them in the Browse-all list.
+  const { data: rootNodes, isLoading } = useFiles(workspace.id, null);
+  const createFolder = useCreateFolder(workspace.id);
+  const deleteFile = useDeleteFile(workspace.id, null);
+
+  const folderNodes = (rootNodes ?? []).filter((f) => f.type === "folder");
+  const looseFiles = (rootNodes ?? []).filter((f) => f.type !== "folder");
+
+  const folders: Folder[] = folderNodes.map((f) => ({
+    id: f.id,
+    name: f.title,
+    owner: resolveOwner(f.createdBy),
+  }));
+
+  // Drop just-uploaded files from the spinner set once they reach a terminal state.
   useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    fetch(`/api/files?workspaceId=${workspace.id}&parentId=null`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("Failed to load folders"))))
-      .then((data: { files: FileNode[] }) => {
-        if (cancelled) return;
-        const topFolders = (data.files || [])
-          .filter((f) => f.type === "folder")
-          .map((f) => ({ id: f.id, name: f.title, owner: resolveOwner(f.createdBy) }));
-        setFolders(topFolders);
-      })
-      .catch(() => {
-        if (!cancelled) toast("Could not load folders");
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [workspace.id, members]);
+    if (pending.size === 0) return;
+    const terminal = new Set(
+      looseFiles.filter((f) => f.indexStatus === "done" || f.indexStatus === "error").map((f) => f.id),
+    );
+    if ([...pending].some((id) => terminal.has(id))) {
+      setPending((prev) => new Set([...prev].filter((id) => !terminal.has(id))));
+    }
+  }, [rootNodes]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Poll while anything is still indexing so the status resolves on its own.
+  const anyIndexing = pending.size > 0 || looseFiles.some((f) => f.indexStatus === "indexing");
+  useEffect(() => {
+    if (!anyIndexing) return;
+    const t = setInterval(() => void invalidateFiles(qc, workspace.id, null), 3000);
+    return () => clearInterval(t);
+  }, [anyIndexing, qc, workspace.id]);
+
+  async function onRootFilesPicked(e: React.ChangeEvent<HTMLInputElement>) {
+    const picked = e.target.files;
+    if (!picked || picked.length === 0) return;
+    setUploading(true);
+    let ok = 0;
+    const newIds: string[] = [];
+    for (const file of Array.from(picked)) {
+      try {
+        const fd = new FormData();
+        fd.append("file", file);
+        fd.append("workspaceId", workspace.id);
+        // No parentId → uploads land at the workspace root.
+        const res = await fetch("/api/files/upload", { method: "POST", body: fd });
+        if (res.ok) {
+          ok += 1;
+          const j = await res.json().catch(() => null);
+          if (j?.file?.id) newIds.push(j.file.id as string);
+        } else {
+          toast.error(`Couldn't upload ${file.name}`);
+        }
+      } catch {
+        toast.error(`Couldn't upload ${file.name}`);
+      }
+    }
+    e.target.value = "";
+    if (newIds.length) setPending((prev) => new Set([...prev, ...newIds]));
+    await invalidateFiles(qc, workspace.id, null);
+    setUploading(false);
+    if (ok > 0) toast(`Uploaded ${ok} ${ok === 1 ? "file" : "files"} — indexing into memory…`);
+  }
 
   async function handleCreate(name: string, staged: UploadedFile[]) {
     try {
-      const res = await fetch("/api/files", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          workspaceId: workspace.id,
-          title: name,
-          type: "folder",
-          parentId: null,
-        }),
-      });
-      if (!res.ok) throw new Error("create failed");
-      const { file } = (await res.json()) as { file: { id: string; title: string; createdBy: string } };
-      setFolders((prev) => [
-        ...prev,
-        { id: file.id, name: file.title, owner: resolveOwner(file.createdBy) },
-      ]);
+      const { file } = await createFolder.mutateAsync(name);
       setModalOpen(false);
       toast("Folder created");
 
@@ -123,24 +163,37 @@ export function AgentFoldersView({ onOpenFolder }: { onOpenFolder?: (folder: Fol
     }
   }
 
-  async function handleRemove(id: string) {
-    try {
-      const res = await fetch(`/api/files/${id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("delete failed");
-      setFolders((prev) => prev.filter((x) => x.id !== id));
-      toast("Folder removed");
-    } catch {
-      toast("Could not remove folder");
-    }
+  function handleRemove(id: string) {
+    deleteFile.mutate(id);
+    toast("Folder removed");
   }
 
-  const filtered = folders.filter((f) => {
-    const q = query.trim().toLowerCase();
+  function handleRemoveFile(id: string, name: string) {
+    deleteFile.mutate(id);
+    toast(`Removed ${name}`);
+  }
+
+  // Browse-all is a unified, searchable list of folders + loose files.
+  const browseAll: BrowseEntry[] = [
+    ...folders.map((f) => ({ kind: "folder" as const, id: f.id, folder: f })),
+    ...looseFiles.map((f) => ({
+      kind: "file" as const,
+      id: f.id,
+      file: f,
+      owner: resolveOwner(f.createdBy),
+    })),
+  ];
+
+  const q = query.trim().toLowerCase();
+  const filtered = browseAll.filter((e) => {
     if (!q) return true;
-    return (
-      f.name.toLowerCase().includes(q) || f.owner.toLowerCase().includes(q)
-    );
+    if (e.kind === "folder") {
+      return e.folder.name.toLowerCase().includes(q) || e.folder.owner.toLowerCase().includes(q);
+    }
+    return e.file.title.toLowerCase().includes(q) || e.owner.toLowerCase().includes(q);
   });
+
+  const hasNothing = folders.length === 0 && looseFiles.length === 0;
 
   return (
     <div style={{ height: "100%", overflowY: "auto" }}>
@@ -182,47 +235,63 @@ export function AgentFoldersView({ onOpenFolder }: { onOpenFolder?: (folder: Fol
                 maxWidth: 520,
               }}
             >
-              Add and remove folders from your sidebar in the table below, and
-              organize folders by dragging and dropping directly in the sidebar
+              Organize folders and files in one place. Uploaded documents are
+              indexed into memory so the agent can reference them.
             </p>
           </div>
-          <button
-            className="btn btn-primary"
-            onClick={() => setModalOpen(true)}
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 7,
-              flexShrink: 0,
-            }}
-          >
-            <Plus className="lucide" aria-hidden style={{ width: 15, height: 15 }} />
-            New folder
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flexShrink: 0 }}>
+            <input
+              ref={rootFileInputRef}
+              type="file"
+              multiple
+              style={{ display: "none" }}
+              onChange={onRootFilesPicked}
+            />
+            <button
+              className="btn btn-outline"
+              disabled={uploading}
+              onClick={() => rootFileInputRef.current?.click()}
+              style={{ display: "inline-flex", alignItems: "center", gap: 7 }}
+            >
+              <Upload className="lucide" aria-hidden style={{ width: 15, height: 15 }} />
+              {uploading ? "Uploading…" : "Upload"}
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={() => setModalOpen(true)}
+              style={{ display: "inline-flex", alignItems: "center", gap: 7 }}
+            >
+              <Plus className="lucide" aria-hidden style={{ width: 15, height: 15 }} />
+              New folder
+            </button>
+          </div>
         </div>
 
         {/* ————— folder grid ————— */}
-        {loading ? (
+        {isLoading ? (
           <div
             style={{
               marginTop: 24,
-              fontSize: 13.5,
-              color: "var(--ink-3)",
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fill, minmax(240px, 1fr))",
+              gap: 16,
             }}
           >
-            Loading folders…
+            {Array.from({ length: 6 }).map((_, i) => (
+              <SkeletonCard key={i} />
+            ))}
           </div>
-        ) : folders.length === 0 ? (
-          <div
-            style={{
-              marginTop: 24,
-              fontSize: 13.5,
-              color: "var(--ink-3)",
-            }}
-          >
-            No folders yet — create one to get started.
+        ) : hasNothing ? (
+          <div style={{ marginTop: 18 }}>
+            <AgentEmptyBlock
+              icon={FolderClosed}
+              title="No folders or files yet"
+              hint="Create a folder to group your work, or upload a document — uploads become searchable by the agent."
+              actionLabel="New folder"
+              onAction={() => setModalOpen(true)}
+            />
           </div>
-        ) : (
+        ) : folders.length > 0 ? (
           <div
             style={{
               marginTop: 24,
@@ -240,80 +309,80 @@ export function AgentFoldersView({ onOpenFolder }: { onOpenFolder?: (folder: Fol
               />
             ))}
           </div>
-        )}
+        ) : null}
 
-        {/* ————— browse all ————— */}
-        <div style={{ marginTop: 28 }}>
-          <div
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: "var(--ink)",
-              marginBottom: 10,
-            }}
-          >
-            Browse all
-          </div>
-
-          <div
-            style={{
-              position: "relative",
-              marginBottom: 6,
-            }}
-          >
-            <Search
-              className="lucide"
-              aria-hidden
+        {/* ————— browse all (folders + loose files) ————— */}
+        {!hasNothing && (
+          <div style={{ marginTop: 28 }}>
+            <div
               style={{
-                position: "absolute",
-                left: 12,
-                top: "50%",
-                transform: "translateY(-50%)",
-                width: 15,
-                height: 15,
-                color: "var(--ink-3)",
-                pointerEvents: "none",
+                fontSize: 13,
+                fontWeight: 600,
+                color: "var(--ink)",
+                marginBottom: 10,
               }}
-            />
-            <input
-              type="text"
-              aria-label="Search folders"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search by name, description, or owner"
-              style={{ width: "100%", paddingLeft: 34 }}
-            />
-          </div>
+            >
+              Browse all
+            </div>
 
-          <div
-            style={{
-              marginTop: 12,
-              borderTop: "1px solid var(--line-soft)",
-            }}
-          >
-            {filtered.length === 0 ? (
-              <div
+            <div style={{ position: "relative", marginBottom: 6 }}>
+              <Search
+                className="lucide"
+                aria-hidden
                 style={{
-                  padding: "18px 14px",
-                  fontSize: 13,
+                  position: "absolute",
+                  left: 12,
+                  top: "50%",
+                  transform: "translateY(-50%)",
+                  width: 15,
+                  height: 15,
                   color: "var(--ink-3)",
+                  pointerEvents: "none",
                 }}
-              >
-                No folders match “{query}”.
-              </div>
-            ) : (
-              filtered.map((f, i) => (
-                <FolderRow
-                  key={f.id}
-                  folder={f}
-                  last={i === filtered.length - 1}
-                  onOpen={() => onOpenFolder?.(f)}
-                  onRemove={() => handleRemove(f.id)}
-                />
-              ))
-            )}
+              />
+              <input
+                type="text"
+                aria-label="Search folders and files"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search by name or owner"
+                style={{ width: "100%", paddingLeft: 34 }}
+              />
+            </div>
+
+            <div style={{ marginTop: 12, borderTop: "1px solid var(--line-soft)" }}>
+              {isLoading ? (
+                Array.from({ length: 3 }).map((_, i) => <SkeletonRow key={i} />)
+              ) : filtered.length === 0 ? (
+                <div style={{ padding: "18px 14px", fontSize: 13, color: "var(--ink-3)" }}>
+                  No folders or files match “{query}”.
+                </div>
+              ) : (
+                filtered.map((e, i) =>
+                  e.kind === "folder" ? (
+                    <FolderRow
+                      key={e.id}
+                      folder={e.folder}
+                      last={i === filtered.length - 1}
+                      onOpen={() => onOpenFolder?.(e.folder)}
+                      onRemove={() => handleRemove(e.id)}
+                    />
+                  ) : (
+                    <FileRow
+                      key={e.id}
+                      file={e.file}
+                      owner={e.owner}
+                      pending={pending.has(e.id)}
+                      last={i === filtered.length - 1}
+                      onOpen={onOpenFile ? () => onOpenFile(e.file.id, e.file.title) : undefined}
+                      onRemove={() => handleRemoveFile(e.id, e.file.title)}
+                    />
+                  ),
+                )
+              )}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {modalOpen && (
@@ -483,6 +552,151 @@ function FolderRow({
           className="btn btn-outline"
           onClick={(e) => { e.stopPropagation(); onRemove(); }}
           style={{ fontSize: 12.5 }}
+        >
+          Remove
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ————————————————————————————————————————————— file row ——— */
+
+function fileExt(title: string): string {
+  const dot = title.lastIndexOf(".");
+  return dot > 0 ? title.slice(dot + 1).toLowerCase() : "";
+}
+
+function fileKindLabel(node: FileNode): string {
+  if (node.type === "page") return "Page";
+  const ext = fileExt(node.title);
+  return ext ? ext.toUpperCase() : "File";
+}
+
+function formatFileDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+}
+
+function FileIndexBadge({ status, pending }: { status: string | null | undefined; pending: boolean }) {
+  const indexing = (pending || status === "indexing") && status !== "error";
+  if (status === "error") {
+    return (
+      <span
+        title="Couldn't read this file — it wasn't added to memory."
+        style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 12, color: "var(--red)", flexShrink: 0 }}
+      >
+        <AlertCircle size={14} aria-hidden />
+        Not indexed
+      </span>
+    );
+  }
+  if (status === "done") {
+    return (
+      <span
+        title="Indexed into memory — searchable by the agent"
+        style={{ display: "inline-flex", alignItems: "center", fontSize: 12, color: "var(--green)", flexShrink: 0 }}
+      >
+        <Check size={15} aria-hidden />
+      </span>
+    );
+  }
+  if (indexing) {
+    return (
+      <span
+        title="Indexing into memory…"
+        aria-label="Indexing into memory"
+        style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--ink-3)", flexShrink: 0 }}
+      >
+        <Loader2 size={14} className="rc-spin" aria-hidden />
+        Indexing…
+      </span>
+    );
+  }
+  return null;
+}
+
+function FileRow({
+  file,
+  owner,
+  pending,
+  last,
+  onOpen,
+  onRemove,
+}: {
+  file: FileNode;
+  owner: string;
+  pending: boolean;
+  last: boolean;
+  onOpen?: () => void;
+  onRemove: () => void;
+}) {
+  const [hover, setHover] = useState(false);
+  const isPdf = fileExt(file.title) === "pdf";
+  return (
+    <div
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      onClick={onOpen}
+      role={onOpen ? "button" : undefined}
+      tabIndex={onOpen ? 0 : undefined}
+      onKeyDown={onOpen ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onOpen(); } } : undefined}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        gap: 12,
+        height: 64,
+        padding: "0 8px",
+        cursor: onOpen ? "pointer" : "default",
+        background: hover ? "var(--hover-soft)" : "transparent",
+        transition: "background 0.1s ease",
+        borderBottom: last ? "none" : "1px solid var(--line-soft)",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 14, minWidth: 0 }}>
+        <span
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 36,
+            height: 36,
+            borderRadius: 9,
+            background: isPdf ? "rgba(220,38,38,.1)" : "var(--hover-soft)",
+            color: isPdf ? "#dc2626" : "var(--ink-2)",
+            flexShrink: 0,
+          }}
+        >
+          <FileText className="lucide" aria-hidden style={{ width: 17, height: 17 }} />
+        </span>
+        <span style={{ minWidth: 0 }}>
+          <span
+            style={{
+              display: "block",
+              fontSize: 14.5,
+              fontWeight: 600,
+              color: "var(--ink)",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
+          >
+            {file.title}
+          </span>
+          <span style={{ display: "block", fontSize: 12.5, color: "var(--ink-3)", marginTop: 2 }}>
+            {fileKindLabel(file)} · {formatFileDate(file.updatedAt)}
+          </span>
+        </span>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
+        <FileIndexBadge status={file.indexStatus} pending={pending} />
+        <span style={{ fontSize: 13.5, color: "var(--ink-3)" }}>{owner}</span>
+        <button
+          className="btn btn-outline"
+          onClick={(e) => { e.stopPropagation(); onRemove(); }}
+          style={{ fontSize: 12.5, opacity: hover ? 1 : 0, transition: "opacity 0.12s ease" }}
         >
           Remove
         </button>

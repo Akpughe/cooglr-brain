@@ -5,6 +5,7 @@ import { Streamdown } from "streamdown";
 import {
   ChevronRight,
   Download,
+  ExternalLink,
   FileText,
   Globe,
   Image as ImageIcon,
@@ -15,7 +16,7 @@ import {
 } from "lucide-react";
 import { PlotlyChart, DataTable, downloadCsv, type ChartSpec, type TableSpec } from "./agent-plotly-chart";
 
-export type PreviewKind = "pdf" | "image" | "html" | "markdown" | "text" | "md" | "xlsx" | "report" | "chart";
+export type PreviewKind = "pdf" | "image" | "html" | "markdown" | "text" | "md" | "xlsx" | "csv" | "report" | "chart";
 
 export interface OpenDocument {
   title: string;
@@ -25,6 +26,11 @@ export interface OpenDocument {
   imageUrl?: string;
   chart?: ChartSpec;
   table?: TableSpec;
+  /** Public URL of the original file — used to render PDFs inline and to offer
+   *  an "Open original" action for formats we can't preview in-app. */
+  sourceUrl?: string;
+  /** True while the preview content is still being fetched. */
+  loading?: boolean;
 }
 
 const KIND_LABEL: Record<string, string> = {
@@ -35,6 +41,7 @@ const KIND_LABEL: Record<string, string> = {
   md: "Document · MD",
   text: "Document",
   xlsx: "Spreadsheet · XLSX",
+  csv: "Spreadsheet · CSV",
   report: "Report",
   chart: "Chart",
 };
@@ -68,6 +75,8 @@ export function AgentDocumentViewer({
   const isImage = doc.kind === "image";
   const isText = doc.kind === "text";
   const isChart = doc.kind === "chart";
+  const isPdf = doc.kind === "pdf";
+  const isTable = (doc.kind === "csv" || doc.kind === "xlsx") && !!doc.table;
 
   // Escape closes the panel.
   useEffect(() => {
@@ -124,9 +133,23 @@ export function AgentDocumentViewer({
           <span style={{ fontSize: 11.5, color: "var(--ink-3)", flexShrink: 0 }}>{KIND_LABEL[doc.kind] ?? "Document"}</span>
         </div>
 
-        <button className="iconbtn tip" data-tip="Download" onClick={doDownload} aria-label="Download">
-          <Download aria-hidden="true" style={{ width: 16, height: 16 }} />
-        </button>
+        {doc.sourceUrl ? (
+          <a
+            className="iconbtn tip"
+            data-tip="Open original"
+            href={doc.sourceUrl}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="Open original"
+            style={{ display: "inline-flex", alignItems: "center", justifyContent: "center" }}
+          >
+            <ExternalLink aria-hidden="true" style={{ width: 16, height: 16 }} />
+          </a>
+        ) : (
+          <button className="iconbtn tip" data-tip="Download" onClick={doDownload} aria-label="Download">
+            <Download aria-hidden="true" style={{ width: 16, height: 16 }} />
+          </button>
+        )}
         {onToggleFull && (
           <button className="iconbtn tip" data-tip={isFull ? "Collapse" : "Full page"} onClick={onToggleFull} aria-label={isFull ? "Collapse to panel" : "Expand to full page"}>
             {isFull ? <Minimize2 aria-hidden="true" style={{ width: 16, height: 16 }} /> : <Maximize2 aria-hidden="true" style={{ width: 16, height: 16 }} />}
@@ -138,8 +161,34 @@ export function AgentDocumentViewer({
       </div>
 
       {/* body */}
-      <div style={{ flex: 1, minHeight: 0, position: "relative", background: isImage ? "#FAFAFA" : "var(--bg)" }}>
-        {isChart && doc.chart ? (
+      <div style={{ flex: 1, minHeight: 0, position: "relative", background: isImage || isPdf ? "#FAFAFA" : "var(--bg)" }}>
+        {doc.loading ? (
+          <div style={{ height: "100%", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--ink-3)", fontSize: 13.5 }}>
+            Loading preview…
+          </div>
+        ) : isPdf && doc.sourceUrl ? (
+          <iframe
+            src={doc.sourceUrl}
+            title={name}
+            style={{ width: "100%", height: "100%", border: "none", display: "block" }}
+          />
+        ) : !isChart && !isImage && !isText && !doc.contentMd && doc.sourceUrl ? (
+          <div style={{ height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 12, padding: 24, textAlign: "center" }}>
+            <FileText aria-hidden style={{ width: 30, height: 30, color: "var(--ink-3)" }} />
+            <div style={{ fontSize: 14, fontWeight: 600, color: "var(--ink)" }}>Preview not available in-app</div>
+            <div style={{ fontSize: 13, color: "var(--ink-3)", maxWidth: 300 }}>
+              This file type can&apos;t be rendered here, but you can open the original.
+            </div>
+            <a className="btn btn-primary" href={doc.sourceUrl} target="_blank" rel="noreferrer" style={{ marginTop: 4, display: "inline-flex", alignItems: "center", gap: 7 }}>
+              <ExternalLink aria-hidden style={{ width: 15, height: 15 }} />
+              Open original
+            </a>
+          </div>
+        ) : isTable && doc.table ? (
+          <div style={{ height: "100%", overflowY: "auto", padding: "16px 18px 40px" }}>
+            <DataTable table={doc.table} />
+          </div>
+        ) : isChart && doc.chart ? (
           <div style={{ height: "100%", overflowY: "auto", padding: "28px 30px 40px" }}>
             <div className="card" style={{ padding: 12 }}>
               <PlotlyChart chart={doc.chart} height={isFull ? 460 : 320} />

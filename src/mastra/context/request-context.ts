@@ -13,9 +13,15 @@ export type AgentRequestContext = {
   workspaceSlug: string;
   role: string;
   traceId: string;
+  /** Document ids the user explicitly @-referenced — retrieval is hard-pinned to
+   *  these when present. Established server-side from validated file ids, never
+   *  from model-supplied arguments. Empty/absent = whole-workspace search. */
+  focusFileIds?: string[];
 };
 
-const KEYS: (keyof AgentRequestContext)[] = [
+// Required string keys (every run must carry these).
+type StringKey = "userId" | "workspaceId" | "workspaceSlug" | "role" | "traceId";
+const KEYS: StringKey[] = [
   "userId",
   "workspaceId",
   "workspaceSlug",
@@ -23,13 +29,20 @@ const KEYS: (keyof AgentRequestContext)[] = [
   "traceId",
 ];
 
+const FOCUS_KEY = "focusFileIds";
+
 // Build a Mastra RequestContext from trusted values.
 export function buildRequestContext(values: AgentRequestContext): RequestContext {
-  return new RequestContext(KEYS.map((key) => [key, values[key]] as const));
+  const entries = KEYS.map((key) => [key, values[key]] as [string, string]);
+  if (values.focusFileIds && values.focusFileIds.length > 0) {
+    entries.push([FOCUS_KEY, JSON.stringify(values.focusFileIds)]);
+  }
+  return new RequestContext(entries);
 }
 
-// Read the trusted context back out inside a tool's execute. Throws if any key
-// is missing — tools must never silently fall back to model-supplied ids.
+// Read the trusted context back out inside a tool's execute. Throws if any
+// required key is missing — tools must never silently fall back to model-supplied
+// ids. focusFileIds is optional and parsed back into a string array.
 export function readContext(context: {
   requestContext?: RequestContext;
 }): AgentRequestContext {
@@ -44,6 +57,15 @@ export function readContext(context: {
       throw new Error(`Missing "${key}" in agent RequestContext`);
     }
     out[key] = value;
+  }
+  const focusRaw = rc.get(FOCUS_KEY) as string | undefined;
+  if (focusRaw) {
+    try {
+      const parsed = JSON.parse(focusRaw);
+      if (Array.isArray(parsed)) out.focusFileIds = parsed.filter((x) => typeof x === "string");
+    } catch {
+      /* ignore malformed focus list */
+    }
   }
   return out;
 }

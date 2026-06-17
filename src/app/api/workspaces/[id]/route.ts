@@ -104,6 +104,8 @@ export async function PATCH(
   }
   if (body.theme) updates.theme = body.theme;
   if (body.avatar_url !== undefined) updates.avatar_url = body.avatar_url;
+  if (body.agent_persona_name !== undefined) updates.agent_persona_name = body.agent_persona_name;
+  if (body.agent_instructions !== undefined) updates.agent_instructions = body.agent_instructions;
 
   const { data, error } = await supabase
     .from("workspaces")

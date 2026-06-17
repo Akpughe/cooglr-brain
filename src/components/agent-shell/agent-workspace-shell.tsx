@@ -1,10 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Menu, SquarePen } from "lucide-react";
 import { useChat } from "@ai-sdk/react";
 import { DefaultChatTransport } from "ai";
+import { useQueryClient } from "@tanstack/react-query";
+import { useThreads, qk, invalidateThreads } from "@/lib/queries";
 import { AgentThreadRail, type RailView } from "./agent-thread-rail";
 import { AgentChatSurface } from "./agent-chat-surface";
 import { AgentPluginsView } from "./agent-plugins-view";
@@ -13,24 +15,15 @@ import { AgentFolderDetailView } from "./agent-folder-detail-view";
 import { AgentSettingsView } from "./agent-settings-view";
 import { AgentProfileView } from "./agent-profile-view";
 import { AgentSearchPalette } from "./agent-search-palette";
-import type { OpenDocument } from "./agent-document-viewer";
+import { AgentDocumentViewer, type OpenDocument } from "./agent-document-viewer";
+import { buildFilePreview, loadingDocFor } from "@/lib/files/open-file";
 import type { SourceRef } from "./agent-message";
 import type { AgentArtifact, ModelProfile, ThreadSummary } from "./types";
 
 type View = "chat" | "plugins" | "folders" | "folder-detail" | "settings" | "profile";
 type OpenFolder = { id: string; name: string; owner?: string };
 
-function buildDoc(ref: SourceRef): OpenDocument {
-  if (ref.kind === "chart" && ref.chart) {
-    return { title: ref.title, breadcrumb: ["Outputs", ref.title], kind: "chart", chart: ref.chart };
-  }
-  return {
-    title: ref.fileId,
-    breadcrumb: ["Sources", ref.fileId],
-    kind: ref.kind ?? "report",
-    contentMd: `# ${ref.fileId}\n\nLoading source preview…`,
-  };
-}
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 interface Props {
   workspaceId: string;
@@ -97,10 +90,56 @@ export function AgentWorkspaceShell({
   const [collapsed, setCollapsed] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [openFolder, setOpenFolder] = useState<OpenFolder | null>(null);
-  const [threads, setThreads] = useState<ThreadSummary[]>(initialThreads);
+  // Right-side file preview shown alongside the Folders/panel surfaces.
+  const [panelDoc, setPanelDoc] = useState<OpenDocument | null>(null);
+  const panelDocReqRef = useRef<string | null>(null);
+  const qc = useQueryClient();
+  const { data: threads = initialThreads } = useThreads(workspaceId, initialThreads);
+  const setThreadsCache = useCallback(
+    (updater: (prev: ThreadSummary[]) => ThreadSummary[]) =>
+      qc.setQueryData<ThreadSummary[]>(qk.threads(workspaceId), (prev) => updater(prev ?? [])),
+    [qc, workspaceId],
+  );
 
   const openDocument = useCallback((d: OpenDocument) => { setOpenDoc(d); setLastDoc(d); }, []);
   const toggleDoc = useCallback(() => setOpenDoc((d) => (d ? null : lastDoc)), [lastDoc]);
+
+  // Open a workspace file in the right-side viewer next to the Folders panel.
+  // Guards against a slow fetch landing after the user clicked a different file.
+  const openFileInPanel = useCallback(async (fileId: string, title: string) => {
+    panelDocReqRef.current = fileId;
+    setPanelDoc(loadingDocFor(title));
+    const doc = await buildFilePreview(fileId, title);
+    if (panelDocReqRef.current === fileId) setPanelDoc(doc);
+  }, []);
+  const closePanelDoc = useCallback(() => { panelDocReqRef.current = null; setPanelDoc(null); }, []);
+
+  // Open a citation/source from a chat answer in the chat-side viewer. Charts
+  // render inline; real files are fetched and previewed; memory/external refs
+  // (no previewable file) get a clear message instead of a stuck spinner.
+  const openSourceReqRef = useRef<string | null>(null);
+  const openSource = useCallback(async (ref: SourceRef) => {
+    if (ref.kind === "chart" && ref.chart) {
+      openDocument({ title: ref.title, breadcrumb: ["Outputs", ref.title], kind: "chart", chart: ref.chart, table: ref.table });
+      return;
+    }
+    const previewable = UUID_RE.test(ref.fileId) && ref.source !== "memory";
+    if (!previewable) {
+      const name = ref.title || ref.fileId;
+      const from = ref.source && ref.source !== "file" ? ` (from ${ref.source})` : "";
+      openDocument({
+        title: name,
+        breadcrumb: ["Sources", name],
+        kind: "report",
+        contentMd: `# ${name}\n\nThis source isn't a previewable file${from}. It was used as context for the answer.`,
+      });
+      return;
+    }
+    openSourceReqRef.current = ref.fileId;
+    openDocument(loadingDocFor(ref.title || ref.fileId));
+    const doc = await buildFilePreview(ref.fileId, ref.title || ref.fileId);
+    if (openSourceReqRef.current === ref.fileId) openDocument(doc);
+  }, [openDocument]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -120,12 +159,27 @@ export function AgentWorkspaceShell({
 
   const { messages, sendMessage, status, setMessages, stop } = useChat({
     transport,
+    // Capture the (possibly new) thread id the server emits so the sidebar can
+    // refresh without a reload, and subsequent messages stay on the same thread.
+    onData: (part: { type: string; data?: unknown }) => {
+      if (part.type === "data-thread") {
+        const id = (part.data as { threadId?: string } | undefined)?.threadId;
+        if (id) {
+          setThreadId((cur) => cur ?? id);
+          invalidateThreads(qc, workspaceId);
+        }
+      }
+    },
+    onFinish: () => {
+      // Refresh threads so a brand-new chat (and its generated title) appears.
+      invalidateThreads(qc, workspaceId);
+    },
   });
 
   const latestArtifact = useMemo(() => deriveLatestArtifact(messages), [messages]);
 
   const send = useCallback(
-    (text: string) => {
+    (text: string, focusFileIds?: string[]) => {
       const trimmed = text.trim();
       if (!trimmed || status === "streaming" || status === "submitted") return;
       sendMessage(
@@ -136,6 +190,7 @@ export function AgentWorkspaceShell({
             modelProfile,
             workspaceId,
             workspaceSlug,
+            focusFileIds,
           },
         },
       );
@@ -149,8 +204,9 @@ export function AgentWorkspaceShell({
     setThreadId(undefined);
     setOutputsOpen(true);
     setOpenDoc(null);
+    closePanelDoc();
     setView("chat");
-  }, [setMessages, stop]);
+  }, [setMessages, stop, closePanelDoc]);
 
   // Load a thread's persisted history into the chat when it's selected.
   const selectThread = useCallback(
@@ -183,7 +239,7 @@ export function AgentWorkspaceShell({
   const deleteThread = useCallback(
     async (id: string) => {
       const removed = threads.find((t) => t.id === id);
-      setThreads((prev) => prev.filter((t) => t.id !== id)); // optimistic
+      setThreadsCache((prev) => prev.filter((t) => t.id !== id)); // optimistic
       if (threadId === id) startNewChat();
       try {
         const res = await fetch(`/api/agent/threads/${id}`, { method: "DELETE" });
@@ -191,7 +247,7 @@ export function AgentWorkspaceShell({
       } catch {
         // Roll back so a failed delete doesn't leave a ghost on next load.
         if (removed) {
-          setThreads((prev) =>
+          setThreadsCache((prev) =>
             [...prev, removed].sort((a, b) =>
               (b.lastMessageAt ?? "").localeCompare(a.lastMessageAt ?? ""),
             ),
@@ -200,7 +256,7 @@ export function AgentWorkspaceShell({
         }
       }
     },
-    [threads, threadId, startNewChat],
+    [threads, threadId, startNewChat, setThreadsCache],
   );
 
   const isEmpty = messages.length === 0;
@@ -213,9 +269,19 @@ export function AgentWorkspaceShell({
   const isPanel = view !== "chat";
   const panelView =
     view === "plugins" ? <AgentPluginsView />
-    : view === "folders" ? <AgentFoldersView onOpenFolder={(f) => { setOpenFolder(f); setView("folder-detail"); }} />
+    : view === "folders" ? (
+        <AgentFoldersView
+          onOpenFolder={(f) => { closePanelDoc(); setOpenFolder(f); setView("folder-detail"); }}
+          onOpenFile={openFileInPanel}
+        />
+      )
     : view === "folder-detail" && openFolder ? (
-        <AgentFolderDetailView folder={openFolder} onRemove={() => setView("folders")} onBack={() => setView("folders")} />
+        <AgentFolderDetailView
+          folder={openFolder}
+          onRemove={() => { closePanelDoc(); setView("folders"); }}
+          onBack={() => { closePanelDoc(); setView("folders"); }}
+          onOpenFile={openFileInPanel}
+        />
       )
     : view === "settings" ? <AgentSettingsView />
     : view === "profile" ? <AgentProfileView />
@@ -272,12 +338,19 @@ export function AgentWorkspaceShell({
 
       <div className="shell-content">
         {isPanel ? (
-          <main
-            className="canvas-panel"
-            style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", margin: "8px 8px 8px 0", overflowY: "auto" }}
-          >
-            {panelView}
-          </main>
+          <div style={{ flex: 1, minWidth: 0, display: "flex" }}>
+            <main
+              className="canvas-panel"
+              style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", margin: "8px 8px 8px 0", overflowY: "auto" }}
+            >
+              {panelView}
+            </main>
+            {panelDoc && (
+              <div style={{ width: "46%", flexShrink: 0, minWidth: 0, display: "flex" }}>
+                <AgentDocumentViewer doc={panelDoc} onClose={closePanelDoc} />
+              </div>
+            )}
+          </div>
         ) : (
           <AgentChatSurface
             isEmpty={isEmpty}
@@ -292,7 +365,7 @@ export function AgentWorkspaceShell({
             artifact={latestArtifact}
             openDoc={openDoc}
             onToggleDoc={toggleDoc}
-            onOpenSource={(ref) => openDocument(buildDoc(ref))}
+            onOpenSource={openSource}
             onConnectApps={() => setView("plugins")}
           />
         )}
@@ -301,8 +374,10 @@ export function AgentWorkspaceShell({
       {paletteOpen && (
         <AgentSearchPalette
           threads={threads}
+          workspaceId={workspaceId}
           onPick={(id) => { setPaletteOpen(false); selectThread(id); }}
           onAsk={(q) => { setPaletteOpen(false); startNewChat(); setTimeout(() => send(q), 50); }}
+          onOpenFile={(id, title) => { setPaletteOpen(false); setView("folders"); openFileInPanel(id, title); }}
           onClose={() => setPaletteOpen(false)}
         />
       )}

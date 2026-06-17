@@ -542,6 +542,21 @@
   background: var(--blue);
   color: #fff;
 }
+/* Word-form citation chip (e.g. an inline "source" link). */
+.agent-shell-root .cite-word {
+  min-width: 0;
+  height: auto;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  vertical-align: 1px;
+  background: var(--blue-bg);
+  color: var(--blue);
+}
+.agent-shell-root .cite-word:hover {
+  background: var(--blue);
+  color: #fff;
+}
 
 /* status badges */
 .agent-shell-root .badge {
@@ -589,6 +604,55 @@
 }
 .agent-shell-root .composer textarea::placeholder {
   color: var(--ink-3);
+}
+
+/* ——— @mention highlight: a backdrop mirrors the text and paints inserted
+   mentions blue; the textarea sits on top with transparent glyphs so the caret
+   and selection still work. Metrics MUST stay in sync with .composer textarea. */
+.agent-shell-root .composer .ta-wrap {
+  position: relative;
+}
+.agent-shell-root .composer .ta-input {
+  position: relative;
+  z-index: 1;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  caret-color: var(--ink);
+}
+.agent-shell-root .composer .ta-input::placeholder {
+  color: var(--ink-3);
+  -webkit-text-fill-color: var(--ink-3);
+}
+.agent-shell-root .composer .ta-input::selection {
+  background: rgba(37, 99, 235, 0.18);
+}
+.agent-shell-root .composer .ta-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  box-sizing: border-box;
+  pointer-events: none;
+  overflow: hidden;
+  font: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+  padding: 14px 18px 4px;
+  max-height: 160px;
+  color: var(--ink);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+/* IMPORTANT: this span must NOT change glyph metrics, or the visible (backdrop)
+   text drifts from the transparent textarea text and the caret lands in the
+   wrong place. So: no padding, no font-weight change, no letter-spacing — only
+   color + a metrics-neutral background highlight. */
+.agent-shell-root .composer .ta-backdrop .mention {
+  color: var(--blue);
+  background: rgba(37, 99, 235, 0.13);
+  background: color-mix(in srgb, var(--blue) 13%, transparent);
+  border-radius: 4px;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
 .agent-shell-root .composer .c-row {
   display: flex;
@@ -1173,3 +1237,25 @@
 /* Inline spinner for per-file indexing status. */
 @keyframes rcSpin { to { transform: rotate(360deg); } }
 .agent-shell-root .rc-spin { animation: rcSpin 0.8s linear infinite; }
+
+/* ============================================================
+   Skeleton loaders — shimmering placeholders
+   ============================================================ */
+.agent-shell-root .skel {
+  position: relative;
+  overflow: hidden;
+  background: var(--hover-soft);
+  border-radius: 8px;
+}
+.agent-shell-root .skel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.045), transparent);
+  animation: rcShimmer 1.3s ease-in-out infinite;
+}
+@keyframes rcShimmer { 100% { transform: translateX(100%); } }
+@media (prefers-reduced-motion: reduce) {
+  .agent-shell-root .skel::after { animation: none; }
+}

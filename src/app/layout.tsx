@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter, Spline_Sans_Mono } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
+import { Providers } from "@/components/providers";
 import "./globals.css";
 import "./agent-shell.css";
 import "streamdown/styles.css";
@@ -35,7 +36,7 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${inter.variable} ${splineMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        {children}
+        <Providers>{children}</Providers>
         <Toaster position="bottom-right" richColors />
       </body>
     </html>

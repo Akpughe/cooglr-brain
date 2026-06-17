@@ -20,7 +20,7 @@ interface Props {
   status: "ready" | "submitted" | "streaming" | "error";
   modelProfile: ModelProfile;
   onModelProfileChange: (p: ModelProfile) => void;
-  onSend: (text: string) => void;
+  onSend: (text: string, focusFileIds?: string[]) => void;
   onStop: () => void;
   outputsOpen: boolean;
   onToggleOutputs: () => void;
@@ -105,6 +105,7 @@ export function AgentChatSurface({
   const [panelOpen, setPanelOpen] = useState<boolean>(!!openDoc);
   useEffect(() => {
     if (openDoc) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- sync the mounted doc + animate open
       setMountedDoc(openDoc);
       const r = requestAnimationFrame(() => setPanelOpen(true));
       return () => cancelAnimationFrame(r);
@@ -135,6 +136,7 @@ export function AgentChatSurface({
   // Reset to an equal 50/50 split when a fresh doc opens.
   useEffect(() => {
     if (openDoc) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- reset split geometry for a freshly opened doc
       setDocFull(false);
       setDocWidth(null);
     }
@@ -152,9 +154,19 @@ export function AgentChatSurface({
     wasBusy.current = busy;
   }, [busy]);
 
+  // Follow the stream, but don't fight the user: only auto-scroll when they're
+  // already near the bottom, and jump instantly while tokens are streaming
+  // (repeated "smooth" scrolls interrupt each other and look janky).
+  const atBottomRef = useRef(true);
+  const onScroll = () => {
+    const el = scrollRef.current;
+    if (el) atBottomRef.current = el.scrollHeight - el.scrollTop - el.clientHeight < 120;
+  };
   useEffect(() => {
     const el = scrollRef.current;
-    if (el) el.scrollTo({ top: el.scrollHeight, behavior: "smooth" });
+    if (el && atBottomRef.current) {
+      el.scrollTo({ top: el.scrollHeight, behavior: busy ? "auto" : "smooth" });
+    }
   }, [messages, busy]);
 
   const lastAssistantIdx = (() => {
@@ -246,7 +258,7 @@ export function AgentChatSurface({
           </div>
         ) : (
           <div style={{ flex: 1, minHeight: 0, display: "flex", flexDirection: "column" }}>
-            <div ref={scrollRef} style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
+            <div ref={scrollRef} onScroll={onScroll} style={{ flex: 1, overflowY: "auto", minHeight: 0 }}>
               <div style={{ maxWidth: 740, margin: "0 auto", padding: "4px 40px 30px" }}>
                 {messages.map((m, i) => (
                   <AgentMessage

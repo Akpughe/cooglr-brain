@@ -40,6 +40,8 @@ export interface Workspace {
   ownerId: string;
   theme: string;
   createdAt: string;
+  agentPersonaName: string | null;
+  agentInstructions: string | null;
 }
 
 export interface WorkspaceInvite {

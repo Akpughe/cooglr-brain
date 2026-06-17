@@ -99,6 +99,8 @@ export default async function WorkspaceLayout({
       ownerId: workspace.owner_id,
       theme: workspace.theme || "default",
       createdAt: workspace.created_at,
+      agentPersonaName: workspace.agent_persona_name ?? null,
+      agentInstructions: workspace.agent_instructions ?? null,
     },
     membership: { role: membership.role as "owner" | "member" },
     installedApps,

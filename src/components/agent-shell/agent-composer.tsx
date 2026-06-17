@@ -4,7 +4,12 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUp, ChevronDown, FileText, Image as ImageIcon, Layers, Mic, Plus, Square, X } from "lucide-react";
 import { useWorkspace } from "@/lib/workspace/context";
 import { MODEL_PROFILE_LABELS, type ModelProfile } from "./types";
-import { AgentMentionMenu, filterMentions, type MentionItem } from "./agent-mention-menu";
+import {
+  AgentMentionMenu,
+  filterMentions,
+  providerLabel,
+  type MentionItem,
+} from "./agent-mention-menu";
 
 /** Format an ISO timestamp as a short YYYY-MM-DD date for the mention sublabel. */
 function formatFileDate(iso: string | null | undefined): string {
@@ -22,8 +27,32 @@ function detectMention(text: string, caret: number): { start: number; query: str
   return { start: caret - m[1].length - 1, query: m[1] };
 }
 
+/**
+ * Split `text` into plain / mention segments by matching the exact `@label`
+ * tokens that were inserted from the menu. Longest labels first so a label that
+ * is a prefix of another doesn't win. Used by the highlight backdrop to paint
+ * inserted mentions blue while leaving the rest of the text in the ink color.
+ */
+function segmentMentions(text: string, labels: string[]): { text: string; mention: boolean }[] {
+  const uniq = [...new Set(labels)].filter(Boolean).sort((a, b) => b.length - a.length);
+  if (uniq.length === 0) return [{ text, mention: false }];
+  const escaped = uniq.map((l) => l.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+  const re = new RegExp(`@(?:${escaped.join("|")})`, "g");
+  const out: { text: string; mention: boolean }[] = [];
+  let last = 0;
+  let m: RegExpExecArray | null;
+  while ((m = re.exec(text)) !== null) {
+    if (m.index > last) out.push({ text: text.slice(last, m.index), mention: false });
+    out.push({ text: m[0], mention: true });
+    last = m.index + m[0].length;
+    if (m.index === re.lastIndex) re.lastIndex++; // guard against zero-width loops
+  }
+  if (last < text.length) out.push({ text: text.slice(last), mention: false });
+  return out;
+}
+
 interface Props {
-  onSend: (text: string) => void;
+  onSend: (text: string, focusFileIds?: string[]) => void;
   onStop: () => void;
   status: "ready" | "submitted" | "streaming" | "error";
   modelProfile: ModelProfile;
@@ -118,50 +147,85 @@ export function AgentComposer({
   const [menuOpen, setMenuOpen] = useState(false);
   const [attachments, setAttachments] = useState<Attachment[]>([]);
   const ref = useRef<HTMLTextAreaElement>(null);
+  const backdropRef = useRef<HTMLDivElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
   const fileRef = useRef<HTMLInputElement>(null);
 
-  // Real workspace files for the @-mention Files group (fetched once per workspace).
+  // Real workspace data for the @-mention menu (fetched once per workspace).
   const [fileMentions, setFileMentions] = useState<MentionItem[]>([]);
-  const filesLoadedRef = useRef(false);
+  const [integrationMentions, setIntegrationMentions] = useState<MentionItem[]>([]);
+  // Exact "@label" tokens inserted from the menu, used to paint them blue.
+  const [mentionLabels, setMentionLabels] = useState<string[]>([]);
+  // Files the user @-referenced, used to hard-pin retrieval on send.
+  const [focusFiles, setFocusFiles] = useState<{ id: string; label: string }[]>([]);
+  const dataLoadedRef = useRef(false);
   useEffect(() => {
-    // Re-fetch if the workspace changes so stale files don't linger.
-    filesLoadedRef.current = false;
+    // Re-fetch if the workspace changes so stale data doesn't linger.
+    dataLoadedRef.current = false;
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- reset stale menu data on workspace switch
     setFileMentions([]);
+    setIntegrationMentions([]);
   }, [workspace.id]);
 
   // @-mention popup state.
   const [mention, setMention] = useState<{ start: number; query: string } | null>(null);
   const [mentionIdx, setMentionIdx] = useState(0);
   const mentionRef = useRef<HTMLDivElement>(null);
-  const mentionCount = mention ? filterMentions(mention.query, fileMentions).length : 0;
+  const mentionCount = mention
+    ? filterMentions(mention.query, integrationMentions, fileMentions).length
+    : 0;
 
-  // Lazily load the workspace's most recent files the first time the menu opens.
+  // Lazily load the workspace's connected apps + recent files the first time the
+  // menu opens. Both are best-effort and degrade to empty on error.
   useEffect(() => {
-    if (!mention || filesLoadedRef.current) return;
-    filesLoadedRef.current = true;
+    if (!mention || dataLoadedRef.current) return;
+    dataLoadedRef.current = true;
     let active = true;
     (async () => {
       try {
         const res = await fetch(`/api/files?workspaceId=${encodeURIComponent(workspace.id)}`);
-        if (!res.ok) throw new Error("not ok");
-        const data: { files?: Array<{ id: string; type: string; title: string; updatedAt?: string }> } =
-          await res.json();
-        const items: MentionItem[] = (data.files ?? [])
-          .filter((f) => f.type !== "folder")
-          .sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""))
-          .slice(0, 8)
-          .map((f) => ({
-            id: `file-${f.id}`,
-            group: "file" as const,
-            label: f.title || "Untitled",
-            sublabel: formatFileDate(f.updatedAt),
-            iconKind: "file",
-          }));
-        if (active) setFileMentions(items);
+        if (res.ok) {
+          const data: { files?: Array<{ id: string; type: string; title: string; updatedAt?: string }> } =
+            await res.json();
+          const items: MentionItem[] = (data.files ?? [])
+            .filter((f) => f.type !== "folder")
+            .sort((a, b) => (b.updatedAt ?? "").localeCompare(a.updatedAt ?? ""))
+            .slice(0, 8)
+            .map((f) => ({
+              id: `file-${f.id}`,
+              group: "file" as const,
+              label: f.title || "Untitled",
+              sublabel: formatFileDate(f.updatedAt),
+              iconKind: "file",
+            }));
+          if (active) setFileMentions(items);
+        }
       } catch {
-        // Degrade gracefully (e.g. 401 in DB-free preview): leave files empty.
         if (active) setFileMentions([]);
+      }
+      try {
+        const res = await fetch("/api/accounts");
+        if (res.ok) {
+          const accounts: Array<{ id: string; provider: string; provider_email?: string }> =
+            await res.json();
+          const seen = new Set<string>();
+          const items: MentionItem[] = [];
+          for (const a of accounts ?? []) {
+            const key = a.provider.toLowerCase();
+            if (seen.has(key)) continue; // one chip per provider
+            seen.add(key);
+            items.push({
+              id: `integration-${key}`,
+              group: "integration",
+              label: providerLabel(a.provider),
+              sublabel: a.provider_email,
+              iconKind: key,
+            });
+          }
+          if (active) setIntegrationMentions(items);
+        }
+      } catch {
+        if (active) setIntegrationMentions([]);
       }
     })();
     return () => {
@@ -183,6 +247,11 @@ export function AgentComposer({
     const next = value.slice(0, mention.start) + insert + value.slice(caret);
     setValue(next);
     setMention(null);
+    setMentionLabels((prev) => (prev.includes(item.label) ? prev : [...prev, item.label]));
+    if (item.group === "file") {
+      const fileId = item.id.replace(/^file-/, "");
+      setFocusFiles((prev) => (prev.some((f) => f.id === fileId) ? prev : [...prev, { id: fileId, label: item.label }]));
+    }
     requestAnimationFrame(() => {
       const pos = mention.start + insert.length;
       if (el) {
@@ -191,6 +260,8 @@ export function AgentComposer({
       }
     });
   }
+
+  const segments = segmentMentions(value, mentionLabels);
 
   const busy = status === "streaming" || status === "submitted";
   const ready = (value.trim().length > 0 || attachments.length > 0) && !busy;
@@ -204,7 +275,18 @@ export function AgentComposer({
     if (!el) return;
     el.style.height = "auto";
     el.style.height = Math.min(el.scrollHeight, 160) + "px";
+    // Keep the highlight backdrop the same height + scroll offset as the textarea.
+    if (backdropRef.current) {
+      backdropRef.current.style.height = el.style.height;
+      backdropRef.current.scrollTop = el.scrollTop;
+    }
   }, [value]);
+
+  function syncBackdropScroll() {
+    if (backdropRef.current && ref.current) {
+      backdropRef.current.scrollTop = ref.current.scrollTop;
+    }
+  }
 
   useEffect(() => {
     function onDoc(e: MouseEvent) {
@@ -241,9 +323,13 @@ export function AgentComposer({
 
   function submit() {
     if (!ready) return;
-    onSend(value);
+    // Only pin files whose @mention is still present in the text the user is sending.
+    const active = focusFiles.filter((f) => value.includes(`@${f.label}`)).map((f) => f.id);
+    onSend(value, active.length > 0 ? active : undefined);
     setValue("");
     setAttachments([]);
+    setMentionLabels([]);
+    setFocusFiles([]);
   }
 
   return (
@@ -255,6 +341,7 @@ export function AgentComposer({
         >
           <AgentMentionMenu
             query={mention.query}
+            integrations={integrationMentions}
             files={fileMentions}
             selectedIndex={mentionIdx}
             onHoverIndex={setMentionIdx}
@@ -272,20 +359,38 @@ export function AgentComposer({
         </div>
       )}
 
-      <textarea
-        ref={ref}
-        rows={1}
-        value={value}
-        placeholder={placeholder}
-        {...(mention && mentionCount > 0
-          ? {
-              role: "combobox",
-              "aria-expanded": true,
-              "aria-controls": "mention-listbox",
-              "aria-activedescendant": `mention-opt-${mentionIdx}`,
-            }
-          : {})}
-        onChange={(e) => {
+      <div className="ta-wrap">
+        {/* Highlight backdrop: mirrors the textarea text and paints inserted
+            @mentions blue. The textarea sits on top with transparent text so the
+            real caret + selection still work. */}
+        <div className="ta-backdrop" aria-hidden="true" ref={backdropRef}>
+          {segments.map((s, i) =>
+            s.mention ? (
+              <span key={i} className="mention">
+                {s.text}
+              </span>
+            ) : (
+              <span key={i}>{s.text}</span>
+            ),
+          )}
+          {"​"}
+        </div>
+        <textarea
+          ref={ref}
+          className="ta-input"
+          rows={1}
+          value={value}
+          placeholder={placeholder}
+          {...(mention && mentionCount > 0
+            ? {
+                role: "combobox",
+                "aria-expanded": true,
+                "aria-controls": "mention-listbox",
+                "aria-activedescendant": `mention-opt-${mentionIdx}`,
+              }
+            : {})}
+          onScroll={syncBackdropScroll}
+          onChange={(e) => {
           setValue(e.target.value);
           syncMention(e.target.value, e.target.selectionStart ?? e.target.value.length);
         }}
@@ -313,7 +418,7 @@ export function AgentComposer({
             }
             if (e.key === "Enter" || e.key === "Tab") {
               e.preventDefault();
-              applyMention(filterMentions(mention.query, fileMentions)[mentionIdx]);
+              applyMention(filterMentions(mention.query, integrationMentions, fileMentions)[mentionIdx]);
               return;
             }
             if (e.key === "Escape") {
@@ -327,7 +432,8 @@ export function AgentComposer({
             submit();
           }
         }}
-      />
+        />
+      </div>
 
       <input
         ref={fileRef}

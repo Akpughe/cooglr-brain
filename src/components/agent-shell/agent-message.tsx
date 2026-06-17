@@ -23,6 +23,36 @@ interface UIMessageLike {
 interface Citation {
   fileId: string;
   score: number;
+  title?: string;
+  source?: string;
+}
+
+const SOURCE_LABELS: Record<string, string> = {
+  file: "Document",
+  manual: "Document",
+  gmail: "Gmail",
+  slack: "Slack",
+  github: "GitHub",
+  "google-drive": "Google Drive",
+  memory: "Memory",
+};
+function sourceLabel(source?: string): string {
+  return (source && SOURCE_LABELS[source]) || "Source";
+}
+/** Best human name for a citation: its title, else the raw reference. */
+function citationName(c: Citation): string {
+  return c.title?.trim() || c.fileId;
+}
+/** Collapse multiple snippet-citations of the same file into one, first wins. */
+function dedupeByFileId(citations: Citation[]): Citation[] {
+  const seen = new Set<string>();
+  const out: Citation[] = [];
+  for (const c of citations) {
+    if (seen.has(c.fileId)) continue;
+    seen.add(c.fileId);
+    out.push(c);
+  }
+  return out;
 }
 interface ToolOutput {
   source?: "database" | "content";
@@ -38,6 +68,7 @@ interface ToolOutput {
 export interface SourceRef {
   title: string;
   fileId: string;
+  source?: string;
   kind?: "markdown" | "md" | "text" | "image" | "pdf" | "report" | "chart" | "xlsx" | "html";
   chart?: ChartSpec;
   table?: TableSpec;
@@ -85,12 +116,34 @@ function Answer({
   onOpenSource?: (ref: SourceRef) => void;
 }) {
   const processed = useMemo(() => {
-    return text
-      .replace(/【(\d+)】/g, "[$1]")
+    let t = text
+      // OpenAI-style citations with a dagger: 【1†source】, 【1†file.csv】,
+      // 【1:0†source】, and the square-bracket variant → plain [n].
+      .replace(/[【\[]\s*(\d+)(?::\d+)?\s*†[^】\]]*[】\]]/g, (m, n) => {
+        const i = parseInt(n, 10);
+        return i >= 1 && i <= citations.length ? `[${n}]` : m;
+      })
+      // Normalize the various citation forms the model emits to plain [n].
+      .replace(/【\s*#?\s*(\d+)\s*】/g, "[$1]")
+      .replace(/\[\s*#\s*(\d+)\s*\]/g, "[$1]")
+      // Numbered citations -> clickable cite links.
       .replace(/\[(\d+)\](?!\()/g, (m, n) => {
         const i = parseInt(n, 10);
         return i >= 1 && i <= citations.length ? `[${n}](cite://${n})` : m;
       });
+    // Bracketed/parenthesized "source N" markers (e.g. [source 1], (source 2),
+    // 【source】) -> clickable cite. A numbered form maps to that source; a bare
+    // "source" opens the first.
+    if (citations.length > 0) {
+      t = t
+        .replace(/[[(（]\s*sources?\s*#?\s*(\d+)\s*[\])）]/gi, (m, n) => {
+          const i = parseInt(n, 10);
+          return i >= 1 && i <= citations.length ? `[source](cite://${n})` : m;
+        })
+        .replace(/【\s*sources?\s*】/gi, "[source](cite://1)")
+        .replace(/\[\s*sources?\s*\](?!\()/gi, "[source](cite://1)");
+    }
+    return t;
   }, [text, citations.length]);
 
   return (
@@ -109,15 +162,32 @@ function Answer({
           ),
           code: ({ className, children }) => {
             const txt = String(children ?? "");
-            if (!className && FILE_PATH.test(txt.trim())) {
-              const p = txt.trim();
+            const trimmed = txt.trim();
+            // An inline `code` span that names one of this answer's sources →
+            // make it open that source (e.g. `instagram-60-post-calendar.csv`).
+            if (!className && citations.length) {
+              const hit = citations.find((c) => citationName(c).toLowerCase() === trimmed.toLowerCase());
+              if (hit) {
+                const name = citationName(hit);
+                return (
+                  <button
+                    className="path-link"
+                    title={`Open source: ${name}`}
+                    onClick={() => onOpenSource?.({ title: name, fileId: hit.fileId, source: hit.source, kind: kindFromExt(name) })}
+                  >
+                    {children}
+                  </button>
+                );
+              }
+            }
+            if (!className && FILE_PATH.test(trimmed)) {
               return (
                 <button
                   className="path-link"
-                  title={p}
-                  onClick={() => onOpenSource?.({ title: p, fileId: p })}
+                  title={trimmed}
+                  onClick={() => onOpenSource?.({ title: trimmed, fileId: trimmed })}
                 >
-                  {p}
+                  {trimmed}
                 </button>
               );
             }
@@ -128,14 +198,17 @@ function Answer({
               const n = parseInt(href.slice("cite://".length), 10);
               const src = citations[n - 1];
               if (!src) return <>{children}</>;
+              const label = String(children ?? n);
+              const isWord = !/^\d+$/.test(label);
+              const name = citationName(src);
               return (
                 <button
-                  className="cite"
-                  title={src.fileId}
-                  aria-label={`Open source ${n}`}
-                  onClick={() => onOpenSource?.({ title: src.fileId, fileId: src.fileId })}
+                  className={isWord ? "cite cite-word" : "cite"}
+                  title={`Open source: ${name}`}
+                  aria-label={`Open source ${n}: ${name}`}
+                  onClick={() => onOpenSource?.({ title: name, fileId: src.fileId, source: src.source, kind: kindFromExt(name) })}
                 >
-                  {n}
+                  {isWord ? "source" : n}
                 </button>
               );
             }
@@ -189,19 +262,18 @@ function ChartCard({
 
 function SourceRow({
   citation,
-  origin,
   onOpenSource,
 }: {
   citation: Citation;
-  origin?: string;
   onOpenSource?: (ref: SourceRef) => void;
 }) {
-  const sub = origin ?? `${(citation.score * 100).toFixed(0)}% match`;
+  const name = citationName(citation);
+  const sub = sourceLabel(citation.source);
   return (
     <button
       className="lrow"
-      aria-label={`Open ${citation.fileId}`}
-      onClick={() => onOpenSource?.({ title: citation.fileId, fileId: citation.fileId, kind: kindFromExt(citation.fileId) })}
+      aria-label={`Open ${name}`}
+      onClick={() => onOpenSource?.({ title: name, fileId: citation.fileId, source: citation.source, kind: kindFromExt(name) })}
     >
       <div className="fic fic-file">
         <FileText className="lucide" aria-hidden="true" />
@@ -218,7 +290,7 @@ function SourceRow({
             color: "var(--ink)",
           }}
         >
-          {citation.fileId}
+          {name}
         </div>
         <div style={{ fontSize: 12, color: "var(--ink-3)" }}>{sub}</div>
       </div>
@@ -290,10 +362,13 @@ function AssistantTurn({
   const text = textFromParts(parts);
   const outputs = toolOutputs(parts);
   const citations = outputs.flatMap((o) => o.citations ?? []);
+  // Distinct sources for the list/counts (a doc can produce several snippet
+  // citations); the inline [n] chips still index the full per-snippet array.
+  const dedupedCitations = dedupeByFileId(citations);
   const chart = outputs.find((o) => o.chart)?.chart;
   const table = outputs.find((o) => o.table)?.table;
   const origins = outputs.flatMap((o) => o.origins ?? []);
-  const nSources = citations.length;
+  const nSources = dedupedCitations.length;
   const hasTool = outputs.length > 0 || busy;
 
   const workedLabel = busy
@@ -368,8 +443,8 @@ function AssistantTurn({
       {/* sources filecard */}
       {nSources > 0 && text !== "" && (
         <div className="card" style={{ overflow: "hidden", margin: "14px 0 0", borderRadius: "var(--r-card)" }}>
-          {(allSources ? citations : citations.slice(0, 3)).map((c, i) => (
-            <SourceRow key={`${c.fileId}-${i}`} citation={c} origin={origins[i]} onOpenSource={onOpenSource} />
+          {(allSources ? dedupedCitations : dedupedCitations.slice(0, 3)).map((c, i) => (
+            <SourceRow key={`${c.fileId}-${i}`} citation={c} onOpenSource={onOpenSource} />
           ))}
           {nSources > 3 && (
             <button className="showmore-row" aria-expanded={allSources} onClick={() => setAllSources(!allSources)}>

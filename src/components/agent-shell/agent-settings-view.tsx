@@ -105,8 +105,12 @@ export function AgentSettingsView() {
   const isOwner = useIsOwner();
   const [tab, setTab] = useState<TabId>("general");
   const [name, setName] = useState(workspace.name);
-  const [personaName, setPersonaName] = useState("All");
-  const [personaInstructions, setPersonaInstructions] = useState("");
+  const [personaName, setPersonaName] = useState(
+    workspace.agentPersonaName ?? "All",
+  );
+  const [personaInstructions, setPersonaInstructions] = useState(
+    workspace.agentInstructions ?? "",
+  );
   const [memberQuery, setMemberQuery] = useState("");
   const [inviteOpen, setInviteOpen] = useState(false);
 
@@ -262,6 +266,8 @@ export function AgentSettingsView() {
             isOwner={isOwner}
             workspaceId={workspace.id}
             workspaceName={workspace.name}
+            workspacePersonaName={workspace.agentPersonaName ?? "All"}
+            workspaceInstructions={workspace.agentInstructions ?? ""}
             name={name}
             setName={setName}
             personaName={personaName}
@@ -301,6 +307,8 @@ function GeneralTab({
   isOwner,
   workspaceId,
   workspaceName,
+  workspacePersonaName,
+  workspaceInstructions,
   name,
   setName,
   personaName,
@@ -311,6 +319,8 @@ function GeneralTab({
   isOwner: boolean;
   workspaceId: string;
   workspaceName: string;
+  workspacePersonaName: string;
+  workspaceInstructions: string;
   name: string;
   setName: (v: string) => void;
   personaName: string;
@@ -320,24 +330,50 @@ function GeneralTab({
 }) {
   const [saving, setSaving] = useState(false);
 
+  // Baseline holds the last-known-saved values. It starts from the workspace
+  // context and is updated after each successful save, so the Save button
+  // returns to its neutral state without needing a full reload.
+  const [baseline, setBaseline] = useState({
+    name: workspaceName,
+    personaName: workspacePersonaName,
+    personaInstructions: workspaceInstructions,
+  });
+
+  const dirty =
+    name.trim() !== baseline.name ||
+    personaName !== baseline.personaName ||
+    personaInstructions !== baseline.personaInstructions;
+
   const handleSave = async () => {
     const trimmed = name.trim();
     if (!trimmed) {
       toast.error("Workspace name cannot be empty");
       return;
     }
+    const nextPersonaName = personaName.trim() || "All";
     setSaving(true);
     try {
       const res = await fetch(`/api/workspaces/${workspaceId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: trimmed }),
+        body: JSON.stringify({
+          name: trimmed,
+          agent_persona_name: nextPersonaName,
+          agent_instructions: personaInstructions,
+        }),
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
         toast.error(data?.error || "Failed to save changes");
         return;
       }
+      // Re-seed the baseline to the just-saved values so `dirty` becomes false
+      // and the button settles back to its neutral look.
+      setBaseline({
+        name: trimmed,
+        personaName: nextPersonaName,
+        personaInstructions: personaInstructions,
+      });
       toast("Changes saved");
     } catch {
       toast.error("Failed to save changes");
@@ -345,6 +381,8 @@ function GeneralTab({
       setSaving(false);
     }
   };
+
+  const canSave = isOwner && dirty && !saving;
 
   return (
     <div style={{ marginTop: 28 }}>
@@ -465,24 +503,45 @@ function GeneralTab({
         )}
         <button
           type="button"
-          disabled={!isOwner || saving}
+          disabled={!canSave}
           onClick={handleSave}
           style={{
             height: 36,
             padding: "0 18px",
             borderRadius: 10,
             border: "none",
-            background: "var(--hover-soft)",
-            color: "var(--ink-3)",
+            // Lights up to a dark active primary button only when there are
+            // unsaved edits; otherwise it stays neutral/gray.
+            background: canSave ? "var(--ink)" : "var(--hover-soft)",
+            color: canSave ? "#fff" : "var(--ink-3)",
             fontSize: 13.5,
             fontWeight: 500,
             fontFamily: "inherit",
-            cursor: isOwner && !saving ? "pointer" : "default",
+            cursor: canSave ? "pointer" : "default",
             opacity: saving ? 0.6 : 1,
+            transition: "background 0.14s ease, color 0.14s ease",
+          }}
+          onMouseEnter={(e) => {
+            if (canSave) e.currentTarget.style.background = "#000";
+          }}
+          onMouseLeave={(e) => {
+            if (canSave) e.currentTarget.style.background = "var(--ink)";
           }}
         >
           {saving ? "Saving…" : "Save changes"}
         </button>
+        {isOwner && (
+          <div
+            style={{
+              fontSize: 12.5,
+              color: "var(--ink-3)",
+              marginTop: 10,
+            }}
+          >
+            These instructions apply to the agent for all members of this
+            workspace.
+          </div>
+        )}
       </div>
     </div>
   );

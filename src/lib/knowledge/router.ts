@@ -20,7 +20,7 @@ export interface UnifiedAnswer {
   table?: TableSpec; // downloadable table computed from the real SQL rows
   connectionId?: string;
   // content
-  citations?: { fileId: string; score: number }[];
+  citations?: { fileId: string; score: number; title?: string; source?: string }[];
   origins?: string[]; // human labels: e.g. ["Gmail"], ["a database"]
 }
 
@@ -81,15 +81,18 @@ function parseExplicitMode(question: string): { dbOnly: boolean; cleaned: string
 }
 
 // Run the content (UltraMem) path with the workspace's content-map overview.
+// When focusFileIds is set, retrieval is hard-pinned to those documents.
 async function runContent(
   supabase: SupabaseServerClient,
   workspaceId: string,
   question: string,
+  focusFileIds?: string[],
 ) {
   const map = await getContentMap(supabase, workspaceId);
   return runContentQuery(workspaceId, question, {
     mapOverview: contentMapOverview(map),
     categories: map.categories.map((x) => x.name),
+    focusFileIds,
   });
 }
 
@@ -132,11 +135,19 @@ async function mergeAnswers(
 //                                       often want figures + document context).
 export async function runUnifiedQuery(
   supabase: SupabaseServerClient,
-  opts: { workspaceId: string; question: string; userId: string },
+  opts: { workspaceId: string; question: string; userId: string; focusFileIds?: string[] },
 ): Promise<UnifiedAnswer> {
-  const { workspaceId, userId } = opts;
+  const { workspaceId, userId, focusFileIds } = opts;
   const { dbConnectionId } = await detectSources(supabase, workspaceId);
   const { dbOnly, cleaned: question } = parseExplicitMode(opts.question);
+
+  // Hard-pin: the user @-referenced specific document(s) → answer ONLY from them
+  // (documents path, scoped). This takes priority over DB routing and the
+  // explicit "database:" prefix, since pinning is the more specific intent.
+  if (focusFileIds && focusFileIds.length > 0) {
+    const c = await runContent(supabase, workspaceId, question, focusFileIds);
+    return { source: "content", answerMd: c.answerMd, citations: c.citations, origins: c.origins };
+  }
 
   // No database connected → answer purely from UltraMem. UltraMem reports its
   // own emptiness; we no longer pre-empt it with a catalog check.

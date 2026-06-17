@@ -26,6 +26,8 @@ type Body = {
   modelProfile?: string;
   workspaceId?: string;
   workspaceSlug?: string;
+  /** File ids the user @-referenced in this turn (hard-pins retrieval). */
+  focusFileIds?: string[];
 };
 
 type UIPart = { type?: string; text?: string };
@@ -77,7 +79,7 @@ export async function POST(req: Request) {
     return new Response("Invalid JSON", { status: 400 });
   }
 
-  const { messages, threadId, modelProfile, workspaceId, workspaceSlug } = body;
+  const { messages, threadId, modelProfile, workspaceId, workspaceSlug, focusFileIds } = body;
   if (!Array.isArray(messages) || !workspaceId) {
     return new Response("messages and workspaceId are required", { status: 400 });
   }
@@ -95,6 +97,36 @@ export async function POST(req: Request) {
     .maybeSingle();
   if (!membership) return new Response("Forbidden", { status: 403 });
 
+  // Workspace persona: owner-set instructions every member's agent follows.
+  const { data: ws } = await svc
+    .from("workspaces")
+    .select("agent_instructions")
+    .eq("id", workspaceId)
+    .maybeSingle();
+  const personaInstructions = (ws?.agent_instructions as string | null)?.trim() || null;
+  const effectiveMessages = personaInstructions
+    ? [
+        { role: "system", content: `Workspace operating instructions (set by the workspace owner — follow these in addition to your core behaviour):\n${personaInstructions}` },
+        ...(messages as UIMessageLike[]),
+      ]
+    : (messages as UIMessageLike[]);
+
+  // Validate any @-referenced file ids actually belong to this workspace, so a
+  // client can't pin retrieval to files outside it. Only the surviving ids are
+  // trusted into the request context.
+  let focusIds: string[] = [];
+  if (Array.isArray(focusFileIds) && focusFileIds.length > 0) {
+    const requested = [...new Set(focusFileIds.filter((id) => typeof id === "string"))].slice(0, 20);
+    if (requested.length > 0) {
+      const { data: ownFiles } = await svc
+        .from("files")
+        .select("id")
+        .eq("workspace_id", workspaceId)
+        .in("id", requested);
+      focusIds = (ownFiles ?? []).map((f) => f.id as string);
+    }
+  }
+
   const traceId = crypto.randomUUID();
   const requestContext = buildRequestContext({
     userId: actor.userId,
@@ -102,6 +134,7 @@ export async function POST(req: Request) {
     workspaceSlug: workspaceSlug ?? "",
     role: (membership.role as string) ?? "member",
     traceId,
+    focusFileIds: focusIds.length > 0 ? focusIds : undefined,
   });
 
   // Best-effort persistence (degrades silently if migration 024 isn't applied yet).
@@ -140,7 +173,7 @@ export async function POST(req: Request) {
 
   let agentStream: Awaited<ReturnType<typeof agent.stream>>;
   try {
-    agentStream = await agent.stream(messages as never, { requestContext });
+    agentStream = await agent.stream(effectiveMessages as never, { requestContext });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (runId) await finishRun({ runId, status: "error", error: msg });
@@ -150,6 +183,11 @@ export async function POST(req: Request) {
   const uiStream = createUIMessageStream({
     originalMessages: messages as never,
     execute: ({ writer }) => {
+      // Surface the (possibly newly-created) thread id so the client can update
+      // its URL/sidebar without a reload.
+      if (activeThreadId) {
+        writer.write({ type: "data-thread", data: { threadId: activeThreadId }, transient: true } as never);
+      }
       writer.merge(toAISdkStream(agentStream, { from: "agent" }) as never);
     },
     onFinish: async ({ responseMessage }) => {

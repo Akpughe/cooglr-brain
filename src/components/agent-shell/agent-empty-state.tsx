@@ -24,7 +24,7 @@ function ContextPill({ icon, label }: { icon: React.ReactNode; label: string }) 
 }
 
 interface Props {
-  onSend: (text: string) => void;
+  onSend: (text: string, focusFileIds?: string[]) => void;
   onStop: () => void;
   status: "ready" | "submitted" | "streaming" | "error";
   modelProfile: ModelProfile;
