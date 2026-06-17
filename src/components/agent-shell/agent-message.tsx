@@ -12,6 +12,8 @@ import {
   ThumbsUp,
 } from "lucide-react";
 import { PlotlyChart, DataTable, type ChartSpec, type TableSpec } from "./agent-plotly-chart";
+import { AgentApprovalCard } from "./agent-approval-card";
+import type { ApprovalView } from "@/lib/agent/approvals/types";
 
 type Part = Record<string, unknown>;
 interface UIMessageLike {
@@ -63,6 +65,8 @@ interface ToolOutput {
   chart?: ChartSpec;
   table?: TableSpec;
   origins?: string[];
+  /** request_approval tool output: a human-in-the-loop action awaiting decision. */
+  approval?: ApprovalView | null;
 }
 
 export interface SourceRef {
@@ -368,6 +372,9 @@ function AssistantTurn({
   const chart = outputs.find((o) => o.chart)?.chart;
   const table = outputs.find((o) => o.table)?.table;
   const origins = outputs.flatMap((o) => o.origins ?? []);
+  const approvals = outputs
+    .map((o) => o.approval)
+    .filter((a): a is ApprovalView => Boolean(a));
   const nSources = dedupedCitations.length;
   const hasTool = outputs.length > 0 || busy;
 
@@ -439,6 +446,11 @@ function AssistantTurn({
 
       {/* data table */}
       {table && <DataTable table={table} />}
+
+      {/* approval requests — actions awaiting the user's decision */}
+      {approvals.map((a) => (
+        <AgentApprovalCard key={a.id} approval={a} />
+      ))}
 
       {/* sources filecard */}
       {nSources > 0 && text !== "" && (
