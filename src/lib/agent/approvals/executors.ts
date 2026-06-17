@@ -20,7 +20,9 @@ export interface ExecutorContext {
   /** The user who clicked Approve (POST /api/agent/approvals/[id]). */
   userId: string;
   /** The user whose agent run drafted the action — whose connected account the
-   *  side-effect runs against. Falls back to `userId` when absent. */
+   *  side-effect runs against. The approvals route enforces requester === approver
+   *  before execute, so this equals `userId` in practice; the side-effect uses it
+   *  explicitly so the action always runs from the drafter's connection. */
   requestedBy: string;
 }
 
@@ -72,7 +74,7 @@ const sendEmail: ApprovalExecutor<SendEmailPayload> = {
   title: (p) => (p.subject ? `Email: ${p.subject}` : "Send email"),
   preview: (p) => ({ to: p.to, subject: p.subject, body: p.body }),
   execute: async (ctx, p) => {
-    const sender = ctx.requestedBy || ctx.userId;
+    const sender = ctx.requestedBy; // route guarantees requester === approver
 
     if (dryRunEnabled()) {
       return { sent: false, dryRun: true, to: p.to, subject: p.subject };
@@ -129,7 +131,7 @@ const replyEmail: ApprovalExecutor<ReplyEmailPayload> = {
   title: () => "Reply in thread",
   preview: (p) => ({ threadId: p.threadId, body: p.body }),
   execute: async (ctx, p) => {
-    const sender = ctx.requestedBy || ctx.userId;
+    const sender = ctx.requestedBy; // route guarantees requester === approver
     if (dryRunEnabled()) {
       return { sent: false, dryRun: true, threadId: p.threadId };
     }

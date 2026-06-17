@@ -101,7 +101,9 @@ export async function githubListIssues(userId: string, owner: string, repo: stri
 // ---------- Google Drive ----------
 export async function driveSearch(userId: string, query: string, max = MAX_ITEMS): Promise<ReadItem[]> {
   const args: Record<string, unknown> = { pageSize: max, orderBy: "modifiedTime desc" };
-  if (query) args.q = `name contains '${query.replace(/'/g, "")}'`;
+  // Strip quotes and backslashes so the value can't break out of the quoted
+  // literal (read-only on the user's own Drive; a bad query just fails safely).
+  if (query) args.q = `name contains '${query.replace(/['\\]/g, "")}'`;
   const res = unwrap(await execAction("GOOGLEDRIVE_LIST_FILES", userId, args));
   return arrOf(res, ["files", "results", "items"]).slice(0, max).map((f) => {
     const id = pickStr(f, ["id", "fileId"]);
