@@ -347,6 +347,40 @@ export function AgentMessage({
   return <AssistantTurn parts={parts} busy={busy} durationLabel={durationLabel} onOpenSource={onOpenSource} />;
 }
 
+// Friendly verb for each tool, shown live in the "worked" row as the agent
+// moves through steps (so the indicator updates instead of sitting on "Working").
+const TOOL_LABELS: Record<string, string> = {
+  ask_workspace_knowledge: "Searching workspace",
+  recall_memory: "Recalling memory",
+  save_memory: "Saving to memory",
+  gmail_search: "Searching Gmail",
+  gmail_read_thread: "Reading Gmail thread",
+  slack_list_channels: "Finding Slack channels",
+  slack_read_channel: "Reading Slack",
+  github_list_issues: "Reading GitHub issues",
+  drive_search: "Searching Drive",
+  drive_read_file: "Reading Drive file",
+  gmail_send_email: "Drafting email",
+  gmail_reply: "Drafting reply",
+};
+
+function toolNameOf(part: Part): string | null {
+  const t = String(part.type ?? "");
+  if (t.startsWith("tool-")) return t.slice(5);
+  if (t === "dynamic-tool") return (typeof part.toolName === "string" && part.toolName) || null;
+  return null;
+}
+
+// The current activity while streaming: the most recent tool the agent invoked.
+// As it moves to the next tool, the label changes — a live progress trail.
+function liveActivity(parts: Part[]): string | null {
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const name = toolNameOf(parts[i]);
+    if (name) return TOOL_LABELS[name] ?? "Working";
+  }
+  return null;
+}
+
 function AssistantTurn({
   parts,
   busy,
@@ -379,8 +413,8 @@ function AssistantTurn({
   const hasTool = outputs.length > 0 || busy;
 
   const workedLabel = busy
-    ? "Working…"
-    : `Searched workspace knowledge${nSources ? ` · ${nSources} sources` : ""}${durationLabel ? ` · ${durationLabel}` : ""}`;
+    ? `${liveActivity(parts) ?? "Working"}…`
+    : `Worked${durationLabel ? ` for ${durationLabel}` : ""}${nSources ? ` · ${nSources} sources` : ""}`;
 
   return (
     <div className="rise">
