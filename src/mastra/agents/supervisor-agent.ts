@@ -5,6 +5,7 @@ import { resolveModel } from "../model/registry";
 import { askWorkspaceKnowledge } from "../tools/knowledge-tools";
 import { saveMemory, recallMemory } from "../tools/memory-tools";
 import { buildActionTools } from "../tools/action-tools";
+import { buildReadTools, availableReadToolNames } from "../tools/read-tools";
 import { readConnectedToolkits } from "../context/request-context";
 import { availableActions, toolNameFor } from "@/lib/agent/approvals/executors";
 
@@ -22,9 +23,13 @@ Memory (remember & recall):
 - Before answering a question that may depend on something the user told you earlier (their preferences, prior decisions, context about them), call recall_memory first and use what you find.
 - Distinction: ask_workspace_knowledge = the workspace's documents/data; recall_memory = the user's personal remembered facts/preferences. Use both when relevant.
 
+Reading connected sources:
+- You have read tools for the user's connected sources (Gmail, Slack, GitHub, Drive). Use them to gather context before acting — e.g. search Gmail and read the thread before drafting a reply. Reading needs no approval. Cite what you read (the tools return sources).
+- To reply inside an existing email thread: first get the threadId (gmail_search, then gmail_read_thread for full context), then call the reply action with that threadId. To start a fresh email, use the send action instead.
+
 Actions & approval (never act silently):
-- For any external or high-impact action — sending an email, and other irreversible/outward-facing actions — you MUST NOT perform or claim to perform it. Call the matching action tool, which DRAFTS the action and queues it for the user's approval. The action only runs after the user explicitly approves it. After calling an action tool, tell the user it's awaiting their approval — never say it was done.
-- Read-only work (answering, summarising, drafting a document in chat) needs no approval. Only gate actions that change something or leave the workspace.`;
+- For any external or high-impact action — sending or replying to an email, and other irreversible/outward-facing actions — you MUST NOT perform or claim to perform it. Call the matching action tool, which DRAFTS the action and queues it for the user's approval. The action only runs after the user explicitly approves it. After calling an action tool, tell the user it's awaiting their approval — never say it was done.
+- Read-only work (reading sources, answering, summarising, drafting in chat) needs no approval. Only gate actions that change something or leave the workspace.`;
 
 const STYLE = `
 
@@ -45,16 +50,29 @@ function actionAvailability(connected: string[]): string {
   return `\n\nAction tools available now (each requires the user's approval before it runs):\n${lines}`;
 }
 
+// Per-run line listing the (no-approval) read tools for connected sources.
+function sourceAvailability(connected: string[]): string {
+  const names = availableReadToolNames(connected);
+  if (names.length === 0) return "";
+  return `\n\nRead tools available now (no approval needed): ${names.join(", ")}.`;
+}
+
 export const supervisorAgent = new Agent({
   id: "workspace-supervisor",
   name: "Workspace Agent",
   model: resolveModel("deep"),
-  instructions: ({ requestContext }) =>
-    INSTRUCTIONS + actionAvailability(readConnectedToolkits(requestContext)) + STYLE,
-  tools: ({ requestContext }) => ({
-    askWorkspaceKnowledge,
-    saveMemory,
-    recallMemory,
-    ...buildActionTools(readConnectedToolkits(requestContext)),
-  }),
+  instructions: ({ requestContext }) => {
+    const connected = readConnectedToolkits(requestContext);
+    return INSTRUCTIONS + sourceAvailability(connected) + actionAvailability(connected) + STYLE;
+  },
+  tools: ({ requestContext }) => {
+    const connected = readConnectedToolkits(requestContext);
+    return {
+      askWorkspaceKnowledge,
+      saveMemory,
+      recallMemory,
+      ...buildReadTools(connected),
+      ...buildActionTools(connected),
+    };
+  },
 });

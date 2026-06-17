@@ -17,14 +17,18 @@ function asStringList(v: unknown): string[] {
   return [];
 }
 
+// Renders a send/reply-style preview: optional To / Subject / In-thread fields,
+// then the body in a scrollable box. Covers both send_email and reply.
 function EmailPreview({ preview }: { preview: Record<string, unknown> }) {
   const to = asStringList(preview.to);
   const subject = typeof preview.subject === "string" ? preview.subject : "";
+  const threadId = typeof preview.threadId === "string" ? preview.threadId : "";
   const body = typeof preview.body === "string" ? preview.body : "";
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      <Field label="To" value={to.join(", ")} />
-      <Field label="Subject" value={subject} />
+      {to.length > 0 && <Field label="To" value={to.join(", ")} />}
+      {subject && <Field label="Subject" value={subject} />}
+      {threadId && <Field label="In thread" value={threadId} />}
       <div>
         <div style={{ fontSize: 11.5, fontWeight: 600, color: "var(--ink-3)", textTransform: "uppercase", letterSpacing: "0.03em" }}>
           Body
@@ -90,8 +94,10 @@ export function AgentApprovalCard({
   const [busy, setBusy] = useState<"approve" | "decline" | null>(null);
 
   const risk = RISK_STYLE[approval.riskLevel];
-  const isEmail = approval.actionType === "send_email";
-  const approveLabel = isEmail ? "Approve & send" : "Approve";
+  // Send/reply actions carry a body and a mail affordance.
+  const isMail = approval.actionType === "send_email" || approval.actionType === "reply";
+  const hasBody = typeof approval.preview.body === "string";
+  const approveLabel = isMail ? "Approve & send" : "Approve";
   const decided = status !== "pending";
 
   async function decide(decision: "approve" | "decline") {
@@ -102,7 +108,7 @@ export function AgentApprovalCard({
       const next = await submit(approval.id, decision);
       setStatus(next.status);
       setError(next.error ?? null);
-      if (next.status === "executed") toast.success(isEmail ? "Email sent" : "Action completed");
+      if (next.status === "executed") toast.success(isMail ? "Email sent" : "Action completed");
       else if (next.status === "declined") toast("Declined");
       else if (next.status === "failed") toast.error(next.error || "Action failed");
     } catch (err) {
@@ -117,7 +123,7 @@ export function AgentApprovalCard({
   // Terminal banner shown in place of the action buttons once decided.
   const banner = (() => {
     if (status === "executed")
-      return { color: "var(--green)", icon: <Check style={{ width: 15, height: 15 }} />, text: isEmail ? "Approved · email sent" : "Approved · done" };
+      return { color: "var(--green)", icon: <Check style={{ width: 15, height: 15 }} />, text: isMail ? "Approved · email sent" : "Approved · done" };
     if (status === "approved")
       return { color: "var(--green)", icon: <Check style={{ width: 15, height: 15 }} />, text: "Approved" };
     if (status === "declined")
@@ -132,7 +138,7 @@ export function AgentApprovalCard({
       {/* header */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
         <span style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 7, background: "var(--blue-bg)", color: "var(--blue)", flexShrink: 0 }}>
-          {isEmail ? <Mail style={{ width: 15, height: 15 }} /> : <ShieldAlert style={{ width: 15, height: 15 }} />}
+          {isMail ? <Mail style={{ width: 15, height: 15 }} /> : <ShieldAlert style={{ width: 15, height: 15 }} />}
         </span>
         <div style={{ flex: 1, minWidth: 0 }}>
           <div style={{ fontSize: 13.5, fontWeight: 600, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
@@ -152,7 +158,7 @@ export function AgentApprovalCard({
       )}
 
       <div style={{ borderTop: "1px solid var(--line-soft)", paddingTop: 12 }}>
-        {isEmail ? <EmailPreview preview={approval.preview} /> : <GenericPreview preview={approval.preview} />}
+        {hasBody ? <EmailPreview preview={approval.preview} /> : <GenericPreview preview={approval.preview} />}
       </div>
 
       {/* footer: actions while pending, terminal banner once decided */}

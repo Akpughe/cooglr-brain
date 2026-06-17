@@ -108,9 +108,55 @@ const sendEmail: ApprovalExecutor<SendEmailPayload> = {
   },
 };
 
+// ---------- reply (Gmail reply-in-thread via Composio) ----------
+const replyEmailSchema = z.object({
+  threadId: z.string().min(1),
+  body: z.string().min(1),
+});
+type ReplyEmailPayload = z.infer<typeof replyEmailSchema>;
+
+const replyEmail: ApprovalExecutor<ReplyEmailPayload> = {
+  actionType: "reply",
+  label: "Reply in thread",
+  description:
+    "Reply within an existing Gmail thread. Provide the `threadId` (from gmail_search " +
+    "or gmail_read_thread) and the reply `body` as plain text. This does NOT send " +
+    "immediately — it drafts the reply and queues it for the user to approve; after " +
+    "calling it, tell the user the reply is awaiting their approval and never claim it was sent.",
+  toolkit: "gmail",
+  defaultRisk: "high",
+  schema: replyEmailSchema,
+  title: () => "Reply in thread",
+  preview: (p) => ({ threadId: p.threadId, body: p.body }),
+  execute: async (ctx, p) => {
+    const sender = ctx.requestedBy || ctx.userId;
+    if (dryRunEnabled()) {
+      return { sent: false, dryRun: true, threadId: p.threadId };
+    }
+    const connected = await resolveConnectedToolkits(sender);
+    if (!connected.includes("gmail")) {
+      throw new Error("Gmail isn't connected. Connect Gmail in Settings → Apps to reply.");
+    }
+    // Composio GMAIL_REPLY_TO_THREAD: arg shape unverified — confirm live.
+    const res = unwrap(
+      await execAction("GMAIL_REPLY_TO_THREAD", sender, {
+        thread_id: p.threadId,
+        message_body: p.body,
+        is_html: false,
+      }),
+    );
+    const messageId =
+      (res as { id?: string; messageId?: string } | null)?.id ??
+      (res as { messageId?: string } | null)?.messageId ??
+      null;
+    return { sent: true, messageId, threadId: p.threadId };
+  },
+};
+
 // ---------- registry ----------
 const EXECUTORS: Record<string, ApprovalExecutor> = {
   [sendEmail.actionType]: sendEmail as ApprovalExecutor,
+  [replyEmail.actionType]: replyEmail as ApprovalExecutor,
 };
 
 export function getExecutor(actionType: string): ApprovalExecutor | null {
