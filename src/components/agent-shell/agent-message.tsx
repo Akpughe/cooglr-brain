@@ -121,6 +121,10 @@ function Answer({
 }) {
   const processed = useMemo(() => {
     let t = text
+      // Strip internal reference tokens the model sometimes parrots from tool
+      // output (e.g. 【gmail:19ec…】, [slack:C123], 【google-drive:…】). These are
+      // plumbing, not user-facing — the Sources list below has the real links.
+      .replace(/[【[]\s*(?:gmail|slack|github|google-drive|drive|memory|file)\s*:[^】\]]+[】\]]/gi, "")
       // OpenAI-style citations with a dagger: 【1†source】, 【1†file.csv】,
       // 【1:0†source】, and the square-bracket variant → plain [n].
       .replace(/[【\[]\s*(\d+)(?::\d+)?\s*†[^】\]]*[】\]]/g, (m, n) => {
