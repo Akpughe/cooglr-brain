@@ -110,7 +110,9 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   // Atomically claim the pending request so it can't be decided/executed twice.
   const claimed = await decideApprovalRequest({ id, decision, decidedBy: auth.userId });
   if (!claimed) {
-    // Either a race lost the claim or persistence is down — re-read for truth.
+    // null means either a lost race (already decided) OR persistence is down —
+    // both surface as 409 here. We don't distinguish: in both cases nothing
+    // executed, and re-reading shows the truth (or also null if storage is down).
     const fresh = await getApprovalRequest(id);
     return NextResponse.json(
       { error: "Could not record decision", approval: fresh ? toView(fresh) : toView(auth.approval) },

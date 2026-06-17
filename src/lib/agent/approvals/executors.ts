@@ -12,8 +12,7 @@
 // run drafted it (`requestedBy`). Server-only.
 
 import { z } from "zod";
-import { execAction, unwrap } from "@/lib/composio/actions";
-import { listConnectedToolkits } from "@/lib/composio/connect";
+import { execAction, unwrap, resolveConnectedToolkits } from "@/lib/composio/actions";
 import type { ApprovalRisk } from "./types";
 
 export interface ExecutorContext {
@@ -79,8 +78,10 @@ const sendEmail: ApprovalExecutor<SendEmailPayload> = {
       return { sent: false, dryRun: true, to: p.to, subject: p.subject };
     }
 
-    // The sender must have a live Gmail connection (Composio handles the OAuth).
-    const connected = await listConnectedToolkits(sender);
+    // Backstop: the sender should have a Gmail connection. Use the cached
+    // resolver (not a live call) so a transient Composio blip doesn't fail an
+    // approved send as "not connected"; it also honours AGENT_FAKE_CONNECTED.
+    const connected = await resolveConnectedToolkits(sender);
     if (!connected.includes("gmail")) {
       throw new Error("Gmail isn't connected. Connect Gmail in Settings → Apps to send email.");
     }

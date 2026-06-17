@@ -26,10 +26,13 @@ export interface ApprovalRow {
   error: string | null;
 }
 
-let warned = false;
+// Log the first failure per call-site, then stay quiet for that site so we
+// don't spam per request — but a different operation failing still surfaces
+// (a single process-wide flag would hide every later failure after the first).
+const warned = new Set<string>();
 function warnOnce(where: string, error: unknown) {
-  if (warned) return;
-  warned = true;
+  if (warned.has(where)) return;
+  warned.add(where);
   console.warn(`[agent/approvals] persistence unavailable (${where}):`, error);
 }
 

@@ -29,10 +29,13 @@ export async function GET() {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { configuredToolkits, listConnectedToolkits } = await import("@/lib/composio/connect");
+  // Cached resolver (60s) — the agent run and the client UI share one source of
+  // truth and avoid hammering Composio on every mention-menu open / page mount.
+  const { configuredToolkits } = await import("@/lib/composio/connect");
+  const { resolveConnectedToolkits } = await import("@/lib/composio/actions");
   const [configured, connected] = await Promise.all([
     Promise.resolve(configuredToolkits()),
-    listConnectedToolkits(user.id),
+    resolveConnectedToolkits(user.id),
   ]);
   return NextResponse.json({ configured, connected });
 }
