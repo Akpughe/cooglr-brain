@@ -4,6 +4,7 @@ import { Agent } from "@mastra/core/agent";
 import { resolveModel } from "../model/registry";
 import { askWorkspaceKnowledge } from "../tools/knowledge-tools";
 import { saveMemory, recallMemory } from "../tools/memory-tools";
+import { listWorkspaceSources } from "../tools/sources-tools";
 import { buildActionTools } from "../tools/action-tools";
 import { buildReadTools, availableReadToolNames } from "../tools/read-tools";
 import { readConnectedToolkits } from "../context/request-context";
@@ -73,6 +74,7 @@ export const supervisorAgent = new Agent({
     const connected = readConnectedToolkits(requestContext);
     return {
       askWorkspaceKnowledge,
+      listWorkspaceSources,
       saveMemory,
       recallMemory,
       ...buildReadTools(connected),
