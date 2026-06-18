@@ -204,21 +204,22 @@ export function AgentComposer({
         if (active) setFileMentions([]);
       }
       try {
-        const res = await fetch("/api/accounts");
+        // Only offer integrations the user has actually connected (Composio),
+        // so @gmail isn't suggested when Gmail isn't connected.
+        const res = await fetch("/api/composio/connect");
         if (res.ok) {
-          const accounts: Array<{ id: string; provider: string; provider_email?: string }> =
-            await res.json();
+          const data = (await res.json()) as { connected?: unknown };
+          const slugs = Array.isArray(data.connected) ? data.connected.map((t) => String(t).toLowerCase()) : [];
           const seen = new Set<string>();
           const items: MentionItem[] = [];
-          for (const a of accounts ?? []) {
-            const key = a.provider.toLowerCase();
-            if (seen.has(key)) continue; // one chip per provider
+          for (const slug of slugs) {
+            const key = slug === "google-drive" ? "drive" : slug; // menu icon/label key
+            if (seen.has(key)) continue; // one chip per integration
             seen.add(key);
             items.push({
               id: `integration-${key}`,
               group: "integration",
-              label: providerLabel(a.provider),
-              sublabel: a.provider_email,
+              label: providerLabel(key),
               iconKind: key,
             });
           }

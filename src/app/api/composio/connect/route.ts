@@ -25,14 +25,19 @@ export async function POST(request: NextRequest) {
 
 // GET /api/composio/connect — which toolkits are configured + which this user
 // has connected.
-export async function GET() {
+export async function GET(request: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  const { configuredToolkits, listConnectedToolkits } = await import("@/lib/composio/connect");
+  // Cached resolver (60s) — the agent run and the client UI share one source of
+  // truth and avoid hammering Composio on every mention-menu open / page mount.
+  // `?fresh=1` bypasses the cache (used by the Connectors view after a connect).
+  const fresh = request.nextUrl.searchParams.get("fresh") === "1";
+  const { configuredToolkits } = await import("@/lib/composio/connect");
+  const { resolveConnectedToolkits } = await import("@/lib/composio/actions");
   const [configured, connected] = await Promise.all([
     Promise.resolve(configuredToolkits()),
-    listConnectedToolkits(user.id),
+    resolveConnectedToolkits(user.id, { fresh }),
   ]);
   return NextResponse.json({ configured, connected });
 }

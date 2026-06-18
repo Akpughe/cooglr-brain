@@ -17,6 +17,9 @@ export type AgentRequestContext = {
    *  these when present. Established server-side from validated file ids, never
    *  from model-supplied arguments. Empty/absent = whole-workspace search. */
   focusFileIds?: string[];
+  /** Composio toolkits this user has connected (e.g. ["gmail"]). Resolved
+   *  server-side; gates which action tools the agent is offered this run. */
+  connectedToolkits?: string[];
 };
 
 // Required string keys (every run must carry these).
@@ -30,6 +33,7 @@ const KEYS: StringKey[] = [
 ];
 
 const FOCUS_KEY = "focusFileIds";
+const CONNECTED_KEY = "connectedToolkits";
 
 // Build a Mastra RequestContext from trusted values.
 export function buildRequestContext(values: AgentRequestContext): RequestContext {
@@ -37,7 +41,28 @@ export function buildRequestContext(values: AgentRequestContext): RequestContext
   if (values.focusFileIds && values.focusFileIds.length > 0) {
     entries.push([FOCUS_KEY, JSON.stringify(values.focusFileIds)]);
   }
+  if (values.connectedToolkits && values.connectedToolkits.length > 0) {
+    entries.push([CONNECTED_KEY, JSON.stringify(values.connectedToolkits)]);
+  }
   return new RequestContext(entries);
+}
+
+// Parse a JSON string-array key from a RequestContext, defaulting to [].
+function readStringArray(rc: RequestContext, key: string): string[] {
+  const raw = rc.get(key) as string | undefined;
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
+}
+
+// Lenient read of the connected toolkits — used by the agent's dynamic tools/
+// instructions, where a partial context must not throw. Returns [] if absent.
+export function readConnectedToolkits(rc: RequestContext): string[] {
+  return readStringArray(rc, CONNECTED_KEY);
 }
 
 // Read the trusted context back out inside a tool's execute. Throws if any
@@ -58,14 +83,9 @@ export function readContext(context: {
     }
     out[key] = value;
   }
-  const focusRaw = rc.get(FOCUS_KEY) as string | undefined;
-  if (focusRaw) {
-    try {
-      const parsed = JSON.parse(focusRaw);
-      if (Array.isArray(parsed)) out.focusFileIds = parsed.filter((x) => typeof x === "string");
-    } catch {
-      /* ignore malformed focus list */
-    }
-  }
+  const focus = readStringArray(rc, FOCUS_KEY);
+  if (focus.length > 0) out.focusFileIds = focus;
+  const connected = readStringArray(rc, CONNECTED_KEY);
+  if (connected.length > 0) out.connectedToolkits = connected;
   return out;
 }

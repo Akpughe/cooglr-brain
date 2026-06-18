@@ -12,6 +12,8 @@ import {
   ThumbsUp,
 } from "lucide-react";
 import { PlotlyChart, DataTable, type ChartSpec, type TableSpec } from "./agent-plotly-chart";
+import { AgentApprovalCard } from "./agent-approval-card";
+import type { ApprovalView } from "@/lib/agent/approvals/types";
 
 type Part = Record<string, unknown>;
 interface UIMessageLike {
@@ -63,6 +65,8 @@ interface ToolOutput {
   chart?: ChartSpec;
   table?: TableSpec;
   origins?: string[];
+  /** request_approval tool output: a human-in-the-loop action awaiting decision. */
+  approval?: ApprovalView | null;
 }
 
 export interface SourceRef {
@@ -117,6 +121,10 @@ function Answer({
 }) {
   const processed = useMemo(() => {
     let t = text
+      // Strip internal reference tokens the model sometimes parrots from tool
+      // output (e.g. 【gmail:19ec…】, [slack:C123], 【google-drive:…】). These are
+      // plumbing, not user-facing — the Sources list below has the real links.
+      .replace(/[【[]\s*(?:gmail|slack|github|google-drive|drive|memory|file)\s*:[^】\]]+[】\]]/gi, "")
       // OpenAI-style citations with a dagger: 【1†source】, 【1†file.csv】,
       // 【1:0†source】, and the square-bracket variant → plain [n].
       .replace(/[【\[]\s*(\d+)(?::\d+)?\s*†[^】\]]*[】\]]/g, (m, n) => {
@@ -343,6 +351,40 @@ export function AgentMessage({
   return <AssistantTurn parts={parts} busy={busy} durationLabel={durationLabel} onOpenSource={onOpenSource} />;
 }
 
+// Friendly verb for each tool, shown live in the "worked" row as the agent
+// moves through steps (so the indicator updates instead of sitting on "Working").
+const TOOL_LABELS: Record<string, string> = {
+  ask_workspace_knowledge: "Searching workspace",
+  recall_memory: "Recalling memory",
+  save_memory: "Saving to memory",
+  gmail_search: "Searching Gmail",
+  gmail_read_thread: "Reading Gmail thread",
+  slack_list_channels: "Finding Slack channels",
+  slack_read_channel: "Reading Slack",
+  github_list_issues: "Reading GitHub issues",
+  drive_search: "Searching Drive",
+  drive_read_file: "Reading Drive file",
+  gmail_send_email: "Drafting email",
+  gmail_reply: "Drafting reply",
+};
+
+function toolNameOf(part: Part): string | null {
+  const t = String(part.type ?? "");
+  if (t.startsWith("tool-")) return t.slice(5);
+  if (t === "dynamic-tool") return (typeof part.toolName === "string" && part.toolName) || null;
+  return null;
+}
+
+// The current activity while streaming: the most recent tool the agent invoked.
+// As it moves to the next tool, the label changes — a live progress trail.
+function liveActivity(parts: Part[]): string | null {
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const name = toolNameOf(parts[i]);
+    if (name) return TOOL_LABELS[name] ?? "Working";
+  }
+  return null;
+}
+
 function AssistantTurn({
   parts,
   busy,
@@ -368,12 +410,15 @@ function AssistantTurn({
   const chart = outputs.find((o) => o.chart)?.chart;
   const table = outputs.find((o) => o.table)?.table;
   const origins = outputs.flatMap((o) => o.origins ?? []);
+  const approvals = outputs
+    .map((o) => o.approval)
+    .filter((a): a is ApprovalView => Boolean(a));
   const nSources = dedupedCitations.length;
   const hasTool = outputs.length > 0 || busy;
 
   const workedLabel = busy
-    ? "Working…"
-    : `Searched workspace knowledge${nSources ? ` · ${nSources} sources` : ""}${durationLabel ? ` · ${durationLabel}` : ""}`;
+    ? `${liveActivity(parts) ?? "Working"}…`
+    : `Worked${durationLabel ? ` for ${durationLabel}` : ""}${nSources ? ` · ${nSources} sources` : ""}`;
 
   return (
     <div className="rise">
@@ -439,6 +484,11 @@ function AssistantTurn({
 
       {/* data table */}
       {table && <DataTable table={table} />}
+
+      {/* approval requests — actions awaiting the user's decision */}
+      {approvals.map((a) => (
+        <AgentApprovalCard key={a.id} approval={a} />
+      ))}
 
       {/* sources filecard */}
       {nSources > 0 && text !== "" && (

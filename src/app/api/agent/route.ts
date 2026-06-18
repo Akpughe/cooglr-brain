@@ -14,6 +14,7 @@ import {
   finishRun,
   saveMessage,
 } from "@/lib/agent/runs";
+import { resolveConnectedToolkits } from "@/lib/composio/actions";
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
 import { toAISdkStream } from "@mastra/ai-sdk";
 
@@ -127,6 +128,10 @@ export async function POST(req: Request) {
     }
   }
 
+  // Which toolkits this user has connected (Composio) — gates which action
+  // tools the agent is offered this run. Best-effort + cached; never blocks.
+  const connectedToolkits = await resolveConnectedToolkits(actor.userId);
+
   const traceId = crypto.randomUUID();
   const requestContext = buildRequestContext({
     userId: actor.userId,
@@ -135,6 +140,7 @@ export async function POST(req: Request) {
     role: (membership.role as string) ?? "member",
     traceId,
     focusFileIds: focusIds.length > 0 ? focusIds : undefined,
+    connectedToolkits: connectedToolkits.length > 0 ? connectedToolkits : undefined,
   });
 
   // Best-effort persistence (degrades silently if migration 024 isn't applied yet).
@@ -171,9 +177,14 @@ export async function POST(req: Request) {
 
   const agent = mastra.getAgent("workspaceSupervisor");
 
+  // Mastra defaults to 5 tool steps per turn — too few for agentic work that
+  // reads several sources and THEN drafts/acts (the model can exhaust the budget
+  // gathering context and end with no answer). Give it room to read-then-act.
+  const AGENT_MAX_STEPS = 16;
+
   let agentStream: Awaited<ReturnType<typeof agent.stream>>;
   try {
-    agentStream = await agent.stream(effectiveMessages as never, { requestContext });
+    agentStream = await agent.stream(effectiveMessages as never, { requestContext, maxSteps: AGENT_MAX_STEPS });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (runId) await finishRun({ runId, status: "error", error: msg });
