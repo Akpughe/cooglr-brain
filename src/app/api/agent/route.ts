@@ -18,6 +18,8 @@ import {
 import { resolveConnectedToolkits } from "@/lib/composio/actions";
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
 import { toAISdkStream } from "@mastra/ai-sdk";
+import { describeStep } from "@/lib/agent/trace/step-descriptor";
+import { narrateStep } from "@/lib/agent/trace/narrate";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -189,9 +191,34 @@ export async function POST(req: Request) {
   // gathering context and end with no answer). Give it room to read-then-act.
   const AGENT_MAX_STEPS = 16;
 
+  // Thinking trace: narrate each agent step live into a `data-trace-step` part.
+  // `onStepFinish` is awaited by the loop, so narrating here preserves order and
+  // guarantees every part is written before the stream closes. Fully guarded —
+  // a narration error can never break the run or the answer.
+  let traceWriter: { write: (part: unknown) => void } | null = null;
+  let traceIndex = 0;
+  const onStepFinish = async (step: unknown) => {
+    try {
+      if (!traceWriter) return;
+      const descriptor = describeStep(step as never);
+      if (!descriptor) return;
+      const text = await narrateStep(descriptor);
+      traceWriter.write({
+        type: "data-trace-step",
+        data: { index: traceIndex++, tool: descriptor.tool, text },
+      });
+    } catch (err) {
+      console.error("[agent route] trace narration failed", err);
+    }
+  };
+
   let agentStream: Awaited<ReturnType<typeof agent.stream>>;
   try {
-    agentStream = await agent.stream(effectiveMessages as never, { requestContext, maxSteps: AGENT_MAX_STEPS });
+    agentStream = await agent.stream(effectiveMessages as never, {
+      requestContext,
+      maxSteps: AGENT_MAX_STEPS,
+      onStepFinish: onStepFinish as never,
+    });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (runId) await finishRun({ runId, status: "error", error: msg });
@@ -201,6 +228,9 @@ export async function POST(req: Request) {
   const uiStream = createUIMessageStream({
     originalMessages: messages as never,
     execute: ({ writer }) => {
+      // Let onStepFinish (which fires during stream consumption below) write
+      // trace parts to this writer.
+      traceWriter = writer as never;
       // Surface the (possibly newly-created) thread id so the client can update
       // its URL/sidebar without a reload.
       if (activeThreadId) {
