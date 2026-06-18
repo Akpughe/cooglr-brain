@@ -1259,3 +1259,19 @@
 @media (prefers-reduced-motion: reduce) {
   .agent-shell-root .skel::after { animation: none; }
 }
+
+/* Thinking trace — the agent's live step narration. */
+.agent-shell-root .agent-trace { margin: 4px 0 8px; }
+.agent-shell-root .agent-trace-toggle {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; color: var(--ink-3);
+}
+.agent-shell-root .agent-trace-steps {
+  list-style: none; margin: 6px 0 0; padding: 0 0 0 8px;
+  border-left: 1px solid var(--line);
+  display: flex; flex-direction: column; gap: 4px;
+}
+.agent-shell-root .agent-trace-step {
+  font-size: 13px; line-height: 1.45; color: var(--ink-2);
+  padding-left: 8px;
+}
