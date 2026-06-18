@@ -59,7 +59,7 @@ export interface UltraMemDocument {
   source?: string;
   reference?: string;
   capturedAt?: number;
-  snippets: string[];
+  snippets: { text: string; score: number }[];
 }
 
 export interface UltraMemSearchResult {
@@ -175,7 +175,7 @@ interface RawSearchDocument {
   documentId: string;
   title?: string;
   metadata?: { capturedAt?: number; source?: string; reference?: string };
-  chunks?: Array<{ content: string }>;
+  chunks?: Array<{ content: string; score?: number }>;
 }
 
 interface RawSearchResult {
@@ -249,7 +249,7 @@ export const ultramem = {
         source: d.metadata?.source,
         reference: d.metadata?.reference,
         capturedAt: d.metadata?.capturedAt,
-        snippets: (d.chunks ?? []).map((c) => c.content),
+        snippets: (d.chunks ?? []).map((c) => ({ text: c.content, score: c.score ?? 0 })),
       })),
       memories: raw.memories ?? [],
     };

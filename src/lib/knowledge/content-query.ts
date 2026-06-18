@@ -1,6 +1,7 @@
 import { complete, BULK_MODEL } from "./llm";
 import { ultramem } from "@/lib/memory/ultramem-client";
 import { scopes } from "@/lib/memory/scopes";
+import { isWeakResult } from "./relevance";
 
 export interface ContentAnswer {
   answerMd: string;
@@ -8,6 +9,7 @@ export interface ContentAnswer {
   chunksUsed: number;
   category?: string | null;
   origins?: string[]; // human labels of where the answer came from (e.g. ["Gmail"])
+  weak: boolean; // true when retrieval was empty or low-relevance
 }
 
 // Human label for a memory's origin, derived from its `source` field.
@@ -65,19 +67,20 @@ export async function runContentQuery(
       chunksUsed: 0,
       category: null,
       origins: [],
+      weak: true,
     };
   }
 
   // Flatten document snippets + standalone memory facts into citable excerpts.
-  type Excerpt = { fileId: string; source?: string; title?: string; text: string };
+  type Excerpt = { fileId: string; source?: string; title?: string; text: string; score: number };
   let docExcerpts: Excerpt[] = res.documents.flatMap((d) =>
-    d.snippets.map((s) => ({ fileId: d.reference || d.id, source: d.source, title: d.title, text: s })),
+    d.snippets.map((s) => ({ fileId: d.reference || d.id, source: d.source, title: d.title, text: s.text, score: s.score })),
   );
   // Hard-pin: keep only excerpts from the referenced document(s), and drop loose
   // memory facts entirely — a pinned question is answered from those docs alone.
   const memExcerpts: Excerpt[] = focusSet
     ? []
-    : res.memories.map((m, i) => ({ fileId: `memory:${i + 1}`, source: "memory", title: "Memory", text: m }));
+    : res.memories.map((m, i) => ({ fileId: `memory:${i + 1}`, source: "memory", title: "Memory", text: m, score: 1 }));
   if (focusSet) {
     docExcerpts = docExcerpts.filter((e) => focusSet.has(e.fileId));
   }
@@ -92,13 +95,15 @@ export async function runContentQuery(
       chunksUsed: 0,
       category: null,
       origins: [],
+      weak: true,
     };
   }
 
   const excerpts = all.map((e, i) => `[#${i + 1} ${e.source ?? "doc"}:${e.fileId}]\n${e.text}`).join("\n\n");
   // Kept per-snippet (1:1 with the [#n] markers above) so inline citations map
   // correctly; the UI dedupes by fileId for the sources list it shows.
-  const citations = all.map((e) => ({ fileId: e.fileId, score: 1, title: e.title, source: e.source }));
+  const citations = all.map((e) => ({ fileId: e.fileId, score: e.score, title: e.title, source: e.source }));
+  const weak = isWeakResult(all.map((e) => e.score));
   const originsForHit = (() => {
     const o = [...new Set(res.documents.map((d) => originLabel(d.source)))];
     if (memExcerpts.length) o.push("memory");
@@ -124,8 +129,9 @@ export async function runContentQuery(
       chunksUsed: all.length,
       category: null,
       origins: originsForHit,
+      weak,
     };
   }
 
-  return { answerMd, citations, chunksUsed: all.length, category: null, origins: originsForHit };
+  return { answerMd, citations, chunksUsed: all.length, category: null, origins: originsForHit, weak };
 }

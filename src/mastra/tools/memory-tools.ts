@@ -81,7 +81,7 @@ export const recallMemory = createTool({
     const tag = scopes.workspaceUser(workspaceId, userId);
     try {
       const res = await ultramem.search({ query, containerTag: tag, limit: 8 });
-      const memories = [...res.memories, ...res.documents.flatMap((d) => d.snippets)];
+      const memories = [...res.memories, ...res.documents.flatMap((d) => d.snippets.map((s) => s.text))];
       return { memories: [...new Set(memories.map((m) => m.trim()).filter(Boolean))].slice(0, 10) };
     } catch (err) {
       console.error("[recall_memory] failed", err);
