@@ -4,7 +4,7 @@
 
 **Goal:** Make the workspace agent try multiple retrieval angles — discover available sources, judge result strength, reformulate, and retry — before ever saying "I couldn't find it."
 
-**Architecture:** The intelligence lives at the agent loop (Mastra supervisor), not buried in one tool call. We give the agent (a) eyes — a `list_workspace_sources` tool, (b) an honest confidence signal — real per-chunk relevance scores threaded through to a `weak` flag, and (c) a procedure + today's date so it can discover, reformulate (e.g. "next 5 days" → an absolute date range), and retry within Mastra's existing 5-step loop.
+**Architecture:** The intelligence lives at the agent loop (Mastra supervisor), not buried in one tool call. We give the agent (a) eyes — a `list_workspace_sources` tool, (b) an honest confidence signal — real per-chunk relevance scores threaded through to a `weak` flag, and (c) a procedure + today's date so it can discover, reformulate (e.g. "next 5 days" → an absolute date range), and retry within the agent's existing 16-step loop.
 
 **Tech Stack:** Next.js 16 App Router, TypeScript, Mastra 1.42 (`@mastra/core`), UltraMem (HTTP), Vitest, Zod.
 
@@ -12,7 +12,8 @@
 
 - **Anti-hallucination guardrail is untouched.** The synthesis prompt in `content-query.ts` ("answer using ONLY the provided excerpts … never invent") stays exactly as-is. This plan changes what excerpts reach it, never the grounding rule.
 - **Identity always from `RequestContext`, never the model.** Every new tool reads `workspaceId`/`userId` via `readContext(context)` (`src/mastra/context/request-context.ts`), matching `knowledge-tools.ts` / `memory-tools.ts`.
-- **Mastra default `maxSteps = 5`** (confirmed in `@mastra/core` 1.42.0). Do NOT set it explicitly; the default is the intended bound. The loop is enabled by instructions, not config.
+- **`maxSteps` is explicitly `16`** (`AGENT_MAX_STEPS`, `src/app/api/agent/route.ts:183`). Ample headroom for the discover→retry loop — do NOT change it. The loop is enabled by instructions, not config.
+- **The supervisor uses dynamic instructions and dynamic tools** — both are functions of `requestContext` (`src/mastra/agents/supervisor-agent.ts`): `instructions: ({ requestContext }) => INSTRUCTIONS + sourceAvailability(...) + actionAvailability(...) + STYLE`, and `tools: ({ requestContext }) => ({ askWorkspaceKnowledge, saveMemory, recallMemory, ...buildReadTools(connected), ...buildActionTools(connected) })`. New tools/instructions slot into these functions and the `INSTRUCTIONS` const — NOT a static object.
 - **Server-only:** `src/lib/memory/ultramem-client.ts` must never be imported from client code.
 - **Test philosophy (match the codebase):** unit-test pure functions with Vitest; leave LLM/UltraMem integration to `*.live.test.ts` and the manual regression scenario. Do NOT add heavy service mocks.
 - **Test runner:** `npx vitest run <path>` for a single file; `npm test` for the suite.
@@ -308,7 +309,7 @@ A cheap discovery tool so the agent can see what's indexed before concluding not
 **Files:**
 - Create: `src/mastra/tools/sources-tools.ts`
 - Test: `src/mastra/tools/__tests__/sources-catalog.test.ts`
-- Modify: `src/mastra/agents/supervisor-agent.ts` (import + `tools` map ~line 38)
+- Modify: `src/mastra/agents/supervisor-agent.ts` (import after line 6; the dynamic `tools` function return object ~lines 74-80)
 
 **Interfaces:**
 - Consumes: `ultramem.timeline` (`src/lib/memory/ultramem-client.ts`), `scopes.workspace` (`src/lib/memory/scopes.ts`), `readContext` (`src/mastra/context/request-context.ts`).
@@ -438,20 +439,39 @@ Expected: PASS (2 tests).
 
 - [ ] **Step 5: Register the tool on the supervisor**
 
-In `src/mastra/agents/supervisor-agent.ts`, add the import (after line 7):
+The supervisor uses a **dynamic tools function** (not a static object). In `src/mastra/agents/supervisor-agent.ts`, add the import after the existing tool imports (after line 6, alongside `import { saveMemory, recallMemory } from "../tools/memory-tools";`):
 
 ```ts
 import { listWorkspaceSources } from "../tools/sources-tools";
 ```
 
-Change the `tools` map (~line 38) from:
+Then add `listWorkspaceSources` to the object returned by the `tools` function (~lines 74-80). Change:
 
 ```ts
-  tools: { askWorkspaceKnowledge, saveMemory, recallMemory, requestApproval },
+  tools: ({ requestContext }) => {
+    const connected = readConnectedToolkits(requestContext);
+    return {
+      askWorkspaceKnowledge,
+      saveMemory,
+      recallMemory,
+      ...buildReadTools(connected),
+      ...buildActionTools(connected),
+    };
+  },
 ```
 to:
 ```ts
-  tools: { askWorkspaceKnowledge, listWorkspaceSources, saveMemory, recallMemory, requestApproval },
+  tools: ({ requestContext }) => {
+    const connected = readConnectedToolkits(requestContext);
+    return {
+      askWorkspaceKnowledge,
+      listWorkspaceSources,
+      saveMemory,
+      recallMemory,
+      ...buildReadTools(connected),
+      ...buildActionTools(connected),
+    };
+  },
 ```
 
 - [ ] **Step 6: Type-check**
@@ -470,13 +490,13 @@ git commit -m "feat(agent): add list_workspace_sources discovery tool"
 
 ### Task 3: Turn the supervisor into a deliberate loop (instructions + today's date)
 
-The loop is already allowed (maxSteps=5). This task rewrites the instructions into a discover→try→judge→reformulate→only-then-give-up procedure, and injects today's date so the agent can resolve relative ranges like "next 5 days".
+The loop is already allowed (maxSteps=16). This task rewrites the instructions into a discover→try→judge→reformulate→only-then-give-up procedure, and injects today's date so the agent can resolve relative ranges like "next 5 days".
 
 **Files:**
 - Create: `src/mastra/context/date-note.ts`
 - Test: `src/mastra/context/__tests__/date-note.test.ts`
-- Modify: `src/app/api/agent/route.ts` (effectiveMessages ~lines 107-112)
-- Modify: `src/mastra/agents/supervisor-agent.ts` (`INSTRUCTIONS` ~lines 9-31)
+- Modify: `src/app/api/agent/route.ts` (effectiveMessages ~lines 107-113)
+- Modify: `src/mastra/agents/supervisor-agent.ts` (the `INSTRUCTIONS` const — `Core behaviour:` block at ~lines 14-19; leave the Memory, Reading connected sources, Actions & approval, and STYLE sections untouched)
 
 **Interfaces:**
 - Produces: `buildDateSystemNote(now: Date): string`.
@@ -556,7 +576,18 @@ Replace the `effectiveMessages` block (~lines 107-112) with one that always prep
 
 - [ ] **Step 6: Rewrite the supervisor instructions into a procedure**
 
-In `src/mastra/agents/supervisor-agent.ts`, replace the `Core behaviour:` block (lines 11-16) with the following (keep the surrounding intro, Memory, Actions, and Style sections unchanged):
+In `src/mastra/agents/supervisor-agent.ts`, inside the `INSTRUCTIONS` template-literal const, replace this exact `Core behaviour:` block (~lines 14-19):
+
+```ts
+Core behaviour:
+- For ANY question about the workspace's data, documents, metrics, records, files, or connected sources, you MUST call the ask_workspace_knowledge tool. Do not answer such questions from memory or assumption.
+- Treat the tool's output as the source of truth. When you use it, always cite the sources it returns (its citations and origins) so the user can verify the answer.
+- Clearly separate remembered conversation context from live source truth. Prior turns are context; the knowledge tool is the live record. If they conflict, the tool wins.
+- Never fabricate numbers, names, quotes, or facts. If the tool reports it has no knowledge, or the workspace has nothing indexed yet, say so plainly and suggest connecting a database or indexing documents.
+- If a question is genuinely general (not about this workspace's data), you may answer directly, but say you are answering generally rather than from the workspace.
+```
+
+with the following (leave the Memory, Reading connected sources, Actions & approval, and STYLE sections exactly as they are):
 
 ```ts
 Core behaviour — be resourceful before you give up:
