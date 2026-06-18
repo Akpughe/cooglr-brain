@@ -7,7 +7,6 @@
 // approval-gated — reading your own connected source is not an outward action.
 
 import { execAction, unwrap } from "./actions";
-import { gmailMessagesToDocs } from "./gmail-ingest";
 
 export interface ReadItem {
   /** Stable id for the item (message/thread/issue/file). */
@@ -19,9 +18,16 @@ export interface ReadItem {
 }
 
 // Caps to keep a big thread/channel from blowing the model's context.
-const MAX_ITEMS = 10; // search / list results
+const MAX_ITEMS = 10; // generic search / list results (slack/github/drive)
 const MAX_THREAD_MSGS = 20; // messages pulled from one thread/channel
-const MAX_TEXT = 2000; // chars per item body
+const MAX_TEXT = 2000; // chars per item body (thread/file reads)
+
+// Gmail search is the coverage tool — it paginates through ALL matches up to a
+// real ceiling and returns lightweight metadata (sender/recipient/date/snippet)
+// so the agent can thoroughly enumerate people/threads without blowing context.
+const GMAIL_PAGE = 50; // results per Composio page
+const GMAIL_SEARCH_MAX = 120; // total search results across pages
+const SNIPPET = 200; // chars of preview per search result
 
 // --- defensive parsing (external shapes vary; mirrors toolkit-ingest) ---
 function arrOf(root: unknown, keys: string[]): Record<string, unknown>[] {
@@ -43,11 +49,36 @@ function trim(s: string): string {
 }
 
 // ---------- Gmail ----------
-export async function gmailSearch(userId: string, query: string, max = MAX_ITEMS): Promise<ReadItem[]> {
-  const res = await execAction("GMAIL_FETCH_EMAILS", userId, { query, max_results: max });
-  return gmailMessagesToDocs(res)
-    .slice(0, max)
-    .map((d) => ({ id: d.id, title: d.subject || "(no subject)", text: trim(d.text), ref: `gmail:${d.id}` }));
+// Paginate GMAIL_FETCH_EMAILS until exhausted or the ceiling, returning a
+// lightweight item per message (subject + from/to/date + short snippet) so the
+// agent sees the FULL set of matches, not just the first page. No date filter —
+// searches the whole mailbox; `query` is Gmail search syntax from the agent.
+export async function gmailSearch(userId: string, query: string, max = GMAIL_SEARCH_MAX): Promise<ReadItem[]> {
+  const items: ReadItem[] = [];
+  let pageToken: string | undefined;
+  for (let page = 0; page < 6 && items.length < max; page++) {
+    const args: Record<string, unknown> = { query, max_results: Math.min(GMAIL_PAGE, max - items.length) };
+    if (pageToken) args.page_token = pageToken;
+    const root = unwrap(await execAction("GMAIL_FETCH_EMAILS", userId, args));
+    const msgs = arrOf(root, ["messages", "emails", "items", "results"]);
+    for (const m of msgs) {
+      const id =
+        pickStr(m, ["messageId", "id", "message_id"]) ||
+        pickStr(m, ["threadId", "thread_id"]) ||
+        String(items.length);
+      const subject = pickStr(m, ["subject", "Subject"]) || "(no subject)";
+      const from = pickStr(m, ["sender", "from", "From"]);
+      const to = pickStr(m, ["to", "To", "recipient", "recipients"]);
+      const date = pickStr(m, ["date", "Date", "messageTimestamp", "internalDate"]);
+      const snippet = pickStr(m, ["snippet", "preview", "messageText", "message_text", "body", "text"]).slice(0, SNIPPET);
+      const meta = [from && `From: ${from}`, to && `To: ${to}`, date && `Date: ${date}`].filter(Boolean).join(" · ");
+      items.push({ id, title: subject, text: meta ? `${meta}\n${snippet}` : snippet, ref: `gmail:${id}` });
+      if (items.length >= max) break;
+    }
+    pageToken = pickStr(root, ["nextPageToken", "next_page_token", "pageToken", "page_token"]) || undefined;
+    if (!pageToken || msgs.length === 0) break;
+  }
+  return items;
 }
 
 // ⚠️ GMAIL_FETCH_MESSAGE_BY_THREAD_ID arg/result shape unverified — confirm live.

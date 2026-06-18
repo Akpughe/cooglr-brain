@@ -36,8 +36,14 @@ const READ_TOOLS: ReadToolEntry[] = [
     name: "gmail_search",
     toolkit: "gmail",
     source: "gmail",
-    description: "Search the user's Gmail. Use Gmail search syntax in `query` (e.g. \"to:ayo partnership\", \"from:david\"). Returns matching messages with their threadId so you can read or reply in-thread.",
-    inputSchema: z.object({ query: z.string().describe("Gmail search query, e.g. 'to:ayo partnership'.") }),
+    description:
+      "Search the user's WHOLE Gmail mailbox (no date limit). `query` uses Gmail search syntax. " +
+      "Returns ALL matches up to ~120, each with sender, recipient, date, subject and a snippet — " +
+      "so you can thoroughly enumerate who was contacted. For 'everyone/all X' questions use a " +
+      "BROAD query (the topic word alone, or 'from:me <topic>' for mail the user sent); do NOT " +
+      "narrow prematurely or stop at the first few — enumerate from the full result set and dedupe " +
+      "by person/organisation.",
+    inputSchema: z.object({ query: z.string().describe("Gmail search query, e.g. 'Nuton' or 'from:me Nuton'.") }),
     run: (userId, input) => gmailSearch(userId, str(input.query)),
   },
   {
@@ -113,8 +119,10 @@ function makeReadTool(entry: ReadToolEntry) {
         const msg = err instanceof Error ? err.message : "read failed";
         return { source: entry.source, count: 0, items: [], markdown: `Couldn't read ${entry.source}: ${msg}`, citations: [] };
       }
+      // Lean index (title + first meta line) — items[] carries the full detail.
+      // Keeps large result sets (e.g. a 120-result Gmail sweep) affordable.
       const markdown = items.length
-        ? items.map((it, i) => `${i + 1}. **${it.title}** — ${it.text.slice(0, 200)}`).join("\n")
+        ? items.map((it, i) => `${i + 1}. ${it.title}${it.text ? ` — ${it.text.split("\n")[0].slice(0, 160)}` : ""}`).join("\n")
         : `No ${entry.source} results.`;
       const citations = items.map((it) => ({ fileId: it.ref, score: 1, title: it.title, source: entry.source }));
       return { source: entry.source, count: items.length, items, markdown, citations };
