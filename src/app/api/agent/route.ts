@@ -8,6 +8,7 @@
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 import { mastra } from "@/mastra";
 import { buildRequestContext } from "@/mastra/context/request-context";
+import { buildDateSystemNote } from "@/mastra/context/date-note";
 import {
   ensureThread,
   startRun,
@@ -105,12 +106,18 @@ export async function POST(req: Request) {
     .eq("id", workspaceId)
     .maybeSingle();
   const personaInstructions = (ws?.agent_instructions as string | null)?.trim() || null;
-  const effectiveMessages = personaInstructions
-    ? [
-        { role: "system", content: `Workspace operating instructions (set by the workspace owner — follow these in addition to your core behaviour):\n${personaInstructions}` },
-        ...(messages as UIMessageLike[]),
-      ]
-    : (messages as UIMessageLike[]);
+  const dateNote = { role: "system", content: buildDateSystemNote(new Date()) };
+  const personaNote = personaInstructions
+    ? {
+        role: "system",
+        content: `Workspace operating instructions (set by the workspace owner — follow these in addition to your core behaviour):\n${personaInstructions}`,
+      }
+    : null;
+  const effectiveMessages = [
+    dateNote,
+    ...(personaNote ? [personaNote] : []),
+    ...(messages as UIMessageLike[]),
+  ];
 
   // Validate any @-referenced file ids actually belong to this workspace, so a
   // client can't pin retrieval to files outside it. Only the surviving ids are
