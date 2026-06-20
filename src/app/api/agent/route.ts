@@ -18,6 +18,8 @@ import {
 import { resolveConnectedToolkits } from "@/lib/composio/actions";
 import { createUIMessageStream, createUIMessageStreamResponse } from "ai";
 import { toAISdkStream } from "@mastra/ai-sdk";
+import { describeStep } from "@/lib/agent/trace/step-descriptor";
+import { narrateStep } from "@/lib/agent/trace/narrate";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 300;
@@ -189,9 +191,43 @@ export async function POST(req: Request) {
   // gathering context and end with no answer). Give it room to read-then-act.
   const AGENT_MAX_STEPS = 16;
 
+  // Thinking trace: narrate each agent step into a `data-trace-step` part.
+  // Fully guarded — a narration error can never break the run or the answer.
+  let traceWriter: { write: (part: unknown) => void } | null = null;
+  let traceIndex = 0;
+  const pendingNarrations: Promise<void>[] = [];
+  // Fire narration WITHOUT blocking the loop: onStepFinish is awaited by Mastra,
+  // so awaiting a model call here would serialize a round-trip into every step
+  // (inflating time-to-answer). Instead we kick off the narration, collect the
+  // promise, and reconcile all of them once the run finishes (see execute).
+  // The client sorts trace steps by `index`, so out-of-order completion is fine.
+  const onStepFinish = (step: unknown) => {
+    if (!traceWriter) return;
+    const writerAtFire = traceWriter;
+    const index = traceIndex++;
+    const job = (async () => {
+      try {
+        const descriptor = describeStep(step as never);
+        if (!descriptor) return;
+        const text = await narrateStep(descriptor);
+        writerAtFire.write({
+          type: "data-trace-step",
+          data: { index, tool: descriptor.tool, text },
+        });
+      } catch (err) {
+        console.error("[agent route] trace narration failed", err);
+      }
+    })();
+    pendingNarrations.push(job);
+  };
+
   let agentStream: Awaited<ReturnType<typeof agent.stream>>;
   try {
-    agentStream = await agent.stream(effectiveMessages as never, { requestContext, maxSteps: AGENT_MAX_STEPS });
+    agentStream = await agent.stream(effectiveMessages as never, {
+      requestContext,
+      maxSteps: AGENT_MAX_STEPS,
+      onStepFinish: onStepFinish as never,
+    });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     if (runId) await finishRun({ runId, status: "error", error: msg });
@@ -200,13 +236,25 @@ export async function POST(req: Request) {
 
   const uiStream = createUIMessageStream({
     originalMessages: messages as never,
-    execute: ({ writer }) => {
+    execute: async ({ writer }) => {
+      // Let onStepFinish (which fires during stream consumption below) write
+      // trace parts to this writer.
+      traceWriter = writer as never;
       // Surface the (possibly newly-created) thread id so the client can update
       // its URL/sidebar without a reload.
       if (activeThreadId) {
         writer.write({ type: "data-thread", data: { threadId: activeThreadId }, transient: true } as never);
       }
       writer.merge(toAISdkStream(agentStream, { from: "agent" }) as never);
+      // Wait for the agent run to finish (all onStepFinish callbacks have fired),
+      // then ensure every fired narration has written its part before the stream
+      // closes — so non-blocking narration never drops a late part.
+      try {
+        await agentStream.finishReason;
+      } catch {
+        /* run errored — answer stream already surfaced it; fall through */
+      }
+      await Promise.allSettled(pendingNarrations);
     },
     onFinish: async ({ responseMessage }) => {
       const assistantText = textOf(responseMessage as UIMessageLike);

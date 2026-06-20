@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { Streamdown } from "streamdown";
 import {
   ChevronDown,
-  ChevronRight,
   Copy,
   FileText,
   Maximize2,
@@ -12,6 +11,7 @@ import {
   ThumbsUp,
 } from "lucide-react";
 import { PlotlyChart, DataTable, type ChartSpec, type TableSpec } from "./agent-plotly-chart";
+import { AgentThinkingTrace } from "./agent-thinking-trace";
 import { AgentApprovalCard } from "./agent-approval-card";
 import type { ApprovalView } from "@/lib/agent/approvals/types";
 
@@ -316,12 +316,10 @@ function SourceRow({
 export function AgentMessage({
   message,
   busy,
-  durationLabel,
   onOpenSource,
 }: {
   message: UIMessageLike;
   busy: boolean;
-  durationLabel?: string;
   onOpenSource?: (ref: SourceRef) => void;
 }) {
   const parts = message.parts ?? [];
@@ -348,55 +346,28 @@ export function AgentMessage({
     );
   }
 
-  return <AssistantTurn parts={parts} busy={busy} durationLabel={durationLabel} onOpenSource={onOpenSource} />;
+  return <AssistantTurn parts={parts} busy={busy} onOpenSource={onOpenSource} />;
 }
 
-// Friendly verb for each tool, shown live in the "worked" row as the agent
-// moves through steps (so the indicator updates instead of sitting on "Working").
-const TOOL_LABELS: Record<string, string> = {
-  ask_workspace_knowledge: "Searching workspace",
-  recall_memory: "Recalling memory",
-  save_memory: "Saving to memory",
-  gmail_search: "Searching Gmail",
-  gmail_read_thread: "Reading Gmail thread",
-  slack_list_channels: "Finding Slack channels",
-  slack_read_channel: "Reading Slack",
-  github_list_issues: "Reading GitHub issues",
-  drive_search: "Searching Drive",
-  drive_read_file: "Reading Drive file",
-  gmail_send_email: "Drafting email",
-  gmail_reply: "Drafting reply",
-};
-
-function toolNameOf(part: Part): string | null {
-  const t = String(part.type ?? "");
-  if (t.startsWith("tool-")) return t.slice(5);
-  if (t === "dynamic-tool") return (typeof part.toolName === "string" && part.toolName) || null;
-  return null;
+function traceSteps(parts: Part[]): { index: number; tool: string; text: string }[] {
+  return parts
+    .filter((p) => p.type === "data-trace-step" && p.data && typeof p.data === "object")
+    .map((p) => p.data as { index: number; tool: string; text: string });
 }
 
-// The current activity while streaming: the most recent tool the agent invoked.
-// As it moves to the next tool, the label changes — a live progress trail.
-function liveActivity(parts: Part[]): string | null {
-  for (let i = parts.length - 1; i >= 0; i--) {
-    const name = toolNameOf(parts[i]);
-    if (name) return TOOL_LABELS[name] ?? "Working";
-  }
-  return null;
+function hasFinalText(parts: Part[]): boolean {
+  return parts.some((p) => p.type === "text" && typeof p.text === "string" && (p.text as string).trim().length > 0);
 }
 
 function AssistantTurn({
   parts,
   busy,
-  durationLabel,
   onOpenSource,
 }: {
   parts: Part[];
   busy: boolean;
-  durationLabel?: string;
   onOpenSource?: (ref: SourceRef) => void;
 }) {
-  const [open, setOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [vote, setVote] = useState<"" | "up" | "down">("");
   const [allSources, setAllSources] = useState(false);
@@ -409,66 +380,15 @@ function AssistantTurn({
   const dedupedCitations = dedupeByFileId(citations);
   const chart = outputs.find((o) => o.chart)?.chart;
   const table = outputs.find((o) => o.table)?.table;
-  const origins = outputs.flatMap((o) => o.origins ?? []);
   const approvals = outputs
     .map((o) => o.approval)
     .filter((a): a is ApprovalView => Boolean(a));
   const nSources = dedupedCitations.length;
-  const hasTool = outputs.length > 0 || busy;
-
-  const workedLabel = busy
-    ? `${liveActivity(parts) ?? "Working"}…`
-    : `Worked${durationLabel ? ` for ${durationLabel}` : ""}${nSources ? ` · ${nSources} sources` : ""}`;
 
   return (
     <div className="rise">
-      {/* worked row */}
-      {hasTool && (
-        <button
-          className="btn-ghost"
-          onClick={() => setOpen(!open)}
-          aria-expanded={open}
-          aria-label={workedLabel}
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 5,
-            fontSize: 13,
-            color: "var(--ink-3)",
-            margin: "20px 0 4px",
-            border: "none",
-            background: "transparent",
-            cursor: "pointer",
-            borderRadius: 7,
-            padding: "3px 6px 3px 4px",
-            fontFamily: "var(--font-body)",
-          }}
-        >
-          <ChevronRight
-            className="lucide"
-            aria-hidden="true"
-            style={{ width: 13, height: 13, transition: "transform .18s ease", transform: open ? "rotate(90deg)" : "" }}
-          />
-          {workedLabel}
-        </button>
-      )}
-      {open && (
-        <div
-          style={{
-            borderLeft: "2px solid var(--line)",
-            margin: "4px 0 12px 10px",
-            padding: "6px 0 6px 16px",
-            fontSize: 12.5,
-            color: "var(--ink-2)",
-            lineHeight: 1.9,
-          }}
-        >
-          Embedded your question and searched workspace knowledge
-          <br />
-          Assembled context from {nSources} source{nSources === 1 ? "" : "s"}
-          {origins.length > 0 ? ` across ${origins.join(", ")}` : ""}
-        </div>
-      )}
+      {/* thinking trace */}
+      <AgentThinkingTrace steps={traceSteps(parts)} answered={hasFinalText(parts)} />
 
       {/* answer */}
       {text === "" && busy ? (
