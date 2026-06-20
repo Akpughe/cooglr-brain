@@ -265,7 +265,6 @@ export function AgentChatSurface({
                     key={m.id}
                     message={m}
                     busy={busy && i === messages.length - 1}
-                    durationLabel={i === lastAssistantIdx && !busy ? durationLabel : undefined}
                     onOpenSource={onOpenSource}
                   />
                 ))}

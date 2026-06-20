@@ -4,7 +4,6 @@ import { useMemo, useState } from "react";
 import { Streamdown } from "streamdown";
 import {
   ChevronDown,
-  ChevronRight,
   Copy,
   FileText,
   Maximize2,
@@ -317,12 +316,10 @@ function SourceRow({
 export function AgentMessage({
   message,
   busy,
-  durationLabel,
   onOpenSource,
 }: {
   message: UIMessageLike;
   busy: boolean;
-  durationLabel?: string;
   onOpenSource?: (ref: SourceRef) => void;
 }) {
   const parts = message.parts ?? [];
@@ -349,14 +346,7 @@ export function AgentMessage({
     );
   }
 
-  return <AssistantTurn parts={parts} busy={busy} durationLabel={durationLabel} onOpenSource={onOpenSource} />;
-}
-
-function toolNameOf(part: Part): string | null {
-  const t = String(part.type ?? "");
-  if (t.startsWith("tool-")) return t.slice(5);
-  if (t === "dynamic-tool") return (typeof part.toolName === "string" && part.toolName) || null;
-  return null;
+  return <AssistantTurn parts={parts} busy={busy} onOpenSource={onOpenSource} />;
 }
 
 function traceSteps(parts: Part[]): { index: number; tool: string; text: string }[] {
@@ -372,12 +362,10 @@ function hasFinalText(parts: Part[]): boolean {
 function AssistantTurn({
   parts,
   busy,
-  durationLabel,
   onOpenSource,
 }: {
   parts: Part[];
   busy: boolean;
-  durationLabel?: string;
   onOpenSource?: (ref: SourceRef) => void;
 }) {
   const [copied, setCopied] = useState(false);
