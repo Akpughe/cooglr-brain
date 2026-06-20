@@ -22,6 +22,7 @@ export interface UnifiedAnswer {
   // content
   citations?: { fileId: string; score: number; title?: string; source?: string }[];
   origins?: string[]; // human labels: e.g. ["Gmail"], ["a database"]
+  weak?: boolean; // true when the content retrieval was empty or low-relevance
 }
 
 // Does this workspace have a connected DATABASE with a built understanding/map?
@@ -146,14 +147,14 @@ export async function runUnifiedQuery(
   // explicit "database:" prefix, since pinning is the more specific intent.
   if (focusFileIds && focusFileIds.length > 0) {
     const c = await runContent(supabase, workspaceId, question, focusFileIds);
-    return { source: "content", answerMd: c.answerMd, citations: c.citations, origins: c.origins };
+    return { source: "content", answerMd: c.answerMd, citations: c.citations, origins: c.origins, weak: c.weak };
   }
 
   // No database connected → answer purely from UltraMem. UltraMem reports its
   // own emptiness; we no longer pre-empt it with a catalog check.
   if (!dbConnectionId) {
     const c = await runContent(supabase, workspaceId, question);
-    return { source: "content", answerMd: c.answerMd, citations: c.citations, origins: c.origins };
+    return { source: "content", answerMd: c.answerMd, citations: c.citations, origins: c.origins, weak: c.weak };
   }
 
   // Explicit DB-only query. Fall back to content if the DB call fails so the
@@ -174,7 +175,7 @@ export async function runUnifiedQuery(
     } catch (err) {
       console.error("[runUnifiedQuery] DB-only query failed; falling back to content", err);
       const c = await runContent(supabase, workspaceId, question);
-      return { source: "content", answerMd: c.answerMd, citations: c.citations, origins: c.origins };
+      return { source: "content", answerMd: c.answerMd, citations: c.citations, origins: c.origins, weak: c.weak };
     }
   }
 
@@ -199,5 +200,6 @@ export async function runUnifiedQuery(
     connectionId: dbRes ? dbConnectionId : undefined,
     citations: contentRes.citations,
     origins,
+    weak: contentRes.weak,
   };
 }

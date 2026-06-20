@@ -25,7 +25,8 @@ export const askWorkspaceKnowledge = createTool({
     "Answer a question grounded in this workspace's connected database and " +
     "ingested documents. Returns a markdown answer with citations (and a chart " +
     "when the data supports one). Use this for anything about the workspace's " +
-    "data, documents, metrics, records or files — it is the source of truth.",
+    "data, documents, metrics, records or files — it is the source of truth. " +
+    "If `weak` is true, the result was empty or low-relevance — discover sources and retry.",
   inputSchema: z.object({
     question: z.string().describe("The natural-language question to answer."),
   }),
@@ -46,6 +47,7 @@ export const askWorkspaceKnowledge = createTool({
     hasTable: z.boolean(),
     table: z.any().optional(),
     origins: z.array(z.string()),
+    weak: z.boolean(),
   }),
   execute: async ({ question }, context) => {
     const { workspaceId, userId, focusFileIds } = readContext(context);
@@ -67,6 +69,7 @@ export const askWorkspaceKnowledge = createTool({
       hasTable: Boolean(ans.table),
       table: ans.table,
       origins: ans.origins ?? [],
+      weak: ans.weak ?? false,
     };
   },
 });
