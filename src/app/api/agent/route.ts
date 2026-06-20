@@ -192,11 +192,6 @@ export async function POST(req: Request) {
   const AGENT_MAX_STEPS = 16;
 
   // Thinking trace: narrate each agent step into a `data-trace-step` part.
-  // Non-blocking: onStepFinish is awaited by Mastra's loop, so awaiting a model
-  // call here would serialize a round-trip into every step (inflating
-  // time-to-answer). Instead we kick off the narration, collect the promise,
-  // and reconcile all of them once the run finishes (see execute).
-  // The client sorts trace steps by `index`, so out-of-order completion is fine.
   // Fully guarded — a narration error can never break the run or the answer.
   let traceWriter: { write: (part: unknown) => void } | null = null;
   let traceIndex = 0;

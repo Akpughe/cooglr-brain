@@ -41,13 +41,6 @@ function deriveTitle(messages: UIMessageLike[]): string {
   return text.length > 56 ? text.slice(0, 56) + "…" : text;
 }
 
-function fmtDuration(ms: number): string {
-  const s = Math.max(1, Math.round(ms / 1000));
-  if (s < 60) return `${s}s`;
-  const m = Math.floor(s / 60);
-  const r = s % 60;
-  return r ? `${m}m ${r}s` : `${m}m`;
-}
 
 type Suggestion = {
   icon: React.ReactNode;
@@ -142,17 +135,6 @@ export function AgentChatSurface({
     }
   }, [openDoc]);
 
-  // Track per-run elapsed → duration label on the latest answer.
-  const startedAtRef = useRef<number | null>(null);
-  const [durationLabel, setDurationLabel] = useState<string | undefined>(undefined);
-  const wasBusy = useRef(false);
-  useEffect(() => {
-    if (busy && !wasBusy.current) startedAtRef.current = Date.now();
-    if (!busy && wasBusy.current && startedAtRef.current) {
-      setDurationLabel(fmtDuration(Date.now() - startedAtRef.current));
-    }
-    wasBusy.current = busy;
-  }, [busy]);
 
   // Follow the stream, but don't fight the user: only auto-scroll when they're
   // already near the bottom, and jump instantly while tokens are streaming
@@ -169,10 +151,6 @@ export function AgentChatSurface({
     }
   }, [messages, busy]);
 
-  const lastAssistantIdx = (() => {
-    for (let i = messages.length - 1; i >= 0; i--) if (messages[i].role === "assistant") return i;
-    return -1;
-  })();
 
   return (
     <>
